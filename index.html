@@ -1,154 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>PureStidy & Zetro – Minecraft Tribute</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Mini Minecraft in Browser</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Press Start 2P', monospace;
-      background: #111;
-      color: #0f0;
-      overflow: hidden;
-    }
-
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: -1;
-    }
-
-    .container {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    h1 {
-      font-size: 1.8em;
-      margin-bottom: 10px;
-      animation: flicker 1.5s infinite;
-    }
-
-    @keyframes flicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    .button {
-      margin-top: 30px;
-      padding: 12px 24px;
-      background: #222;
-      border: 2px solid #0f0;
-      border-radius: 4px;
-      color: #0f0;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .button:hover {
-      background: #0f0;
-      color: #000;
-    }
-
-    .modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      background: #000;
-      color: #0f0;
-      padding: 30px;
-      border: 2px solid #0f0;
-      border-radius: 6px;
-      box-shadow: 0 0 20px #0f0;
-      transition: transform 0.3s ease;
-      z-index: 10;
-      width: 80%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    .modal.show {
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    .echo {
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+    #info {
       position: absolute;
-      bottom: 10px;
+      top: 10px;
       left: 10px;
-      font-size: 0.6em;
-      opacity: 0.5;
+      padding: 10px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <canvas id="bg"></canvas>
-  <div class="container">
-    <h1>Welcome to PureStidy & Zetro’s Minecraft Tribute</h1>
-    <button class="button" onclick="showModal()">Activate Redstone</button>
-    <div class="echo">Echo logged: 9/17/2025 • Tribute to Minecraft legacy</div>
-  </div>
-  <div class="modal" id="modal">
-    <h2>Command Block Activated</h2>
-    <p>“This was the day we turned Minecraft into code.”</p>
-    <p>Built by PureStidy & Zetro</p>
-    <button class="button" onclick="hideModal()">Close</button>
-  </div>
-
+  <div id="info">⛏️ Mini Minecraft Clone<br>WASD = Move | Mouse = Look | Left Click = Destroy | Right Click = Place</div>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/PointerLockControls.js"></script>
   <script>
-    // Modal logic
-    function showModal() {
-      document.getElementById("modal").classList.add("show");
-    }
-    function hideModal() {
-      document.getElementById("modal").classList.remove("show");
-    }
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    let renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    // Particle background
-    const canvas = document.getElementById("bg");
-    const ctx = canvas.getContext("2d");
-    let particles = [];
+    // Lighting
+    let light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1,1,1).normalize();
+    scene.add(light);
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    for (let i = 0; i < 100; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: (Math.random() - 0.5) * 1.2,
-        radius: Math.random() * 2 + 1,
-        color: `rgba(0,255,0,0.7)`
-      });
+    // Ground
+    let blockSize = 1;
+    let groundGeo = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
+    let groundMat = new THREE.MeshLambertMaterial({color: 0x00aa00});
+    for (let x=-10; x<=10; x++) {
+      for (let z=-10; z<=10; z++) {
+        let block = new THREE.Mesh(groundGeo, groundMat);
+        block.position.set(x, -1, z);
+        scene.add(block);
+      }
     }
 
-    function drawParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
+    // Controls
+    let controls = new THREE.PointerLockControls(camera, document.body);
+    document.body.addEventListener('click', () => controls.lock());
+    scene.add(controls.getObject());
+    camera.position.y = 1.6;
 
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+    // Movement
+    let velocity = new THREE.Vector3();
+    let keys = {};
+    document.addEventListener('keydown', e => keys[e.code] = true);
+    document.addEventListener('keyup', e => keys[e.code] = false);
 
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-      });
-      requestAnimationFrame(drawParticles);
+    function move() {
+      const speed = 0.05;
+      if (keys["KeyW"]) velocity.z = -speed;
+      if (keys["KeyS"]) velocity.z = speed;
+      if (keys["KeyA"]) velocity.x = -speed;
+      if (keys["KeyD"]) velocity.x = speed;
+      controls.moveRight(velocity.x);
+      controls.moveForward(velocity.z);
+      velocity.set(0,0,0);
     }
-    drawParticles();
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      move();
+      renderer.render(scene, camera);
+    }
+    animate();
   </script>
 </body>
 </html>
