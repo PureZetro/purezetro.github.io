@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>EchoVerse: PureStidy & Zetro</title>
+  <title>BlockSignal: PureStidy & Zetro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at center, #0f0f0f, #000);
-      color: #fff;
+      font-family: 'Courier New', monospace;
+      background: #1e1e1e;
+      color: #dcdcdc;
       overflow: hidden;
     }
 
@@ -23,29 +23,25 @@
 
     .container {
       text-align: center;
-      padding: 80px 20px;
+      padding: 60px 20px;
     }
 
     h1 {
-      font-size: 3em;
-      white-space: nowrap;
-      overflow: hidden;
-      border-right: 3px solid white;
-      width: 0;
-      animation: typing 4s steps(40, end) forwards, blink 0.7s step-end infinite;
+      font-size: 2.8em;
+      background: linear-gradient(to right, #00ff00, #00ffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: pulse 2s infinite;
     }
 
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-
-    @keyframes blink {
-      50% { border-color: transparent }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
 
     .clock {
-      font-size: 1.2em;
+      font-size: 1.1em;
       margin-top: 10px;
       opacity: 0.8;
     }
@@ -53,16 +49,17 @@
     .button {
       margin-top: 30px;
       padding: 12px 24px;
-      background: #ffffff22;
-      border: 2px solid white;
-      border-radius: 8px;
-      color: white;
+      background: #444;
+      border: 2px solid #00ff00;
+      border-radius: 6px;
+      color: #00ff00;
       cursor: pointer;
       transition: background 0.3s;
     }
 
     .button:hover {
-      background: #ffffff55;
+      background: #00ff00;
+      color: #000;
     }
 
     .modal {
@@ -71,10 +68,10 @@
       left: 50%;
       transform: translate(-50%, -50%) scale(0);
       background: #222;
-      color: white;
+      color: #0f0;
       padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 0 20px #fff;
+      box-shadow: 0 0 20px #0f0;
       transition: transform 0.3s ease;
       z-index: 10;
       width: 80%;
@@ -86,26 +83,20 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
-    .echo {
-      font-size: 0.9em;
-      margin-top: 10px;
-      opacity: 0.6;
-    }
-
     .theme-toggle {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: #ffffff22;
-      border: 1px solid white;
+      background: #333;
+      border: 1px solid #0f0;
       padding: 6px 12px;
       border-radius: 6px;
-      color: white;
+      color: #0f0;
       cursor: pointer;
     }
 
     body.light {
-      background: radial-gradient(circle at center, #f0f0f0, #ccc);
+      background: #f0f0f0;
       color: #111;
     }
 
@@ -116,36 +107,39 @@
     }
 
     body.light h1 {
-      border-right: 3px solid #111;
+      -webkit-text-fill-color: #111;
     }
 
-    body.light .modal {
-      background: #fff;
-      color: #000;
+    .echo {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 0.8em;
+      opacity: 0.6;
     }
   </style>
 </head>
 <body>
-  <canvas id="bg"></canvas>
+  <canvas id="portal"></canvas>
   <div class="container">
-    <h1>Welcome to EchoVerse</h1>
+    <h1>Welcome to BlockSignal</h1>
     <div class="clock" id="clock"></div>
-    <button class="button" onclick="showModal()">Reveal Legacy Echo</button>
-    <div class="echo">Built by PureStidy & Zetro • 9/17/2025</div>
+    <button class="button" onclick="showModal()">Activate Command Block</button>
+    <div class="echo">Built by PureStidy & Zetro • 9/17/2025 • Biome: Legacy Plains</div>
   </div>
   <div class="modal" id="modal">
-    <h2>Legacy Echo</h2>
+    <h2>Command Block Activated</h2>
     <p>“This was the day we turned Minecraft into code.”</p>
     <p>Lesson 1: HTML Mastery. Echo logged.</p>
     <button class="button" onclick="hideModal()">Close</button>
   </div>
-  <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+  <button class="theme-toggle" onclick="toggleTheme()">Toggle Redstone Theme</button>
 
   <script>
     // Live Clock
     function updateClock() {
       const now = new Date();
-      document.getElementById("clock").textContent = now.toLocaleTimeString();
+      document.getElementById("clock").textContent = "Time: " + now.toLocaleTimeString();
     }
     setInterval(updateClock, 1000);
     updateClock();
@@ -163,8 +157,8 @@
       document.getElementById("modal").classList.remove("show");
     }
 
-    // Particle Background
-    const canvas = document.getElementById("bg");
+    // Nether Portal Particle Effect
+    const canvas = document.getElementById("portal");
     const ctx = canvas.getContext("2d");
     let particles = [];
 
@@ -175,19 +169,19 @@
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 150; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: (Math.random() - 0.5) * 1.2,
-        radius: Math.random() * 2 + 1
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
+        radius: Math.random() * 2 + 1,
+        color: `rgba(${Math.floor(Math.random()*255)},0,${Math.floor(Math.random()*255)},0.7)`
       });
     }
 
     function drawParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = document.body.classList.contains("light") ? "#333" : "#fff";
       particles.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
@@ -197,6 +191,7 @@
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
         ctx.fill();
       });
       requestAnimationFrame(drawParticles);
@@ -204,4 +199,3 @@
     drawParticles();
   </script>
 </body>
-</html>
