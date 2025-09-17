@@ -1,162 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zetro’s Website</title>
+  <meta charset="UTF-8">
+  <title>Legacy Pulse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
+    html, body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(120deg, #1e3c72, #2a5298);
-      color: white;
-      text-align: center;
-    }
-    header {
-      padding: 2rem;
-      font-size: 2rem;
-      font-weight: bold;
-    }
-    .content {
-      padding: 3rem;
-    }
-    button {
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 10px;
-      background: #00c3ff;
-      color: black;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #00ff88;
-    }
-    footer {
-      margin-top: 4rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.1);
-    }
-  </style>
-</head>
-<body>
-  <header>🌍 Welcome to Zetro’s Website</header>
-
-  <div class="content">
-    <p>This is a simple website built with HTML, CSS, and JavaScript.</p>
-    <button onclick="sayHello()">Click Me</button>
-    <p id="message"></p>
-  </div>
-
-  <footer>© 2025 Zetro | Made with ❤️</footer>
-
-  <script>
-    function sayHello() {
-      document.getElementById("message").innerText = "Hello, Zetro! 🚀";
-    }
-  </script>
-</body>
-</html>
-👉 Save this as index.html, then double-click it to open in your browser.
-
-Do you want me to make it more Minecraft-themed (like blocks, swords, etc.), or keep it as a clean general website?
-
-
-
-
-
-
-
-You said:
-can you code a website with the name keyrealmz and make it so its a minecraft server
-
-
-ChatGPT said:
-Got it ✅ You want a Minecraft server website with the name KeyRealmz. I’ll set up a clean landing page that looks like a Minecraft server website — with a header, server info, and a “copy IP” button so players can join easily.
-
-Here’s the full code (HTML + CSS + JavaScript):
-
-html
-Copy code
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KeyRealmz - Minecraft Server</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Trebuchet MS', sans-serif;
-      background: url('https://i.ibb.co/FztLCSz/minecraft-bg.jpg') no-repeat center center fixed;
-      background-size: cover;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f0f0f;
       color: #fff;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .container {
       text-align: center;
+      padding: 60px 20px;
     }
-    header {
-      background: rgba(0, 0, 0, 0.7);
-      padding: 2rem;
-      font-size: 2.5rem;
-      font-weight: bold;
-      text-shadow: 2px 2px #000;
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 3px solid white;
+      width: 0;
+      animation: typing 3s steps(30, end) forwards, blink 0.7s step-end infinite;
     }
-    .content {
-      margin: 3rem auto;
-      padding: 2rem;
-      max-width: 700px;
-      background: rgba(0, 0, 0, 0.6);
-      border-radius: 15px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.8);
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
     }
-    h2 {
-      color: #00ff88;
-      text-shadow: 1px 1px #000;
+
+    @keyframes blink {
+      50% { border-color: transparent }
     }
-    button {
-      padding: 1rem 2rem;
-      border: none;
+
+    .clock {
+      font-size: 1.2em;
+      margin-top: 10px;
+      opacity: 0.8;
+    }
+
+    .theme-toggle {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: #ffffff22;
+      border: 2px solid white;
       border-radius: 8px;
-      background: #00c3ff;
-      color: black;
-      font-size: 1.1rem;
+      color: white;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s;
     }
-    button:hover {
-      background: #00ff88;
+
+    .theme-toggle:hover {
+      background: #ffffff55;
     }
-    footer {
-      margin-top: 4rem;
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.7);
-      font-size: 0.9rem;
+
+    .echo {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 0.8em;
+      opacity: 0.6;
+    }
+
+    body.light {
+      background-color: #f0f0f0;
+      color: #111;
+    }
+
+    body.light .theme-toggle {
+      border-color: #111;
+      color: #111;
+    }
+
+    body.light h1 {
+      border-right: 3px solid #111;
+    }
+
+    body.light .echo {
+      color: #333;
     }
   </style>
 </head>
 <body>
-  <header>⚔️ KeyRealmz Minecraft Server ⚔️</header>
-
-  <div class="content">
-    <h2>Welcome to KeyRealmz!</h2>
-    <p>The ultimate survival + PvP Minecraft experience.<br>
-    Build, explore, and battle in a world full of adventure!</p>
-
-    <h3>Server IP:</h3>
-    <p id="server-ip">play.keyrealmz.net</p>
-    <button onclick="copyIP()">Copy IP</button>
-    <p id="copy-msg" style="margin-top: 1rem;"></p>
+  <canvas id="particles"></canvas>
+  <div class="container">
+    <h1>Built by Joe & [Friend’s Name]</h1>
+    <div class="clock" id="clock"></div>
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
   </div>
-
-  <footer>© 2025 KeyRealmz | Made for Minecraft players</footer>
+  <div class="echo">Lesson 1: HTML Mastery. Echo logged on 9/17/2025.</div>
 
   <script>
-    function copyIP() {
-      const ip = document.getElementById("server-ip").innerText;
-      navigator.clipboard.writeText(ip).then(() => {
-        document.getElementById("copy-msg").innerText = "✅ Server IP copied!";
+    // Live Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("clock").textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Theme Toggle
+    function toggleTheme() {
+      document.body.classList.toggle("light");
+    }
+
+    // Particle Background
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    for (let i = 0; i < 100; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
+        radius: Math.random() * 2 + 1
       });
     }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = document.body.classList.contains("light") ? "#333" : "#fff";
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
   </script>
 </body>
 </html>
