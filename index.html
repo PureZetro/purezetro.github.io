@@ -1,81 +1,108 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Mini Minecraft in Browser</title>
-  <style>
-    body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
-    #info {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 10px;
-      background: rgba(0,0,0,0.5);
-      color: white;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-  <div id="info">⛏️ Mini Minecraft Clone<br>WASD = Move | Mouse = Look | Left Click = Destroy | Right Click = Place</div>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/PointerLockControls.js"></script>
-  <script>
-    let scene = new THREE.Scene();
-    let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    let renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+<!doctype html>
+// prevent context menu so right click works
+window.addEventListener('contextmenu', e=>{ if(controls.isLocked) e.preventDefault(); });
 
-    // Lighting
-    let light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(1,1,1).normalize();
-    scene.add(light);
 
-    // Ground
-    let blockSize = 1;
-    let groundGeo = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
-    let groundMat = new THREE.MeshLambertMaterial({color: 0x00aa00});
-    for (let x=-10; x<=10; x++) {
-      for (let z=-10; z<=10; z++) {
-        let block = new THREE.Mesh(groundGeo, groundMat);
-        block.position.set(x, -1, z);
-        scene.add(block);
-      }
-    }
+// Movement controls
+const move = { forward:false, back:false, left:false, right:false, up:false, down:false };
+const velocity = new THREE.Vector3();
+const speed = 6;
+document.addEventListener('keydown', (e)=>{
+if(e.code==='KeyW') move.forward=true;
+if(e.code==='KeyS') move.back=true;
+if(e.code==='KeyA') move.left=true;
+if(e.code==='KeyD') move.right=true;
+if(e.code==='Space') move.up=true;
+if(e.code==='ShiftLeft') move.down=true;
+});
+document.addEventListener('keyup', (e)=>{
+if(e.code==='KeyW') move.forward=false;
+if(e.code==='KeyS') move.back=false;
+if(e.code==='KeyA') move.left=false;
+if(e.code==='KeyD') move.right=false;
+if(e.code==='Space') move.up=false;
+if(e.code==='ShiftLeft') move.down=false;
+});
 
-    // Controls
-    let controls = new THREE.PointerLockControls(camera, document.body);
-    document.body.addEventListener('click', () => controls.lock());
-    scene.add(controls.getObject());
-    camera.position.y = 1.6;
 
-    // Movement
-    let velocity = new THREE.Vector3();
-    let keys = {};
-    document.addEventListener('keydown', e => keys[e.code] = true);
-    document.addEventListener('keyup', e => keys[e.code] = false);
+// Simple collision: don't fall below y=0
+let prevTime = performance.now();
+function animate(){
+const time = performance.now();
+const delta = (time - prevTime) / 1000;
+prevTime = time;
 
-    function move() {
-      const speed = 0.05;
-      if (keys["KeyW"]) velocity.z = -speed;
-      if (keys["KeyS"]) velocity.z = speed;
-      if (keys["KeyA"]) velocity.x = -speed;
-      if (keys["KeyD"]) velocity.x = speed;
-      controls.moveRight(velocity.x);
-      controls.moveForward(velocity.z);
-      velocity.set(0,0,0);
-    }
 
-    // Animation loop
-    function animate() {
-      requestAnimationFrame(animate);
-      move();
-      renderer.render(scene, camera);
-    }
-    animate();
-  </script>
+// movement
+velocity.x -= velocity.x * 10.0 * delta;
+velocity.z -= velocity.z * 10.0 * delta;
+velocity.y -= 9.8 * delta; // gravity
+
+
+const dir = new THREE.Vector3();
+if(move.forward) dir.z -= 1;
+if(move.back) dir.z += 1;
+if(move.left) dir.x -= 1;
+if(move.right) dir.x += 1;
+dir.normalize();
+
+
+if(move.up){ velocity.y = 5; }
+
+
+const forward = new THREE.Vector3();
+controls.getDirection(forward);
+forward.y = 0; forward.normalize();
+const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0), forward).normalize();
+
+
+velocity.addScaledVector(forward, dir.z * speed * delta);
+velocity.addScaledVector(right, dir.x * speed * delta);
+
+
+controls.moveRight(velocity.x * delta);
+controls.moveForward(velocity.z * delta);
+controls.getObject().position.y += velocity.y * delta;
+
+
+// floor collision
+if(controls.getObject().position.y < 1.6){
+velocity.y = 0; controls.getObject().position.y = 1.6;
+}
+
+
+raycastCenter();
+renderer.render(scene, camera);
+requestAnimationFrame(animate);
+}
+animate();
+
+
+// resize
+window.addEventListener('resize', ()=>{
+camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight);
+});
+
+
+// small help: centre camera above terrain start
+camera.position.set(sizeX/2, 12, sizeZ/2 + 6);
+controls.getObject().position.copy(camera.position);
+
+
+// Helpful: allow number keys to pick blocks
+window.addEventListener('keydown', (e)=>{
+const n = parseInt(e.key);
+if(!isNaN(n) && n>0 && n<=BLOCKS.length){
+const idx = n-1; document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('selected')); document.querySelectorAll('.swatch')[idx].classList.add('selected'); currentBlock = idx; currentBlockEl.textContent = BLOCKS[idx].name;
+}
+});
+
+
+// tiny performance tip: merge geometry when many blocks added — omitted for simplicity in demo
+
+
+// Add instructions to console
+console.log('Mini Minecraft demo loaded. WASD to move, mouse to look. Left click to remove, right click to place. Press 1-' + BLOCKS.length + ' to change blocks.');
+</script>
 </body>
 </html>
