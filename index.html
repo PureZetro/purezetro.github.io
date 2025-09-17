@@ -1,59 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zetro’s Website</title>
+  <meta charset="UTF-8">
+  <title>Powered by Friendship</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(120deg, #1e3c72, #2a5298);
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
       color: white;
       text-align: center;
+      padding: 50px;
+      overflow: hidden;
     }
-    header {
-      padding: 2rem;
-      font-size: 2rem;
-      font-weight: bold;
+
+    h1 {
+      font-size: 3em;
+      animation: pulse 2s infinite;
     }
-    .content {
-      padding: 3rem;
+
+    p {
+      font-size: 1.2em;
+      margin-top: 10px;
+      opacity: 0.8;
     }
-    button {
-      padding: 1rem 2rem;
-      border: none;
+
+    .button {
+      margin-top: 30px;
+      padding: 15px 30px;
+      font-size: 1em;
+      background-color: #ffffff22;
+      border: 2px solid white;
       border-radius: 10px;
-      background: #00c3ff;
-      color: black;
-      font-size: 1.1rem;
+      color: white;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s;
     }
-    button:hover {
-      background: #00ff88;
+
+    .button:hover {
+      background-color: #ffffff55;
     }
-    footer {
-      margin-top: 4rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.1);
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .echo {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 0.8em;
+      opacity: 0.6;
     }
   </style>
 </head>
 <body>
-  <header>🌍 Welcome to Zetro’s Website</header>
+  <h1>Built by Joe & [Friend’s Name]</h1>
+  <p>Powered by Minecraft friendship and legacy energy.</p>
+  <button class="button" onclick="surprise()">Click for Echo</button>
 
-  <div class="content">
-    <p>This is a simple website built with HTML, CSS, and JavaScript.</p>
-    <button onclick="sayHello()">Click Me</button>
-    <p id="message"></p>
-  </div>
-
-  <footer>© 2025 Zetro | Made with ❤️</footer>
+  <div class="echo" id="echo"></div>
 
   <script>
-    function sayHello() {
-      document.getElementById("message").innerText = "Hello, Zetro! 🚀";
+    function surprise() {
+      const echoes = [
+        "Lesson 1: HTML Skeleton. 9/17/2025.",
+        "Echo logged. You’re doing great.",
+        "This page is yours now.",
+        "Friendship is the framework.",
+        "Built with joy, styled with trust."
+      ];
+      const random = echoes[Math.floor(Math.random() * echoes.length)];
+      document.getElementById("echo").textContent = random;
     }
   </script>
 </body>
