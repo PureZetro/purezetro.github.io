@@ -2,200 +2,125 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>BlockSignal: PureStidy & Zetro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KeyRealmz - Minecraft Server</title>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      font-family: 'Courier New', monospace;
-      background: #1e1e1e;
-      color: #dcdcdc;
-      overflow: hidden;
-    }
-
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: -1;
-    }
-
-    .container {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    h1 {
-      font-size: 2.8em;
-      background: linear-gradient(to right, #00ff00, #00ffff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    .clock {
-      font-size: 1.1em;
-      margin-top: 10px;
-      opacity: 0.8;
-    }
-
-    .button {
-      margin-top: 30px;
-      padding: 12px 24px;
-      background: #444;
-      border: 2px solid #00ff00;
-      border-radius: 6px;
-      color: #00ff00;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .button:hover {
-      background: #00ff00;
-      color: #000;
-    }
-
-    .modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      background: #222;
-      color: #0f0;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px #0f0;
-      transition: transform 0.3s ease;
-      z-index: 10;
-      width: 80%;
-      max-width: 400px;
+      font-family: 'Trebuchet MS', sans-serif;
+      background: url("https://i.ibb.co/FztLCSz/minecraft-bg.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
       text-align: center;
     }
 
-    .modal.show {
-      transform: translate(-50%, -50%) scale(1);
+    header {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 2rem;
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-shadow: 2px 2px #000;
     }
 
-    .theme-toggle {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #333;
-      border: 1px solid #0f0;
-      padding: 6px 12px;
-      border-radius: 6px;
-      color: #0f0;
+    .content {
+      margin: 3rem auto;
+      padding: 2rem;
+      max-width: 800px;
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    h2 {
+      color: #00ff88;
+      text-shadow: 1px 1px #000;
+      margin-bottom: 1rem;
+    }
+
+    #server-ip {
+      font-size: 1.3rem;
+      margin: 1rem 0;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #00c3ff;
+      color: black;
+      font-size: 1.1rem;
       cursor: pointer;
+      transition: 0.3s;
     }
 
-    body.light {
-      background: #f0f0f0;
-      color: #111;
+    button:hover {
+      background: #00ff88;
     }
 
-    body.light .theme-toggle,
-    body.light .button {
-      border-color: #111;
-      color: #111;
+    .links {
+      margin-top: 20px;
     }
 
-    body.light h1 {
-      -webkit-text-fill-color: #111;
+    .links a {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: black;
+      background: #ffcc00;
+      transition: 0.3s;
     }
 
-    .echo {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      font-size: 0.8em;
-      opacity: 0.6;
+    .links a:hover {
+      background: #ff8800;
+      color: white;
+    }
+
+    footer {
+      margin-top: 4rem;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.7);
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-  <canvas id="portal"></canvas>
-  <div class="container">
-    <h1>Welcome to BlockSignal</h1>
-    <div class="clock" id="clock"></div>
-    <button class="button" onclick="showModal()">Activate Command Block</button>
-    <div class="echo">Built by PureStidy & Zetro • 9/17/2025 • Biome: Legacy Plains</div>
+  <header>⚔️ Welcome to KeyRealmz ⚔️</header>
+
+  <div class="content">
+    <h2>Survival • PvP • Lifesteal • Adventure</h2>
+    <p>Join the most exciting Minecraft realm and prove your skills!</p>
+
+    <h3>Server IP:</h3>
+    <p id="server-ip">play.keyrealmz.net</p>
+    <br>
+    <button onclick="copyIP()">📋 Copy IP</button>
+    <p id="copy-msg" style="margin-top: 1rem;"></p>
+
+    <div class="links">
+      <a href="https://store.keyrealmz.net" target="_blank">🛒 Store</a>
+      <a href="https://discord.gg/keyrealmz" target="_blank">💬 Discord</a>
+    </div>
   </div>
-  <div class="modal" id="modal">
-    <h2>Command Block Activated</h2>
-    <p>“This was the day we turned Minecraft into code.”</p>
-    <p>Lesson 1: HTML Mastery. Echo logged.</p>
-    <button class="button" onclick="hideModal()">Close</button>
-  </div>
-  <button class="theme-toggle" onclick="toggleTheme()">Toggle Redstone Theme</button>
+
+  <footer>© 2025 KeyRealmz | Built for Minecraft players</footer>
 
   <script>
-    // Live Clock
-    function updateClock() {
-      const now = new Date();
-      document.getElementById("clock").textContent = "Time: " + now.toLocaleTimeString();
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Theme Toggle
-    function toggleTheme() {
-      document.body.classList.toggle("light");
-    }
-
-    // Modal
-    function showModal() {
-      document.getElementById("modal").classList.add("show");
-    }
-    function hideModal() {
-      document.getElementById("modal").classList.remove("show");
-    }
-
-    // Nether Portal Particle Effect
-    const canvas = document.getElementById("portal");
-    const ctx = canvas.getContext("2d");
-    let particles = [];
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    for (let i = 0; i < 150; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 1.5,
-        vy: (Math.random() - 0.5) * 1.5,
-        radius: Math.random() * 2 + 1,
-        color: `rgba(${Math.floor(Math.random()*255)},0,${Math.floor(Math.random()*255)},0.7)`
+    function copyIP() {
+      const ip = document.getElementById("server-ip").innerText;
+      navigator.clipboard.writeText(ip).then(() => {
+        document.getElementById("copy-msg").innerText = "✅ Server IP copied!";
       });
     }
-
-    function drawParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-      });
-      requestAnimationFrame(drawParticles);
-    }
-    drawParticles();
   </script>
 </body>
+</html>
+
