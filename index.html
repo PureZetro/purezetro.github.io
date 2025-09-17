@@ -2,125 +2,153 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>PureStidy & Zetro – Minecraft Tribute</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KeyRealmz - Minecraft Server</title>
   <style>
-    body {
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    html, body {
       margin: 0;
-      font-family: 'Trebuchet MS', sans-serif;
-      background: url("https://i.ibb.co/FztLCSz/minecraft-bg.jpg") no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
+      padding: 0;
+      font-family: 'Press Start 2P', monospace;
+      background: #111;
+      color: #0f0;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .container {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 10px;
+      animation: flicker 1.5s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .button {
+      margin-top: 30px;
+      padding: 12px 24px;
+      background: #222;
+      border: 2px solid #0f0;
+      border-radius: 4px;
+      color: #0f0;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .button:hover {
+      background: #0f0;
+      color: #000;
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #000;
+      color: #0f0;
+      padding: 30px;
+      border: 2px solid #0f0;
+      border-radius: 6px;
+      box-shadow: 0 0 20px #0f0;
+      transition: transform 0.3s ease;
+      z-index: 10;
+      width: 80%;
+      max-width: 400px;
       text-align: center;
     }
 
-    header {
-      background: rgba(0, 0, 0, 0.8);
-      padding: 2rem;
-      font-size: 2.5rem;
-      font-weight: bold;
-      text-shadow: 2px 2px #000;
+    .modal.show {
+      transform: translate(-50%, -50%) scale(1);
     }
 
-    .content {
-      margin: 3rem auto;
-      padding: 2rem;
-      max-width: 800px;
-      background: rgba(0, 0, 0, 0.65);
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.8);
-    }
-
-    h2 {
-      color: #00ff88;
-      text-shadow: 1px 1px #000;
-      margin-bottom: 1rem;
-    }
-
-    #server-ip {
-      font-size: 1.3rem;
-      margin: 1rem 0;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 10px;
-      border-radius: 8px;
-      display: inline-block;
-    }
-
-    button {
-      padding: 12px 20px;
-      margin: 10px;
-      border: none;
-      border-radius: 8px;
-      background: #00c3ff;
-      color: black;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background: #00ff88;
-    }
-
-    .links {
-      margin-top: 20px;
-    }
-
-    .links a {
-      display: inline-block;
-      margin: 10px;
-      padding: 12px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: black;
-      background: #ffcc00;
-      transition: 0.3s;
-    }
-
-    .links a:hover {
-      background: #ff8800;
-      color: white;
-    }
-
-    footer {
-      margin-top: 4rem;
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.7);
-      font-size: 0.9rem;
+    .echo {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 0.6em;
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
-  <header>⚔️ Welcome to KeyRealmz ⚔️</header>
-
-  <div class="content">
-    <h2>Survival • PvP • Lifesteal • Adventure</h2>
-    <p>Join the most exciting Minecraft realm and prove your skills!</p>
-
-    <h3>Server IP:</h3>
-    <p id="server-ip">play.keyrealmz.net</p>
-    <br>
-    <button onclick="copyIP()">📋 Copy IP</button>
-    <p id="copy-msg" style="margin-top: 1rem;"></p>
-
-    <div class="links">
-      <a href="https://store.keyrealmz.net" target="_blank">🛒 Store</a>
-      <a href="https://discord.gg/keyrealmz" target="_blank">💬 Discord</a>
-    </div>
+  <canvas id="bg"></canvas>
+  <div class="container">
+    <h1>Welcome to PureStidy & Zetro’s Minecraft Tribute</h1>
+    <button class="button" onclick="showModal()">Activate Redstone</button>
+    <div class="echo">Echo logged: 9/17/2025 • Tribute to Minecraft legacy</div>
+  </div>
+  <div class="modal" id="modal">
+    <h2>Command Block Activated</h2>
+    <p>“This was the day we turned Minecraft into code.”</p>
+    <p>Built by PureStidy & Zetro</p>
+    <button class="button" onclick="hideModal()">Close</button>
   </div>
 
-  <footer>© 2025 KeyRealmz | Built for Minecraft players</footer>
-
   <script>
-    function copyIP() {
-      const ip = document.getElementById("server-ip").innerText;
-      navigator.clipboard.writeText(ip).then(() => {
-        document.getElementById("copy-msg").innerText = "✅ Server IP copied!";
+    // Modal logic
+    function showModal() {
+      document.getElementById("modal").classList.add("show");
+    }
+    function hideModal() {
+      document.getElementById("modal").classList.remove("show");
+    }
+
+    // Particle background
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    for (let i = 0; i < 100; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: (Math.random() - 0.5) * 1.2,
+        radius: Math.random() * 2 + 1,
+        color: `rgba(0,255,0,0.7)`
       });
     }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
   </script>
 </body>
 </html>
-
