@@ -5,74 +5,61 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Keyrealmz</title>
 <style>
-body { font-family: Arial, sans-serif; background: #111; color: #eee; margin: 0; }
-header { background: #222; padding: 20px; text-align: center; }
-header h1 { color: #4da6ff; }
-nav { background: #333; padding: 10px; text-align: center; }
-nav a { color: #4da6ff; margin: 0 15px; text-decoration: none; font-weight: bold; }
-.container { padding: 20px; }
-.ranks, .shop { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-.card { background: #1a1a1a; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 0 10px #000; }
-.card h3 { margin: 10px 0; color: #4da6ff; }
-.card button { background: #4da6ff; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
-.chatbox { position: fixed; bottom: 0; left: 0; right: 0; background: #222; padding: 10px; border-top: 2px solid #4da6ff; }
-.chatbox input { width: 80%; padding: 10px; border: none; border-radius: 6px; }
-.chatbox button { padding: 10px 15px; background: #4da6ff; border: none; border-radius: 6px; margin-left: 5px; }
-</style>
-</head>
-<body>
-<header>
-<h1>Welcome to Keyrealmz</h1>
-<p>The Ultimate Minecraft Experience</p>
-</header>
-
-
-<nav>
-<a href="#ranks">Ranks</a>
-<a href="#shop">Shop</a>
-<a href="#discord">Discord</a>
-</nav>
-
-
-<div class="container">
-<section id="ranks">
-<h2>Ranks</h2>
-<div class="ranks">
-<div class="card"><h3>Rank 1</h3><p>Starter rank with perks.</p></div>
-<div class="card"><h3>Rank 2</h3><p>Better perks and commands.</p></div>
-<div class="card"><h3>Rank 3</h3><p>Exclusive features.</p></div>
-<div class="card"><h3>Rank 4</h3><p>Special abilities.</p></div>
-<div class="card"><h3>Rank 5</h3><p>VIP treatment.</p></div>
-<div class="card"><h3>Rank 6</h3><p>Elite access.</p></div>
-<div class="card"><h3>Rank 7</h3><p>Legendary rewards.</p></div>
-</div>
-</section>
-
-
-<section id="shop">
-<h2>Shop</h2>
-<div class="shop">
-<div class="card"><h3>Rank 1</h3><button>Buy Now</button></div>
-<div class="card"><h3>Rank 2</h3><button>Buy Now</button></div>
-<div class="card"><h3>Rank 3</h3><button>Buy Now</button></div>
-<div class="card"><h3>Rank 4</h3><button>Buy Now</button></div>
-<div class="card"><h3>Rank 5</h3><button>Buy Now</button></div>
-<div class="card"><h3>Rank 6</h3><button>Buy Now</button></div>
-<div class="card"><h3>Rank 7</h3><button>Buy Now</button></div>
-</div>
-</section>
-
-
-<section id="discord" style="text-align:center; margin-top:40px;">
-<h2>Join our Discord</h2>
-<a href="https://discord.gg/YOUR_INVITE_HERE" target="_blank">
-<button>Join Keyrealmz Discord</button>
-</a>
-</section>
-</div>
-
-
-<div class="chatbox">
-<input type="text" placeholder="Type your message...">
-<button>Send</button>
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+color: #f0f0f0;
+margin: 0;
+}
+header {
+background: linear-gradient(90deg, #004e92, #000428);
+padding: 40px;
+text-align: center;
+box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+header h1 {
+color: #4da6ff;
+font-size: 3em;
+margin: 0;
+text-shadow: 0 0 15px #4da6ff;
+}
+header p {
+font-size: 1.2em;
+color: #ddd;
+}
+nav {
+background: #111;
+padding: 15px;
+text-align: center;
+position: sticky;
+top: 0;
+z-index: 10;
+}
+nav a {
+color: #4da6ff;
+margin: 0 20px;
+text-decoration: none;
+font-weight: bold;
+transition: color 0.3s;
+}
+nav a:hover {
+color: #00ffff;
+}
+.container { padding: 40px; }
+h2 {
+text-align: center;
+margin-bottom: 20px;
+font-size: 2em;
+color: #00c6ff;
+text-shadow: 0 0 10px #00c6ff;
+}
+.ranks, .shop {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+gap: 25px;
+}
+.card {
+background: rgba(20,20,20,0.9);
+padding: 20px;
+border-radius: 15px;
 </html>
