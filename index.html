@@ -73,12 +73,14 @@
       font-size: 1rem;
       font-weight: bold;
       transition: all 0.3s ease;
+      position: relative; /* fix z-index */
+      z-index: 2; /* bring above particle layer */
     }
 
     button:hover, .links a:hover {
-      background: #00ff88; /* bright hover color */
-      box-shadow: 0 0 10px #00ff88, 0 0 20px #00c3ff, 0 0 30px #ff00aa; /* glowing effect */
-      transform: scale(1.05); /* slightly enlarge */
+      background: #00ff88; 
+      box-shadow: 0 0 10px #00ff88, 0 0 20px #00c3ff, 0 0 30px #ff00aa;
+      transform: scale(1.05);
     }
 
     .rank-store {
