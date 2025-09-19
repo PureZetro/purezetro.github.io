@@ -70,9 +70,29 @@
   .progress-diamond { background: #00FFFF; width:70%; }
   .progress-netherite { background: #111111; width:85%; }
   .progress-opnetherite { background: #FF3333; width:100%; }
+
+  /* Dancing Minecraft player */
+  #dancingPlayer {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    width: 150px;
+    z-index: 999;
+    pointer-events: none;
+    animation: floatPlayer 2s ease-in-out infinite alternate;
+  }
+  @keyframes floatPlayer {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(-5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+  }
 </style>
 </head>
 <body>
+
+<!-- Dancing Minecraft player GIF -->
+<img src="YOUR_DANCING_PLAYER_GIF.gif" alt="Dancing Player" id="dancingPlayer">
+
 <header>⚔️ KeyRealmz - Minecraft Ranks ⚔️</header>
 <div class="container">
 <h2>Server IP</h2>
@@ -132,7 +152,7 @@
 </div>
 <footer>© 2025 KeyRealmz | All Rights Reserved</footer>
 
-<!-- <<< Sound effect for Buy buttons -->
+<!-- Sound effect for Buy buttons -->
 <audio id="buttonSound" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
 
 <script>
@@ -140,11 +160,9 @@ function copyIP(){
   const ip = document.getElementById("server-ip").innerText;
   navigator.clipboard.writeText(ip).then(()=>{document.getElementById("copy-msg").innerText="✅ Server IP copied!";});
 }
-
-// <<< Play sound on Buy buttons
 function playButtonSound(){
   const sound = document.getElementById("buttonSound");
-  sound.currentTime = 0; // restart sound
+  sound.currentTime = 0;
   sound.play();
 }
 </script>
