@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KeyRealmz - Ranks Store</title>
+  <title>KeyRealmz - Ranks Store & Feedback</title>
   <style>
     body { margin:0; font-family: Arial,sans-serif; color:white; overflow-x:hidden; }
     body::before {
@@ -33,6 +33,11 @@
     .feedback-section input, .feedback-section textarea { padding:10px; border-radius:8px; border:none; font-size:1rem; resize:none; }
     .feedback-section textarea { min-height:100px; }
   </style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function(){ emailjs.init("YOUR_PUBLIC_KEY"); })(); // replace YOUR_PUBLIC_KEY
+  </script>
 </head>
 <body>
   <header>⚔️ KeyRealmz - Minecraft Ranks ⚔️</header>
@@ -60,15 +65,14 @@
     <!-- Feedback Section -->
     <h2>Feedback</h2>
     <div class="feedback-section">
-      <form onsubmit="sendFeedback(); return false;">
-        <input type="text" id="feedback-name" placeholder="Your Name" required>
-        <input type="email" id="feedback-email" placeholder="Your Email" required>
-        <textarea id="feedback-message" placeholder="Your Feedback" required></textarea>
+      <form id="feedback-form">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <textarea name="message" placeholder="Your Feedback" required></textarea>
         <button type="submit">Submit Feedback</button>
       </form>
       <p id="feedback-msg" style="text-align:center; margin-top:15px;"></p>
     </div>
-
   </div>
   <footer>© 2025 KeyRealmz | All Rights Reserved</footer>
 
@@ -78,13 +82,16 @@
       navigator.clipboard.writeText(ip).then(()=>{document.getElementById("copy-msg").innerText="✅ Server IP copied!";});
     }
 
-    function sendFeedback(){
-      const name = encodeURIComponent(document.getElementById("feedback-name").value);
-      const email = encodeURIComponent(document.getElementById("feedback-email").value);
-      const message = encodeURIComponent(document.getElementById("feedback-message").value);
-      window.location.href = `mailto:Pure_Zetro@gmail.com?subject=Feedback from ${name}&body=Name: ${name}%0AEmail: ${email}%0AMessage: ${message}`;
-      document.getElementById("feedback-msg").innerText = "📧 Your email client should open to send feedback.";
-    }
+    const feedbackForm = document.getElementById('feedback-form');
+    const feedbackMsg = document.getElementById('feedback-msg');
+
+    feedbackForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      // Replace with your EmailJS service ID, template ID
+      emailjs.sendForm('YOUR_SERVICE_ID','YOUR_TEMPLATE_ID', this)
+        .then(()=>{ feedbackMsg.innerText="✅ Feedback sent!"; feedbackForm.reset(); })
+        .catch(()=>{ feedbackMsg.innerText="⚠️ Oops! Something went wrong."; });
+    });
   </script>
 </body>
 </html>
