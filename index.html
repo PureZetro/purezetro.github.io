@@ -12,7 +12,7 @@
       overflow-x: hidden;
     }
 
-    /* 🌌 Dark stormy background */
+    /* 🌈 Cool animated gradient background */
     body::before {
       content: "";
       position: fixed;
@@ -20,21 +20,16 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at bottom, #0a0a0a 20%, #000000 100%);
-      z-index: -2;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #00ffcc, #ff00aa);
+      background-size: 800% 800%;
+      animation: gradientShift 20s ease infinite;
+      z-index: -1;
     }
 
-    /* ⚡ Lightning flashes */
-    .flash {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: white;
-      opacity: 0;
-      z-index: -1;
-      pointer-events: none;
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     header {
@@ -135,8 +130,6 @@
   </style>
 </head>
 <body>
-  <div class="flash" id="flash"></div>
-
   <header>⚔️ KeyRealmz - Minecraft Ranks ⚔️</header>
 
   <div class="container">
@@ -170,21 +163,6 @@
         document.getElementById("copy-msg").innerText = "✅ Server IP copied!";
       });
     }
-
-    // ⚡ Lightning flash effect
-    const flash = document.getElementById("flash");
-    function lightning() {
-      let delay = Math.random() * 8000 + 2000; // random between 2s and 10s
-      setTimeout(() => {
-        flash.style.opacity = "1";
-        setTimeout(() => {
-          flash.style.opacity = "0";
-        }, 100 + Math.random() * 200); // short flash
-        lightning();
-      }, delay);
-    }
-    lightning();
   </script>
 </body>
 </html>
-
