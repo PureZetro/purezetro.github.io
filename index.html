@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KeyRealmz - Ranks Store & Feedback</title>
+  <title>KeyRealmz - Ranks Store</title>
   <style>
     body { margin:0; font-family: Arial,sans-serif; color:white; overflow-x:hidden; }
     body::before {
@@ -28,16 +28,7 @@
     @keyframes particlesMove { 0%{background-position:0 0;} 100%{background-position:50px 50px;} }
     .links { margin:20px 0; text-align:center; }
     .links a { text-decoration:none; background:#5865F2; color:white; }
-    .feedback-section { margin-top:40px; }
-    .feedback-section form { display:flex; flex-direction:column; gap:15px; margin-top:15px; }
-    .feedback-section input, .feedback-section textarea { padding:10px; border-radius:8px; border:none; font-size:1rem; resize:none; }
-    .feedback-section textarea { min-height:100px; }
   </style>
-  <!-- EmailJS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <script>
-    (function(){ emailjs.init("YOUR_PUBLIC_KEY"); })(); // replace YOUR_PUBLIC_KEY
-  </script>
 </head>
 <body>
   <header>⚔️ KeyRealmz - Minecraft Ranks ⚔️</header>
@@ -61,18 +52,6 @@
     <div class="links">
       <a href="https://discord.gg/yourdiscord" target="_blank">💬 Join Our Discord</a>
     </div>
-
-    <!-- Feedback Section -->
-    <h2>Feedback</h2>
-    <div class="feedback-section">
-      <form id="feedback-form">
-        <input type="text" name="name" placeholder="Your Name" required>
-        <input type="email" name="email" placeholder="Your Email" required>
-        <textarea name="message" placeholder="Your Feedback" required></textarea>
-        <button type="submit">Submit Feedback</button>
-      </form>
-      <p id="feedback-msg" style="text-align:center; margin-top:15px;"></p>
-    </div>
   </div>
   <footer>© 2025 KeyRealmz | All Rights Reserved</footer>
 
@@ -81,17 +60,6 @@
       const ip = document.getElementById("server-ip").innerText;
       navigator.clipboard.writeText(ip).then(()=>{document.getElementById("copy-msg").innerText="✅ Server IP copied!";});
     }
-
-    const feedbackForm = document.getElementById('feedback-form');
-    const feedbackMsg = document.getElementById('feedback-msg');
-
-    feedbackForm.addEventListener('submit', function(e){
-      e.preventDefault();
-      // Replace with your EmailJS service ID, template ID
-      emailjs.sendForm('YOUR_SERVICE_ID','YOUR_TEMPLATE_ID', this)
-        .then(()=>{ feedbackMsg.innerText="✅ Feedback sent!"; feedbackForm.reset(); })
-        .catch(()=>{ feedbackMsg.innerText="⚠️ Oops! Something went wrong."; });
-    });
   </script>
 </body>
 </html>
