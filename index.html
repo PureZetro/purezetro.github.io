@@ -2,145 +2,193 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>⚔️ KeyRealmz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KeyRealmz - Ranks Store</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(270deg, #ff0000, #ff7300, #ffeb00, #47ff00, #00ffee, #2b65ff, #8000ff);
-      background-size: 1400% 1400%;
-      animation: lightningBackground 10s ease infinite;
       color: white;
-      text-align: center;
+      overflow-x: hidden;
     }
 
-    @keyframes lightningBackground {
+    /* 🌈 Cool animated gradient background */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #00ffcc, #ff00aa);
+      background-size: 800% 800%;
+      animation: gradientShift 20s ease infinite;
+      z-index: -1;
+    }
+
+    @keyframes gradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
 
-    h1 {
-      font-size: 3em;
-      margin: 20px;
+    header {
+      background: rgba(0,0,0,0.7);
+      padding: 20px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      text-shadow: 2px 2px black;
     }
 
-    .rank {
-      margin: 20px;
-      padding: 15px;
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+      background: rgba(0,0,0,0.6);
       border-radius: 12px;
-      font-size: 1.5em;
-      cursor: pointer;
-      transition: box-shadow 0.3s, transform 0.2s;
+    }
+
+    h2 {
+      color: #00ff99;
+      text-shadow: 1px 1px #000;
+    }
+
+    .server-ip {
+      font-size: 1.2rem;
+      background: rgba(255,255,255,0.1);
+      padding: 8px;
+      border-radius: 8px;
       display: inline-block;
     }
 
-    .rank:hover {
-      box-shadow: 0 0 20px white;
-      transform: scale(1.05);
-    }
-
-    .dirt { background: #8B4513; }
-    .stone { background: #A9A9A9; }
-    .iron { background: #D8D8D8; color: black; }
-    .gold { background: #FFD700; color: black; }
-    .diamond { background: #00FFFF; color: black; }
-    .emerald { background: #50C878; }
-    .netherite { background: black; color: white; }
-    .opnetherite {
-      background: black;
-      animation: flashColors 3s infinite;
-      color: white;
-    }
-
-    @keyframes flashColors {
-      0% { color: #ff0000; }
-      25% { color: #00ff00; }
-      50% { color: #0000ff; }
-      75% { color: #ff00ff; }
-      100% { color: #00ffff; }
-    }
-
-    #dancingPlayer {
-      position: fixed;
-      top: 50px; 
-      left: 10px;
-      width: 150px;
-      z-index: 999;
-      pointer-events: none;
-      animation: floatPlayer 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatPlayer {
-      from { transform: translateY(0); }
-      to { transform: translateY(-15px); }
-    }
-
-    /* Sign-In Button */
-    #googleSignIn {
-      margin: 30px;
-      padding: 12px 25px;
-      font-size: 1.2em;
+    button {
+      padding: 10px 20px;
       border: none;
-      border-radius: 10px;
-      background: #ffffff;
-      color: black;
+      border-radius: 8px;
+      margin: 10px;
       cursor: pointer;
+      background: #00c3ff;
+      font-size: 1rem;
+      font-weight: bold;
       transition: all 0.3s ease;
     }
 
-    #googleSignIn:hover {
-      background: #4285F4;
+    /* ✨ Button glow effect */
+    button:hover {
+      background: #00ff88;
+      box-shadow: 0 0 20px #00ff88, 0 0 40px #00ff88;
+    }
+
+    .rank-store {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .rank-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .rank-card h3 {
+      margin-bottom: 10px;
+    }
+
+    /* Colors for ranks */
+    .dirt { color: #8B4513; }
+    .stone { color: #bbbbbb; }
+    .iron { color: #d8d8d8; }
+    .gold { color: #FFD700; }
+    .diamond { color: #00FFFF; }
+    .netherite { color: #000000; }
+    .opnetherite {
+      animation: rainbowFlash 5s infinite linear;
+      font-weight: bold;
+    }
+
+    /* 🌈 Rainbow flash for OP Netherite */
+    @keyframes rainbowFlash {
+      0% { color: #ff0000; }
+      20% { color: #ff9900; }
+      40% { color: #ffff00; }
+      60% { color: #00ff00; }
+      80% { color: #00ffff; }
+      100% { color: #ff00ff; }
+    }
+
+    .links {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .links a {
+      text-decoration: none;
+      padding: 12px 20px;
+      background: #5865F2;
+      border-radius: 8px;
       color: white;
-      box-shadow: 0 0 15px #4285F4;
+      font-weight: bold;
+      margin: 10px;
+      display: inline-block;
+    }
+
+    footer {
+      margin-top: 40px;
+      padding: 15px;
+      background: rgba(0,0,0,0.7);
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    /* 🕺 Dancing Minecraft player */
+    .dancing-player {
+      position: fixed;
+      right: 20px;
+      top: 20%;
+      width: 120px;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
-  <h1>⚔️ Welcome to KeyRealmz ⚔️</h1>
+  <header>⚔️ KeyRealmz - Minecraft Ranks ⚔️</header>
 
-  <!-- Dancing Player GIF -->
-  <img src="YOUR_DANCING_PLAYER_GIF.gif" alt="Dancing Player" id="dancingPlayer">
+  <div class="container">
+    <h2>Server IP</h2>
+    <p class="server-ip" id="server-ip">Keyrealmz.aternos.me</p>
+    <button onclick="copyIP()">📋 Copy IP</button>
+    <p id="copy-msg"></p>
 
-  <!-- Google Sign-In Button -->
-  <button id="googleSignIn" onclick="signInWithGoogle()">Sign in with Google</button>
+    <h2>Ranks Store</h2>
+    <div class="rank-store">
+      <div class="rank-card"><h3 class="dirt">Dirt</h3><p>Basic starter rank.</p><button>Buy $10</button></div>
+      <div class="rank-card"><h3 class="stone">Stone</h3><p>Extra perks.</p><button>Buy $20</button></div>
+      <div class="rank-card"><h3 class="iron">Iron</h3><p>Better kits.</p><button>Buy $30</button></div>
+      <div class="rank-card"><h3 class="gold">Gold</h3><p>All Iron perks.</p><button>Buy $40</button></div>
+      <div class="rank-card"><h3 class="diamond">Diamond</h3><p>Rare kits.</p><button>Buy $50</button></div>
+      <div class="rank-card"><h3 class="netherite">Netherite</h3><p>God tools.</p><button>Buy $60</button></div>
+      <div class="rank-card"><h3 class="opnetherite">OP Netherite</h3><p>Ultimate rank.</p><button>Buy $70</button></div>
+    </div>
 
-  <!-- Ranks -->
-  <div class="rank dirt">Dirt - $10</div>
-  <div class="rank stone">Stone - $20</div>
-  <div class="rank iron">Iron - $30</div>
-  <div class="rank gold">Gold - $40</div>
-  <div class="rank diamond">Diamond - $50</div>
-  <div class="rank emerald">Emerald - $60</div>
-  <div class="rank netherite">Netherite - $70</div>
-  <div class="rank opnetherite">⚡ OP Netherite - $100 ⚡</div>
+    <div class="links">
+      <a href="https://discord.gg/yourdiscord" target="_blank">💬 Join Our Discord</a>
+    </div>
+  </div>
 
-  <!-- Firebase Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+  <footer>© 2025 KeyRealmz | All Rights Reserved</footer>
+
+  <!-- 🕺 Minecraft dancing player -->
+  <img src="https://i.gifer.com/7Sc.gif" alt="Minecraft Dancing Player" class="dancing-player">
 
   <script>
-    // Your Firebase project config
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    // Google Sign-In
-    function signInWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(result => {
-        alert("Welcome, " + result.user.displayName + "!");
-      }).catch(error => {
-        console.error(error);
+    function copyIP() {
+      const ip = document.getElementById("server-ip").innerText;
+      navigator.clipboard.writeText(ip).then(() => {
+        document.getElementById("copy-msg").innerText = "✅ Server IP copied!";
       });
     }
   </script>
