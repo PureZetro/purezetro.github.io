@@ -8,9 +8,33 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: url("OIP.webp") no-repeat center center fixed;
-      background-size: cover;
       color: white;
+      overflow-x: hidden;
+    }
+
+    /* 🌌 Dark stormy background */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at bottom, #0a0a0a 20%, #000000 100%);
+      z-index: -2;
+    }
+
+    /* ⚡ Lightning flashes */
+    .flash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      opacity: 0;
+      z-index: -1;
+      pointer-events: none;
     }
 
     header {
@@ -111,6 +135,8 @@
   </style>
 </head>
 <body>
+  <div class="flash" id="flash"></div>
+
   <header>⚔️ KeyRealmz - Minecraft Ranks ⚔️</header>
 
   <div class="container">
@@ -121,47 +147,13 @@
 
     <h2>Ranks Store</h2>
     <div class="rank-store">
-      <div class="rank-card">
-        <h3 class="dirt">🟤 Dirt</h3>
-        <p>Basic starter rank with a chat tag.</p>
-        <button onclick="buyRank('Dirt')">Buy $10</button>
-      </div>
-
-      <div class="rank-card">
-        <h3 class="stone">⚪ Stone</h3>
-        <p>Extra perks + /hat command.</p>
-        <button onclick="buyRank('Stone')">Buy $20</button>
-      </div>
-
-      <div class="rank-card">
-        <h3 class="iron">⚙️ Iron</h3>
-        <p>Better kits + extra homes.</p>
-        <button onclick="buyRank('Iron')">Buy $30</button>
-      </div>
-
-      <div class="rank-card">
-        <h3 class="gold">🟡 Gold</h3>
-        <p>All Iron perks + fly in spawn.</p>
-        <button onclick="buyRank('Gold')">Buy $40</button>
-      </div>
-
-      <div class="rank-card">
-        <h3 class="diamond">💎 Diamond</h3>
-        <p>Shiny chat tag + rare kits.</p>
-        <button onclick="buyRank('Diamond')">Buy $50</button>
-      </div>
-
-      <div class="rank-card">
-        <h3 class="netherite">⚫ Netherite</h3>
-        <p>All Diamond perks + god tools.</p>
-        <button onclick="buyRank('Netherite')">Buy $60</button>
-      </div>
-
-      <div class="rank-card">
-        <h3 class="opnetherite">🔥 OP Netherite</h3>
-        <p>Ultimate rank, OP kits, special commands.</p>
-        <button onclick="buyRank('OP Netherite')">Buy $70</button>
-      </div>
+      <div class="rank-card"><h3 class="dirt">🟤 Dirt</h3><p>Basic starter rank.</p><button>Buy $10</button></div>
+      <div class="rank-card"><h3 class="stone">⚪ Stone</h3><p>Extra perks.</p><button>Buy $20</button></div>
+      <div class="rank-card"><h3 class="iron">⚙️ Iron</h3><p>Better kits.</p><button>Buy $30</button></div>
+      <div class="rank-card"><h3 class="gold">🟡 Gold</h3><p>All Iron perks.</p><button>Buy $40</button></div>
+      <div class="rank-card"><h3 class="diamond">💎 Diamond</h3><p>Rare kits.</p><button>Buy $50</button></div>
+      <div class="rank-card"><h3 class="netherite">⚫ Netherite</h3><p>God tools.</p><button>Buy $60</button></div>
+      <div class="rank-card"><h3 class="opnetherite">🔥 OP Netherite</h3><p>Ultimate rank.</p><button>Buy $70</button></div>
     </div>
 
     <div class="links">
@@ -179,9 +171,20 @@
       });
     }
 
-    function buyRank(rank) {
-      alert("Buying " + rank + " is not yet connected. Hook this to Tebex/PayPal!");
+    // ⚡ Lightning flash effect
+    const flash = document.getElementById("flash");
+    function lightning() {
+      let delay = Math.random() * 8000 + 2000; // random between 2s and 10s
+      setTimeout(() => {
+        flash.style.opacity = "1";
+        setTimeout(() => {
+          flash.style.opacity = "0";
+        }, 100 + Math.random() * 200); // short flash
+        lightning();
+      }, delay);
     }
+    lightning();
   </script>
 </body>
 </html>
+
