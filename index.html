@@ -112,7 +112,7 @@
     .iron { color: #d8d8d8; }
     .gold { color: #FFD700; }
     .diamond { color: #00FFFF; }
-    .netherite { color: #111111; } /* dark but readable */
+    .netherite { color: #111111; }
 
     /* OP Netherite flashing */
     .opnetherite {
@@ -213,10 +213,10 @@
     <!-- Feedback Section -->
     <h2>Feedback</h2>
     <div class="feedback-section">
-      <form id="feedback-form">
-        <input type="text" placeholder="Your Name" required>
-        <input type="email" placeholder="Your Email" required>
-        <textarea placeholder="Your Feedback" required></textarea>
+      <form id="feedback-form" action="https://formspree.io/f/mgebpzyr" method="POST">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <textarea name="message" placeholder="Your Feedback" required></textarea>
         <button type="submit">Submit Feedback</button>
       </form>
       <p id="feedback-msg" style="text-align:center; margin-top:15px;"></p>
@@ -239,8 +239,22 @@
 
     feedbackForm.addEventListener('submit', function(e){
       e.preventDefault();
-      feedbackMsg.innerText = "✅ Thanks for your feedback!";
-      feedbackForm.reset();
+      // Send to Formspree
+      const formData = new FormData(feedbackForm);
+      fetch(feedbackForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      }).then(response => {
+        if(response.ok){
+          feedbackMsg.innerText = "✅ Thanks for your feedback!";
+          feedbackForm.reset();
+        } else {
+          feedbackMsg.innerText = "⚠️ Oops! There was a problem.";
+        }
+      }).catch(() => {
+        feedbackMsg.innerText = "⚠️ Oops! There was a problem.";
+      });
     });
   </script>
 </body>
