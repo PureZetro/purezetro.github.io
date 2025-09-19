@@ -29,7 +29,7 @@
   @keyframes particlesMove { 0%{background-position:0 0;} 100%{background-position:50px 50%;} }
   .links { margin:20px 0; text-align:center; }
   .links a { text-decoration:none; color:white; padding:12px 20px; border-radius:8px; font-weight:bold; display:inline-block; transition: all 0.3s ease; animation: discordPulse 3s linear infinite; }
-  
+
   /* Flashing Buy buttons with glow */
   .rank-card button {
     animation: buyButtonFlash 3s linear infinite, buttonGlow 2s ease-in-out infinite;
@@ -59,6 +59,7 @@
     84% { background-color:#00ffcc; }
     100% { background-color:#ff00aa; }
   }
+
   /* Progress bars */
   .progress-container { background: rgba(255,255,255,0.2); border-radius: 8px; height:10px; overflow:hidden; margin-top:5px; }
   .progress-bar { height:100%; border-radius:8px; }
@@ -85,43 +86,43 @@
     <h3 class="dirt">Dirt</h3>
     <p>Basic starter rank.</p>
     <div class="progress-container"><div class="progress-bar progress-dirt"></div></div>
-    <button onclick="playSong()">Buy $10</button>
+    <button onclick="playButtonSound()">Buy $10</button>
   </div>
   <div class="rank-card">
     <h3 class="stone">Stone</h3>
     <p>Extra perks.</p>
     <div class="progress-container"><div class="progress-bar progress-stone"></div></div>
-    <button onclick="playSong()">Buy $20</button>
+    <button onclick="playButtonSound()">Buy $20</button>
   </div>
   <div class="rank-card">
     <h3 class="iron">Iron</h3>
     <p>Better kits.</p>
     <div class="progress-container"><div class="progress-bar progress-iron"></div></div>
-    <button onclick="playSong()">Buy $30</button>
+    <button onclick="playButtonSound()">Buy $30</button>
   </div>
   <div class="rank-card">
     <h3 class="gold">Gold</h3>
     <p>All Iron perks.</p>
     <div class="progress-container"><div class="progress-bar progress-gold"></div></div>
-    <button onclick="playSong()">Buy $40</button>
+    <button onclick="playButtonSound()">Buy $40</button>
   </div>
   <div class="rank-card">
     <h3 class="diamond">Diamond</h3>
     <p>Rare kits.</p>
     <div class="progress-container"><div class="progress-bar progress-diamond"></div></div>
-    <button onclick="playSong()">Buy $50</button>
+    <button onclick="playButtonSound()">Buy $50</button>
   </div>
   <div class="rank-card">
     <h3 class="netherite">Netherite</h3>
     <p>God tools.</p>
     <div class="progress-container"><div class="progress-bar progress-netherite"></div></div>
-    <button onclick="playSong()">Buy $60</button>
+    <button onclick="playButtonSound()">Buy $60</button>
   </div>
   <div class="rank-card">
     <h3 class="opnetherite">OP Netherite</h3>
     <p>Ultimate rank.</p>
     <div class="progress-container"><div class="progress-bar progress-opnetherite"></div></div>
-    <button onclick="playSong()">Buy $70</button>
+    <button onclick="playButtonSound()">Buy $70</button>
   </div>
 </div>
 
@@ -131,8 +132,8 @@
 </div>
 <footer>© 2025 KeyRealmz | All Rights Reserved</footer>
 
-<!-- Song audio -->
-<audio id="sajaSong" src="YOUR_SONG_URL_HERE.mp3"></audio>
+<!-- <<< Sound effect for Buy buttons -->
+<audio id="buttonSound" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
 
 <script>
 function copyIP(){
@@ -140,11 +141,11 @@ function copyIP(){
   navigator.clipboard.writeText(ip).then(()=>{document.getElementById("copy-msg").innerText="✅ Server IP copied!";});
 }
 
-function playSong(){
-  const audio = document.getElementById("sajaSong");
-  audio.currentTime = 0;
-  audio.play();
-  setTimeout(()=>{ audio.pause(); },10000); // stops after 10 seconds
+// <<< Play sound on Buy buttons
+function playButtonSound(){
+  const sound = document.getElementById("buttonSound");
+  sound.currentTime = 0; // restart sound
+  sound.play();
 }
 </script>
 </body>
