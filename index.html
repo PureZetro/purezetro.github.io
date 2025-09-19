@@ -213,7 +213,8 @@
     <!-- Feedback Section -->
     <h2>Feedback</h2>
     <div class="feedback-section">
-      <form id="feedback-form" action="https://formspree.io/f/mgebpzyr" method="POST">
+      <!-- Replace YOUR_FORM_ID with your Formspree form ID -->
+      <form id="feedback-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
         <input type="text" name="name" placeholder="Your Name" required>
         <input type="email" name="email" placeholder="Your Email" required>
         <textarea name="message" placeholder="Your Feedback" required></textarea>
@@ -239,7 +240,6 @@
 
     feedbackForm.addEventListener('submit', function(e){
       e.preventDefault();
-      // Send to Formspree
       const formData = new FormData(feedbackForm);
       fetch(feedbackForm.action, {
         method: 'POST',
