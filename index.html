@@ -3,148 +3,102 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KeyRealmz - Ranks Store</title>
+<title>Super Cool Clicker Game</title>
 <style>
-  body { margin:0; font-family: Arial,sans-serif; color:white; overflow-x:hidden; }
-  body::before {
-    content:""; position:fixed; top:0; left:0; width:100%; height:100%;
-    background: linear-gradient(-45deg,#0ff,#00f,#0f0,#ff0,#f0f,#f00);
-    background-size:400% 400%; animation:gradient 15s ease infinite;
-    z-index:-1;
-  }
-  @keyframes gradient {
-    0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}
-  }
-  header { text-align:center; padding:20px; font-size:2em; font-weight:bold; text-shadow:0 0 15px #000; }
-  .rank { margin:20px auto; padding:20px; width:280px; border-radius:15px; text-align:center; 
-    box-shadow:0 0 15px rgba(255,255,255,0.5); }
-  .buy-btn {
-    margin-top:10px; padding:10px 20px; border:none; border-radius:25px; cursor:pointer;
-    background:linear-gradient(90deg,#ff00ff,#00ffff,#ff00ff);
-    background-size:300%; color:white; font-weight:bold; font-size:1em;
-    box-shadow:0 0 10px #0ff,0 0 20px #f0f; animation:glow 3s linear infinite;
-  }
-  @keyframes glow {
-    0%{background-position:0%}100%{background-position:300%}
-  }
-
-  /* Owners Bar */
-  .owners-bar {
-    text-align:center; padding:8px; background: rgba(0,0,0,0.5);
-    font-weight:bold; color:#ffdd00; text-shadow:1px 1px black;
-  }
-
-  /* Modal base */
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7);
-  }
-  .modal-content {
-    background: #111;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 15px;
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
     text-align: center;
-    width: 300px;
-    box-shadow: 0 0 15px #0ff, 0 0 30px #0ff;
+    background: linear-gradient(135deg, #1a1a1a, #222, #333);
+    color: white;
+    overflow-x: hidden;
   }
-  .modal-content h2 {
-    margin-bottom: 20px;
-    color: #fff;
-    text-shadow: 0 0 10px #0ff;
+  h1 {
+    font-size: 3em;
+    text-shadow: 0 0 10px cyan, 0 0 20px blue;
+    margin-top: 20px;
   }
-  .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+  #score {
+    font-size: 2em;
+    margin: 20px;
+  }
+  #clickButton {
+    font-size: 2em;
+    padding: 20px 50px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(45deg, cyan, blue, purple);
+    color: white;
     cursor: pointer;
+    box-shadow: 0 0 20px cyan;
+    transition: transform 0.1s ease-in-out;
   }
-  .close:hover { color: #fff; }
-  .pay-btn {
-    display: block;
-    width: 100%;
-    margin: 10px 0;
-    padding: 12px;
-    font-size: 16px;
-    font-weight: bold;
+  #clickButton:active {
+    transform: scale(0.9);
+    box-shadow: 0 0 30px lime;
+  }
+  .upgrade {
+    margin: 10px;
+    padding: 10px 20px;
+    background: #444;
     border: none;
     border-radius: 10px;
-    cursor: pointer;
     color: white;
-    background: linear-gradient(90deg,#00f6ff,#0ff,#00f6ff);
-    box-shadow: 0 0 10px #0ff,0 0 20px #0ff;
-    transition: 0.3s;
+    cursor: pointer;
+    transition: background 0.3s;
   }
-  .pay-btn:hover { transform: scale(1.05); }
+  .upgrade:hover {
+    background: #666;
+  }
 </style>
 </head>
 <body>
-
-<!-- Owners Info -->
-<div class="owners-bar">Owners: Zetro & Purestidy</div>
-
-<!-- Dancing Minecraft player GIF -->
-<img src="https://s.namemc.com/3d/skin/body.png?id=8534a3637388a0d7&model=slim&theta=1&phi=18&time=90&width=600&height=800" 
-     alt="Dancing Player" id="dancingPlayer" style="display:block;margin:20px auto;max-height:200px;">
-
-<header>⚔️ KeyRealmz - Minecraft Ranks ⚔️</header>
-
-<!-- Example Rank -->
-<div class="rank" style="background:#222;">
-  <h2>Dirt Rank</h2>
-  <p>Price: $10</p>
-  <button class="buy-btn">Buy</button>
-</div>
-
-<div class="rank" style="background:#333;">
-  <h2>Stone Rank</h2>
-  <p>Price: $20</p>
-  <button class="buy-btn">Buy</button>
-</div>
-
-<div class="rank" style="background:#444;">
-  <h2>Iron Rank</h2>
-  <p>Price: $30</p>
-  <button class="buy-btn">Buy</button>
-</div>
-
-<!-- Payment Modal -->
-<div id="paymentModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h2>Choose Payment Method</h2>
-    <button class="pay-btn">💳 Credit Card</button>
-    <button class="pay-btn">🏦 Zelle</button>
-  </div>
-</div>
+  <h1>⚡ Super Cool Clicker ⚡</h1>
+  <div id="score">Score: 0</div>
+  <button id="clickButton">CLICK ME!</button>
+  <h2>Upgrades</h2>
+  <button class="upgrade" id="upgrade1">+1 per click (Cost: 50)</button>
+  <button class="upgrade" id="upgrade2">+5 per click (Cost: 200)</button>
 
 <script>
-  // Open modal when any Buy button is clicked
-  const buyButtons = document.querySelectorAll('.buy-btn');
-  const modal = document.getElementById('paymentModal');
+  let score = 0;
+  let clickValue = 1;
 
-  buyButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      modal.style.display = 'block';
-    });
+  const scoreDisplay = document.getElementById("score");
+  const clickButton = document.getElementById("clickButton");
+  const upgrade1 = document.getElementById("upgrade1");
+  const upgrade2 = document.getElementById("upgrade2");
+
+  function updateScore() {
+    scoreDisplay.textContent = "Score: " + score;
+  }
+
+  clickButton.addEventListener("click", () => {
+    score += clickValue;
+    updateScore();
   });
 
-  function closeModal() {
-    modal.style.display = 'none';
-  }
-
-  // Close when clicking outside modal
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      closeModal();
+  upgrade1.addEventListener("click", () => {
+    if (score >= 50) {
+      score -= 50;
+      clickValue += 1;
+      updateScore();
+      upgrade1.disabled = true;
+      upgrade1.textContent = "Purchased!";
     }
-  }
-</script>
+  });
 
+  upgrade2.addEventListener("click", () => {
+    if (score >= 200) {
+      score -= 200;
+      clickValue += 5;
+      updateScore();
+      upgrade2.disabled = true;
+      upgrade2.textContent = "Purchased!";
+    }
+  });
+
+  updateScore();
+</script>
 </body>
 </html>
