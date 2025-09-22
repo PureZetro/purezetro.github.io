@@ -1,104 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Super Cool Clicker Game</title>
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background: linear-gradient(135deg, #1a1a1a, #222, #333);
-    color: white;
-    overflow-x: hidden;
-  }
-  h1 {
-    font-size: 3em;
-    text-shadow: 0 0 10px cyan, 0 0 20px blue;
-    margin-top: 20px;
-  }
-  #score {
-    font-size: 2em;
-    margin: 20px;
-  }
-  #clickButton {
-    font-size: 2em;
-    padding: 20px 50px;
-    border: none;
-    border-radius: 20px;
-    background: linear-gradient(45deg, cyan, blue, purple);
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 0 20px cyan;
-    transition: transform 0.1s ease-in-out;
-  }
-  #clickButton:active {
-    transform: scale(0.9);
-    box-shadow: 0 0 30px lime;
-  }
-  .upgrade {
-    margin: 10px;
-    padding: 10px 20px;
-    background: #444;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  .upgrade:hover {
-    background: #666;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clicker Rank Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    #game-area {
+      margin: 20px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #ff9800;
+      color: white;
+      margin: 10px;
+    }
+    button:hover {
+      background: #e68900;
+    }
+    #click-button {
+      display: none;
+      background: #4caf50;
+    }
+    #click-button:hover {
+      background: #3e8e41;
+    }
+    #result {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h1>⚡ Super Cool Clicker ⚡</h1>
-  <div id="score">Score: 0</div>
-  <button id="clickButton">CLICK ME!</button>
-  <h2>Upgrades</h2>
-  <button class="upgrade" id="upgrade1">+1 per click (Cost: 50)</button>
-  <button class="upgrade" id="upgrade2">+5 per click (Cost: 200)</button>
+  <h1>⚡ Clicker Rank Game ⚡</h1>
+  <div id="game-area">
+    <p>Choose your time limit (1–20 seconds):</p>
+    <input type="number" id="time-input" min="1" max="20" value="5">
+    <button onclick="startGame()">Start Game</button>
+    <br>
+    <button id="click-button" onclick="addClick()">Click Me!</button>
+    <p id="timer"></p>
+    <p id="result"></p>
+  </div>
 
-<script>
-  let score = 0;
-  let clickValue = 1;
+  <script>
+    let clicks = 0;
+    let timeLeft;
+    let timer;
 
-  const scoreDisplay = document.getElementById("score");
-  const clickButton = document.getElementById("clickButton");
-  const upgrade1 = document.getElementById("upgrade1");
-  const upgrade2 = document.getElementById("upgrade2");
+    function startGame() {
+      clicks = 0;
+      timeLeft = parseInt(document.getElementById("time-input").value);
+      if (isNaN(timeLeft) || timeLeft < 1 || timeLeft > 20) {
+        alert("Please enter a number between 1 and 20!");
+        return;
+      }
 
-  function updateScore() {
-    scoreDisplay.textContent = "Score: " + score;
-  }
+      document.getElementById("click-button").style.display = "inline-block";
+      document.getElementById("result").textContent = "";
+      document.getElementById("timer").textContent = `Time left: ${timeLeft}s`;
 
-  clickButton.addEventListener("click", () => {
-    score += clickValue;
-    updateScore();
-  });
-
-  upgrade1.addEventListener("click", () => {
-    if (score >= 50) {
-      score -= 50;
-      clickValue += 1;
-      updateScore();
-      upgrade1.disabled = true;
-      upgrade1.textContent = "Purchased!";
+      timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = `Time left: ${timeLeft}s`;
+        if (timeLeft <= 0) endGame();
+      }, 1000);
     }
-  });
 
-  upgrade2.addEventListener("click", () => {
-    if (score >= 200) {
-      score -= 200;
-      clickValue += 5;
-      updateScore();
-      upgrade2.disabled = true;
-      upgrade2.textContent = "Purchased!";
+    function addClick() {
+      clicks++;
     }
-  });
 
-  updateScore();
-</script>
+    function endGame() {
+      clearInterval(timer);
+      document.getElementById("click-button").style.display = "none";
+
+      let rank = "Unranked";
+      if (clicks < 5) rank = "Noob 👶";
+      else if (clicks < 15) rank = "Beginner 🐣";
+      else if (clicks < 30) rank = "Apprentice ⚒️";
+      else if (clicks < 50) rank = "Pro ⚡";
+      else if (clicks < 80) rank = "Master 🔥";
+      else if (clicks >= 80) rank = "Legend 👑";
+
+      document.getElementById("result").textContent = `You got ${clicks} clicks! Rank: ${rank}`;
+    }
+  </script>
 </body>
 </html>
