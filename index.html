@@ -3,13 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎨 Interactive 3D Minecraft Skin Painter</title>
+<title>🎨 3D Minecraft Skin Painter with Hover Highlight</title>
 <style>
-body {
-  margin:0; overflow:hidden; font-family:Arial,sans-serif;
+body { margin:0; overflow:hidden; font-family:Arial,sans-serif;
   background: linear-gradient(270deg, #ff4e50, #f9d423, #24c6dc, #abecd6);
-  background-size: 800% 800%;
-  animation: rainbowBG 15s ease infinite;
+  background-size: 800% 800%; animation: rainbowBG 15s ease infinite;
   color:white; display:flex; justify-content:center; align-items:flex-start; height:100vh;
 }
 @keyframes rainbowBG { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
@@ -82,7 +80,6 @@ let colorPicker=document.getElementById('colorPicker');
 let mirrorMode='none';
 let layerMode='all';
 let zoomLevel=1;
-
 function hexToRGBA(hex){ let bigint=parseInt(hex.slice(1),16); return [(bigint>>16)&255,(bigint>>8)&255,bigint&255,255]; }
 function colorsMatch(a,b){ return a[0]===b[0] && a[1]===b[1] && a[2]===b[2] && a[3]===b[3]; }
 
@@ -111,7 +108,7 @@ function bucketFill(x,y,fillColor){
     updatePad(); update3D();
 }
 
-// --- Painting on pad ---
+// --- Painting on 2D pad ---
 paintingPad.addEventListener('mousedown', (e)=>{ painting=true; paintOnPad(e,true); saveState(); });
 paintingPad.addEventListener('mouseup', ()=>{ painting=false; });
 paintingPad.addEventListener('mousemove', (e)=>{ if(painting) paintOnPad(e,false); });
@@ -140,7 +137,7 @@ document.getElementById('mirrorSelect').addEventListener('change',(e)=>{ mirrorM
 document.getElementById('layerSelect').addEventListener('change',(e)=>{ layerMode=e.target.value; });
 document.getElementById('zoomSelect').addEventListener('change',(e)=>{ zoomLevel=parseInt(e.target.value); paintingPad.style.width=64*zoomLevel+'px'; paintingPad.style.height=64*zoomLevel+'px'; });
 
-// --- 3D preview with interactive painting ---
+// --- 3D Preview ---
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45,1,0.1,1000);
 let renderer = new THREE.WebGLRenderer({antialias:true});
@@ -154,10 +151,11 @@ let skinTexture = new THREE.CanvasTexture(skinCanvas);
 let skinMaterial = new THREE.MeshBasicMaterial({map:skinTexture});
 let parts=[];
 
+// --- Create body parts with grid ---
 function createBox(w,h,d,x,y,z){
     let mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), skinMaterial);
     let geo = new THREE.EdgesGeometry(mesh.geometry);
-    let grid = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({color:0x000000, linewidth:1}));
+    let grid = new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:0x000000}));
     mesh.add(grid);
     mesh.position.set(x,y,z);
     scene.add(mesh);
@@ -170,25 +168,41 @@ createBox(0.5,1.5,0.5,0.75,1.25,0); // right arm
 createBox(0.5,1.5,0.5,-0.25,-0.5,0); // left leg
 createBox(0.5,1.5,0.5,0.25,-0.5,0); // right leg
 
-// --- Raycaster for interactive painting on 3D player ---
+// --- Hover highlight ---
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
+let highlight = new THREE.Mesh(new THREE.BoxGeometry(1/64,1/64,0.001), new THREE.MeshBasicMaterial({color:0xffff00, transparent:true, opacity:0.6}));
+scene.add(highlight);
+highlight.visible=false;
 
+renderer.domElement.addEventListener('mousemove', (e)=>{
+    mouse.x = (e.offsetX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = -(e.offsetY / renderer.domElement.clientHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse,camera);
+    let intersects = raycaster.intersectObjects(parts,true);
+    if(intersects.length>0 && intersects[0].uv){
+        let uv = intersects[0].uv;
+        let px = uv.x;
+        let py = 1 - uv.y;
+        highlight.position.copy(intersects[0].point);
+        highlight.visible=true;
+    } else { highlight.visible=false; }
+});
+
+// --- Click to paint on 3D ---
 renderer.domElement.addEventListener('mousedown', (e)=>{
     mouse.x = (e.offsetX / renderer.domElement.clientWidth) * 2 - 1;
     mouse.y = -(e.offsetY / renderer.domElement.clientHeight) * 2 + 1;
     raycaster.setFromCamera(mouse,camera);
     let intersects = raycaster.intersectObjects(parts,true);
-    if(intersects.length>0){
-        // Determine UV coordinate from intersection
+    if(intersects.length>0 && intersects[0].uv){
         let uv = intersects[0].uv;
-        if(uv){
-            let px = Math.floor(uv.x*64);
-            let py = Math.floor((1-uv.y)*64);
-            skinCtx.fillStyle = erasing?"#ffffff":colorPicker.value;
-            skinCtx.fillRect(px,py,1,1);
-            updatePad(); update3D();
-        }
+        let px = Math.floor(uv.x*64);
+        let py = Math.floor((1-uv.y)*64);
+        skinCtx.fillStyle = erasing?"#ffffff":colorPicker.value;
+        skinCtx.fillRect(px,py,1,1);
+        updatePad(); update3D();
+        saveState();
     }
 });
 
