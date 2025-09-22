@@ -20,16 +20,33 @@
       color: #00ffcc;
       text-shadow: 0 0 8px #00ffcc, 0 0 16px #00ffcc;
     }
+    .editor-preview {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
     #skinCanvas {
       border: 2px solid white;
       image-rendering: pixelated;
       cursor: crosshair;
       background: repeating-conic-gradient(#444 0% 25%, #555 0% 50%) 50% / 20px 20px;
     }
+    #preview3D {
+      width: 300px;
+      height: 400px;
+      border: 2px solid white;
+      border-radius: 8px;
+      background: #111;
+    }
     .controls {
-      margin-top: 10px;
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 10px;
     }
     button {
       padding: 10px 15px;
@@ -39,82 +56,140 @@
       font-weight: bold;
       transition: 0.2s;
     }
-    #downloadBtn {
-      background: lime;
-    }
-    #downloadBtn:hover {
-      background: #00cc00;
-    }
-    #clearBtn {
-      background: crimson;
-      color: white;
-    }
-    #clearBtn:hover {
-      background: darkred;
-    }
+    #downloadBtn { background: lime; }
+    #downloadBtn:hover { background: #00cc00; }
+    #clearBtn { background: crimson; color: white; }
+    #clearBtn:hover { background: darkred; }
+    #eraserBtn { background: orange; color: black; }
+    #eraserBtn.active { background: gold; }
     input[type="color"] {
       border: none;
       width: 50px;
       height: 40px;
       cursor: pointer;
     }
+    .zoom-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    input[type="range"] {
+      width: 150px;
+    }
   </style>
 </head>
 <body>
   <h1>✨ Minecraft Skin Creator ✨</h1>
-  <canvas id="skinCanvas" width="64" height="64"></canvas>
+
+  <div class="editor-preview">
+    <canvas id="skinCanvas" width="64" height="64"></canvas>
+    <div id="preview3D"></div>
+  </div>
+  
   <div class="controls">
     <input type="color" id="colorPicker" value="#00ff00">
+    <button id="eraserBtn">Eraser</button>
     <button id="clearBtn">Clear</button>
     <button id="downloadBtn">Download Skin</button>
   </div>
 
+  <div class="zoom-control">
+    <label for="zoomRange">Zoom:</label>
+    <input type="range" id="zoomRange" min="4" max="20" value="8">
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
   <script>
     const canvas = document.getElementById("skinCanvas");
     const ctx = canvas.getContext("2d");
     const colorPicker = document.getElementById("colorPicker");
     const clearBtn = document.getElementById("clearBtn");
     const downloadBtn = document.getElementById("downloadBtn");
+    const eraserBtn = document.getElementById("eraserBtn");
+    const zoomRange = document.getElementById("zoomRange");
 
-    // Make grid pixels bigger for editing
-    const scale = 8;
+    let scale = parseInt(zoomRange.value);
     canvas.style.width = canvas.width * scale + "px";
     canvas.style.height = canvas.height * scale + "px";
 
     let painting = false;
+    let erasing = false;
 
     function paintPixel(e) {
       const rect = canvas.getBoundingClientRect();
       const x = Math.floor((e.clientX - rect.left) / scale);
       const y = Math.floor((e.clientY - rect.top) / scale);
-      ctx.fillStyle = colorPicker.value;
-      ctx.fillRect(x, y, 1, 1);
+      if (erasing) {
+        ctx.clearRect(x, y, 1, 1);
+      } else {
+        ctx.fillStyle = colorPicker.value;
+        ctx.fillRect(x, y, 1, 1);
+      }
+      updateSkinTexture();
     }
 
-    canvas.addEventListener("mousedown", (e) => {
-      painting = true;
-      paintPixel(e);
-    });
-
-    canvas.addEventListener("mousemove", (e) => {
-      if (painting) paintPixel(e);
-    });
-
+    canvas.addEventListener("mousedown", (e) => { painting = true; paintPixel(e); });
+    canvas.addEventListener("mousemove", (e) => { if (painting) paintPixel(e); });
     canvas.addEventListener("mouseup", () => painting = false);
     canvas.addEventListener("mouseleave", () => painting = false);
 
-    // Clear canvas
     clearBtn.addEventListener("click", () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      updateSkinTexture();
     });
 
-    // Download as PNG
     downloadBtn.addEventListener("click", () => {
       const link = document.createElement("a");
       link.download = "minecraft_skin.png";
       link.href = canvas.toDataURL();
       link.click();
     });
+
+    eraserBtn.addEventListener("click", () => {
+      erasing = !erasing;
+      eraserBtn.classList.toggle("active", erasing);
+    });
+
+    zoomRange.addEventListener("input", () => {
+      scale = parseInt(zoomRange.value);
+      canvas.style.width = canvas.width * scale + "px";
+      canvas.style.height = canvas.height * scale + "px";
+    });
+
+    // --- THREE.JS 3D PREVIEW ---
+    const preview3D = document.getElementById("preview3D");
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, preview3D.clientWidth / preview3D.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(preview3D.clientWidth, preview3D.clientHeight);
+    preview3D.appendChild(renderer.domElement);
+
+    // Lighting
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 2).normalize();
+    scene.add(light);
+
+    // Create player (simple cube body)
+    const skinTexture = new THREE.CanvasTexture(canvas);
+    const material = new THREE.MeshBasicMaterial({ map: skinTexture });
+
+    const geometry = new THREE.BoxGeometry(2, 3, 1); // body
+    const player = new THREE.Mesh(geometry, material);
+    scene.add(player);
+
+    camera.position.z = 6;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      player.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    function updateSkinTexture() {
+      skinTexture.needsUpdate = true;
+    }
   </script>
 </body>
 </html>
