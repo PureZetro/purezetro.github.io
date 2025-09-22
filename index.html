@@ -3,15 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skindex-Style Minecraft Skin Painter</title>
+<title>Advanced Skindex-Style Minecraft Skin Painter</title>
 <style>
 body { margin:0; overflow:hidden; background:#111; font-family:Arial,sans-serif; color:white; display:flex; justify-content:center; align-items:flex-start; height:100vh; }
 #container { display:flex; margin-top:20px; gap:20px; }
 #editor { display:flex; flex-direction:column; align-items:center; }
-#skinCanvas { display:none; }
 #paintingPad { width:512px; height:512px; background:white; image-rendering:pixelated; border:2px solid white; }
 #ui { margin-top:10px; display:flex; gap:5px; flex-wrap:wrap; justify-content:center; }
-button,input[type=color]{ padding:8px 12px; border-radius:5px; border:none; font-weight:bold; cursor:pointer; font-size:14px; }
+button,input[type=color],select{ padding:8px 12px; border-radius:5px; border:none; font-weight:bold; cursor:pointer; font-size:14px; }
 button:hover{ transform:scale(1.1); }
 #bucketBtn.active{ background:#0077ff; color:white; }
 </style>
@@ -27,6 +26,24 @@ button:hover{ transform:scale(1.1); }
       <button id="bucketBtn">Bucket</button>
       <button id="undoBtn">Undo</button>
       <button id="downloadBtn">Download</button>
+      <select id="mirrorSelect">
+        <option value="none">Mirror: None</option>
+        <option value="horizontal">Mirror: Horizontal</option>
+        <option value="vertical">Mirror: Vertical</option>
+      </select>
+      <select id="layerSelect">
+        <option value="all">Layer: All</option>
+        <option value="head">Layer: Head</option>
+        <option value="body">Layer: Body</option>
+        <option value="arms">Layer: Arms</option>
+        <option value="legs">Layer: Legs</option>
+      </select>
+      <select id="zoomSelect">
+        <option value="1">Zoom: 1x</option>
+        <option value="2">Zoom: 2x</option>
+        <option value="4">Zoom: 4x</option>
+        <option value="8">Zoom: 8x</option>
+      </select>
     </div>
   </div>
   <div id="preview3D" style="width:600px; height:600px;"></div>
@@ -56,6 +73,9 @@ function undo(){ if(undoStack.length===0) return; skinCtx.putImageData(undoStack
 // --- Tools ---
 let painting=false, erasing=false, bucketMode=false;
 let colorPicker=document.getElementById('colorPicker');
+let mirrorMode='none';
+let layerMode='all';
+let zoomLevel=1;
 
 function hexToRGBA(hex){ let bigint=parseInt(hex.slice(1),16); return [(bigint>>16)&255,(bigint>>8)&255,bigint&255,255]; }
 function colorsMatch(a,b){ return a[0]===b[0] && a[1]===b[1] && a[2]===b[2] && a[3]===b[3]; }
@@ -95,18 +115,27 @@ function paintOnPad(e,isDown){
     let rect = paintingPad.getBoundingClientRect();
     let x = Math.floor((e.clientX-rect.left)/rect.width*64);
     let y = Math.floor((e.clientY-rect.top)/rect.height*64);
-    if(bucketMode){ bucketFill(x,y,colorPicker.value); return; }
-    skinCtx.fillStyle=erasing?"#ffffff":colorPicker.value;
-    skinCtx.fillRect(x,y,1,1);
+    // Mirror logic
+    let points = [[x,y]];
+    if(mirrorMode==='horizontal') points.push([63-x,y]);
+    if(mirrorMode==='vertical') points.push([x,63-y]);
+    for(let [px,py] of points){
+        if(bucketMode){ bucketFill(px,py,colorPicker.value); continue; }
+        skinCtx.fillStyle=erasing?"#ffffff":colorPicker.value;
+        skinCtx.fillRect(px,py,1,1);
+    }
     updatePad();
     update3D();
 }
 
-// --- Buttons ---
+// --- Buttons & selectors ---
 document.getElementById('eraserBtn').addEventListener('click',()=>{ erasing=!erasing; bucketMode=false; document.getElementById('bucketBtn').classList.remove('active'); });
 document.getElementById('bucketBtn').addEventListener('click',()=>{ bucketMode=!bucketMode; erasing=false; document.getElementById('bucketBtn').classList.toggle('active',bucketMode); });
 document.getElementById('undoBtn').addEventListener('click',undo);
 document.getElementById('downloadBtn').addEventListener('click',()=>{ let link=document.createElement('a'); link.download="minecraft_skin.png"; link.href=skinCanvas.toDataURL(); link.click(); });
+document.getElementById('mirrorSelect').addEventListener('change',(e)=>{ mirrorMode=e.target.value; });
+document.getElementById('layerSelect').addEventListener('change',(e)=>{ layerMode=e.target.value; });
+document.getElementById('zoomSelect').addEventListener('change',(e)=>{ zoomLevel=parseInt(e.target.value); paintingPad.style.width=64*zoomLevel+'px'; paintingPad.style.height=64*zoomLevel+'px'; });
 
 // --- 3D preview ---
 let scene = new THREE.Scene();
@@ -119,7 +148,6 @@ camera.position.set(3,3,5); controls.update();
 let light = new THREE.DirectionalLight(0xffffff,1); light.position.set(5,10,7); scene.add(light);
 let skinTexture = new THREE.CanvasTexture(skinCanvas);
 let skinMaterial = new THREE.MeshBasicMaterial({map:skinTexture});
-
 let parts=[];
 function createBox(w,h,d,x,y,z){ let box=new THREE.Mesh(new THREE.BoxGeometry(w,h,d), skinMaterial); box.position.set(x,y,z); scene.add(box); parts.push(box); }
 createBox(1,1,1,0,2.5,0); // head
