@@ -3,14 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Minecraft Skin Painter</title>
+<title>🎨 Colorful Minecraft Skin Painter</title>
 <style>
-body { margin:0; overflow:hidden; background:#111; font-family:Arial,sans-serif; color:white; }
-#ui { position:absolute; top:10px; left:10px; z-index:10; }
-button,input[type=color]{ margin:5px; padding:8px; border-radius:5px; border:none; font-weight:bold; }
-#bucketBtn.active { background:dodgerblue; color:white; }
-#previewContainer { position:absolute; top:10px; right:10px; border:2px solid white; }
-#preview2D { width:256px; height:256px; image-rendering:pixelated; background:white; }
+body {
+  margin:0;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+  background: linear-gradient(135deg, #ff7eb9, #7afcff, #7effa8, #ffde7a);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color:white;
+}
+
+@keyframes gradientBG {
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+#ui {
+  position:absolute;
+  top:10px;
+  left:10px;
+  z-index:10;
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+
+button, input[type=color]{
+  margin:5px;
+  padding:10px 14px;
+  border-radius:8px;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+  font-size:14px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.4);
+}
+
+button:hover{ transform:scale(1.1); box-shadow: 0 0 20px white; }
+
+#eraserBtn{ background:#ff6b6b; color:white; }
+#bucketBtn{ background:#6bcaff; color:black; }
+#bucketBtn.active{ background:#0077ff; color:white; }
+#undoBtn{ background:#c26bff; color:white; }
+#downloadBtn{ background:#6bff95; color:black; }
+
+#previewContainer {
+  position:absolute;
+  top:10px;
+  right:10px;
+  border:4px solid;
+  border-image: linear-gradient(to right, #ff7eb9, #7afcff, #7effa8, #ffde7a) 1;
+  border-radius:12px;
+}
+#preview2D {
+  width:256px;
+  height:256px;
+  image-rendering:pixelated;
+  background:white;
+  border-radius:8px;
+}
+
 #skinCanvas { display:none; }
 </style>
 </head>
@@ -28,7 +84,6 @@ button,input[type=color]{ margin:5px; padding:8px; border-radius:5px; border:non
 <canvas id="preview2D" width="64" height="64"></canvas>
 </div>
 
-<!-- Hidden canvas for editing -->
 <canvas id="skinCanvas" width="64" height="64"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
@@ -95,7 +150,7 @@ previewCanvas.addEventListener('mousemove',(e)=>{ if(painting && !bucketMode) pa
 
 function paint(e){
     let rect = previewCanvas.getBoundingClientRect();
-    let x = Math.floor((e.clientX-rect.left)/4); // preview scaled 64→256
+    let x = Math.floor((e.clientX-rect.left)/4);
     let y = Math.floor((e.clientY-rect.top)/4);
     if(bucketMode){ bucketFill(x,y,colorPicker.value); return; }
     skinCtx.fillStyle = erasing?"#ffffff":colorPicker.value;
