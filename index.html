@@ -1,338 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minecraft Skin Creator</title>
-  <style>
-    body {
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      height: 100vh;
-      margin: 0;
-    }
-    h1 {
-      color: #00ffcc;
-      text-shadow: 0 0 8px #00ffcc, 0 0 16px #00ffcc;
-    }
-    .editor-preview {
-      display: flex;
-      gap: 30px;
-      margin-top: 20px;
-      align-items: flex-start;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    #skinCanvas {
-      border: 2px solid white;
-      image-rendering: pixelated;
-      cursor: crosshair;
-      background: white;
-    }
-    #preview3D {
-      width: 350px;
-      height: 500px;
-      border: 2px solid white;
-      border-radius: 8px;
-      background: #111;
-    }
-    .controls {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 10px;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.2s;
-    }
-    #downloadBtn { background: lime; }
-    #downloadBtn:hover { background: #00cc00; }
-    #clearBtn { background: crimson; color: white; }
-    #clearBtn:hover { background: darkred; }
-    #eraserBtn { background: orange; color: black; }
-    #eraserBtn.active { background: gold; }
-    #bucketBtn { background: deepskyblue; color: black; }
-    #bucketBtn.active { background: dodgerblue; color: white; }
-    #undoBtn { background: violet; color: white; }
-    #undoBtn:hover { background: purple; }
-    input[type="color"] {
-      border: none;
-      width: 50px;
-      height: 40px;
-      cursor: pointer;
-    }
-    .zoom-control {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    input[type="range"] {
-      width: 150px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Minecraft Skin Painter</title>
+<style>
+  body { margin:0; overflow:hidden; background:#111; color:white; font-family:Arial,sans-serif; }
+  #ui { position:absolute; top:10px; left:10px; z-index:10; }
+  button, input[type=color] { margin:5px; padding:8px; border-radius:5px; border:none; font-weight:bold; }
+  #bucketBtn.active { background: dodgerblue; color:white; }
+</style>
 </head>
 <body>
-  <h1>✨ Minecraft Skin Creator ✨</h1>
 
-  <div class="editor-preview">
-    <canvas id="skinCanvas" width="64" height="64"></canvas>
-    <div id="preview3D"></div>
-  </div>
-  
-  <div class="controls">
-    <input type="color" id="colorPicker" value="#00ff00">
-    <button id="eraserBtn">Eraser</button>
-    <button id="bucketBtn">Paint Bucket</button>
-    <button id="undoBtn">Undo</button>
-    <button id="clearBtn">Clear</button>
-    <button id="downloadBtn">Download Skin</button>
-  </div>
+<div id="ui">
+  <input type="color" id="colorPicker" value="#00ff00">
+  <button id="eraserBtn">Eraser</button>
+  <button id="bucketBtn">Paint Bucket</button>
+  <button id="undoBtn">Undo</button>
+  <button id="downloadBtn">Download Skin</button>
+</div>
 
-  <div class="zoom-control">
-    <label for="zoomRange">Zoom:</label>
-    <input type="range" id="zoomRange" min="4" max="20" value="8">
-  </div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-  <script>
-    const canvas = document.getElementById("skinCanvas");
-    const ctx = canvas.getContext("2d");
-    const colorPicker = document.getElementById("colorPicker");
-    const clearBtn = document.getElementById("clearBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const eraserBtn = document.getElementById("eraserBtn");
-    const bucketBtn = document.getElementById("bucketBtn");
-    const undoBtn = document.getElementById("undoBtn");
-    const zoomRange = document.getElementById("zoomRange");
+<script>
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-    let scale = parseInt(zoomRange.value);
-    canvas.style.width = canvas.width * scale + "px";
-    canvas.style.height = canvas.height * scale + "px";
+let controls = new THREE.OrbitControls(camera, renderer.domElement);
+camera.position.set(3,3,5);
+controls.update();
 
-    let painting = false;
-    let erasing = false;
-    let bucketMode = false;
+let light = new THREE.DirectionalLight(0xffffff,1);
+light.position.set(5,10,7);
+scene.add(light);
 
-    // Undo stack
-    let undoStack = [];
-    const maxUndo = 20;
+// --- Skin canvas ---
+let skinCanvas = document.createElement('canvas');
+skinCanvas.width = 64;
+skinCanvas.height = 64;
+let skinCtx = skinCanvas.getContext('2d');
+skinCtx.fillStyle = "#ffffff";
+skinCtx.fillRect(0,0,64,64);
 
-    // fill canvas with white background at start
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    saveState();
-    drawGrid();
+let skinTexture = new THREE.CanvasTexture(skinCanvas);
+let skinMaterial = new THREE.MeshBasicMaterial({map: skinTexture});
 
-    function saveState() {
-      if (undoStack.length >= maxUndo) undoStack.shift();
-      undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+let parts = [];
+function createBox(w,h,d,x,y,z){
+  let box = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), skinMaterial);
+  box.position.set(x,y,z);
+  scene.add(box);
+  parts.push(box);
+}
+createBox(1,1,1,0,2.5,0); // head
+createBox(1,1.5,0.5,0,1.25,0); // body
+createBox(0.5,1.5,0.5,-0.75,1.25,0); // left arm
+createBox(0.5,1.5,0.5,0.75,1.25,0); // right arm
+createBox(0.5,1.5,0.5,-0.25,-0.5,0); // left leg
+createBox(0.5,1.5,0.5,0.25,-0.5,0); // right leg
+
+camera.position.z = 6;
+
+let painting=false;
+let erasing=false;
+let bucketMode=false;
+let undoStack=[];
+
+function saveState(){
+  if(undoStack.length>20) undoStack.shift();
+  undoStack.push(skinCtx.getImageData(0,0,64,64));
+}
+function restoreState(){
+  if(undoStack.length==0) return;
+  skinCtx.putImageData(undoStack.pop(),0,0);
+  skinTexture.needsUpdate=true;
+}
+
+// --- Paint / bucket logic ---
+function getUVFromMouse(event){
+  let mouse = new THREE.Vector2();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  let raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(mouse,camera);
+  let intersects = raycaster.intersectObjects(parts);
+  if(intersects.length>0){
+    let uv = intersects[0].uv;
+    if(!uv) return null;
+    uv.x = Math.floor(uv.x*64);
+    uv.y = Math.floor((1-uv.y)*64);
+    return uv;
+  }
+  return null;
+}
+
+// Flood-fill for bucket
+function bucketFill(x, y, fillColor){
+  const imgData = skinCtx.getImageData(0,0,64,64);
+  const data = imgData.data;
+  const targetIndex = (y*64 + x)*4;
+  const targetColor = data.slice(targetIndex, targetIndex+4);
+  const newColor = hexToRGBA(fillColor);
+  if(colorsMatch(targetColor,newColor)) return;
+
+  let stack=[[x,y]];
+  while(stack.length){
+    let [px,py]=stack.pop();
+    let index = (py*64 + px)*4;
+    let currColor = data.slice(index,index+4);
+    if(!colorsMatch(currColor,targetColor)) continue;
+
+    data[index]=newColor[0];
+    data[index+1]=newColor[1];
+    data[index+2]=newColor[2];
+    data[index+3]=newColor[3];
+
+    if(px>0) stack.push([px-1,py]);
+    if(px<63) stack.push([px+1,py]);
+    if(py>0) stack.push([px,py-1]);
+    if(py<63) stack.push([px,py+1]);
+  }
+  skinCtx.putImageData(imgData,0,0);
+  skinTexture.needsUpdate=true;
+}
+
+function hexToRGBA(hex){
+  const bigint = parseInt(hex.slice(1),16);
+  return [(bigint>>16)&255,(bigint>>8)&255, bigint&255,255];
+}
+function colorsMatch(a,b){ return a[0]===b[0] && a[1]===b[1] && a[2]===b[2] && a[3]===b[3]; }
+
+renderer.domElement.addEventListener('mousedown',(e)=>{ painting=true; });
+renderer.domElement.addEventListener('mouseup',(e)=>{ painting=false; saveState(); });
+renderer.domElement.addEventListener('mousemove',(e)=>{
+  if(!painting) return;
+  let uv = getUVFromMouse(e);
+  if(uv){
+    if(bucketMode){
+      bucketFill(uv.x, uv.y, document.getElementById('colorPicker').value);
+    }else{
+      skinCtx.fillStyle = erasing?"#ffffff":document.getElementById('colorPicker').value;
+      skinCtx.fillRect(uv.x, uv.y,1,1);
+      skinTexture.needsUpdate=true;
     }
+  }
+});
 
-    function restoreState() {
-      if (undoStack.length === 0) return;
-      const imageData = undoStack.pop();
-      ctx.putImageData(imageData, 0, 0);
-      drawGrid();
-      updateSkinTexture();
-    }
+// --- Buttons ---
+document.getElementById('eraserBtn').addEventListener('click',()=>{ erasing=!erasing; bucketMode=false; document.getElementById('bucketBtn').classList.remove('active'); });
+document.getElementById('bucketBtn').addEventListener('click',()=>{
+  bucketMode=!bucketMode;
+  erasing=false;
+  document.getElementById('bucketBtn').classList.toggle('active', bucketMode);
+});
+document.getElementById('undoBtn').addEventListener('click', restoreState);
+document.getElementById('downloadBtn').addEventListener('click',()=>{
+  let link=document.createElement('a');
+  link.download="minecraft_skin.png";
+  link.href=skinCanvas.toDataURL();
+  link.click();
+});
 
-    function hexToRgba(hex) {
-      const bigint = parseInt(hex.slice(1), 16);
-      return [
-        (bigint >> 16) & 255,
-        (bigint >> 8) & 255,
-        bigint & 255,
-        255
-      ];
-    }
-
-    function colorsMatch(a, b) {
-      return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
-    }
-
-    function bucketFill(x, y, fillColor) {
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imgData.data;
-      const targetIndex = (y * canvas.width + x) * 4;
-      const targetColor = data.slice(targetIndex, targetIndex + 4);
-
-      if (colorsMatch(targetColor, fillColor)) return;
-
-      const stack = [[x, y]];
-      while (stack.length) {
-        const [px, py] = stack.pop();
-        const index = (py * canvas.width + px) * 4;
-        const currentColor = data.slice(index, index + 4);
-
-        if (!colorsMatch(currentColor, targetColor)) continue;
-
-        data[index] = fillColor[0];
-        data[index + 1] = fillColor[1];
-        data[index + 2] = fillColor[2];
-        data[index + 3] = fillColor[3];
-
-        if (px > 0) stack.push([px - 1, py]);
-        if (px < canvas.width - 1) stack.push([px + 1, py]);
-        if (py > 0) stack.push([px, py - 1]);
-        if (py < canvas.height - 1) stack.push([px, py + 1]);
-      }
-      ctx.putImageData(imgData, 0, 0);
-      drawGrid();
-    }
-
-    function paintPixel(e) {
-      const rect = canvas.getBoundingClientRect();
-      const x = Math.floor((e.clientX - rect.left) / scale);
-      const y = Math.floor((e.clientY - rect.top) / scale);
-
-      saveState();
-
-      if (bucketMode) {
-        bucketFill(x, y, hexToRgba(colorPicker.value));
-      } else if (erasing) {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(x, y, 1, 1);
-      } else {
-        ctx.fillStyle = colorPicker.value;
-        ctx.fillRect(x, y, 1, 1);
-      }
-      drawGrid();
-      updateSkinTexture();
-    }
-
-    canvas.addEventListener("mousedown", (e) => { painting = true; paintPixel(e); });
-    canvas.addEventListener("mousemove", (e) => { if (painting && !bucketMode) paintPixel(e); });
-    canvas.addEventListener("mouseup", () => painting = false);
-    canvas.addEventListener("mouseleave", () => painting = false);
-
-    undoBtn.addEventListener("click", restoreState);
-
-    clearBtn.addEventListener("click", () => {
-      saveState();
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      drawGrid();
-      updateSkinTexture();
-    });
-
-    downloadBtn.addEventListener("click", () => {
-      const link = document.createElement("a");
-      link.download = "minecraft_skin.png";
-      link.href = canvas.toDataURL();
-      link.click();
-    });
-
-    eraserBtn.addEventListener("click", () => {
-      erasing = !erasing;
-      bucketMode = false;
-      eraserBtn.classList.toggle("active", erasing);
-      bucketBtn.classList.remove("active");
-    });
-
-    bucketBtn.addEventListener("click", () => {
-      bucketMode = !bucketMode;
-      erasing = false;
-      bucketBtn.classList.toggle("active", bucketMode);
-      eraserBtn.classList.remove("active");
-    });
-
-    zoomRange.addEventListener("input", () => {
-      scale = parseInt(zoomRange.value);
-      canvas.style.width = canvas.width * scale + "px";
-      canvas.style.height = canvas.height * scale + "px";
-      drawGrid();
-    });
-
-    // --- Draw grid overlay ---
-    function drawGrid() {
-      const gridColor = "rgba(0,0,0,0.2)";
-      ctx.save();
-      ctx.strokeStyle = gridColor;
-      ctx.lineWidth = 0.1;
-      for (let i = 0; i <= canvas.width; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i + 0.5, 0);
-        ctx.lineTo(i + 0.5, canvas.height);
-        ctx.stroke();
-      }
-      for (let i = 0; i <= canvas.height; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, i + 0.5);
-        ctx.lineTo(canvas.width, i + 0.5);
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    // --- THREE.JS FULL PLAYER PREVIEW ---
-    const preview3D = document.getElementById("preview3D");
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, preview3D.clientWidth / preview3D.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(preview3D.clientWidth, preview3D.clientHeight);
-    preview3D.appendChild(renderer.domElement);
-
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(1, 1, 2).normalize();
-    scene.add(light);
-
-    const skinTexture = new THREE.CanvasTexture(canvas);
-    const defaultMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const skinMaterial = new THREE.MeshBasicMaterial({ map: skinTexture });
-
-    const head = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), defaultMaterial);
-    head.position.y = 2.5;
-    scene.add(head);
-
-    const body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 0.5), defaultMaterial);
-    body.position.y = 1.25;
-    scene.add(body);
-
-    const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 0.5), defaultMaterial);
-    leftArm.position.set(-0.75, 1.25, 0);
-    scene.add(leftArm);
-
-    const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 0.5), defaultMaterial);
-    rightArm.position.set(0.75, 1.25, 0);
-    scene.add(rightArm);
-
-    const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 0.5), defaultMaterial);
-    leftLeg.position.set(-0.25, -0.5, 0);
-    scene.add(leftLeg);
-
-    const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 0.5), defaultMaterial);
-    rightLeg.position.set(0.25, -0.5, 0);
-    scene.add(rightLeg);
-
-    camera.position.z = 6;
-
-    function animate() {
-      requestAnimationFrame(animate);
-      scene.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    function updateSkinTexture() {
-      skinTexture.needsUpdate = true;
-      [head, body, leftArm, rightArm, leftLeg, rightLeg].forEach(part => {
-        if (part.material !== skinMaterial) {
-          part.material = skinMaterial;
-        }
-      });
-    }
-  </script>
+function animate(){ requestAnimationFrame(animate); renderer.render(scene,camera); }
+animate();
+</script>
 </body>
 </html>
