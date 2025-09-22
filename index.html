@@ -9,6 +9,8 @@
   #ui { position:absolute; top:10px; left:10px; z-index:10; }
   button, input[type=color] { margin:5px; padding:8px; border-radius:5px; border:none; font-weight:bold; }
   #bucketBtn.active { background: dodgerblue; color:white; }
+  #previewContainer { position:absolute; top:10px; right:10px; border:2px solid white; }
+  #preview2D { width:256px; height:256px; image-rendering: pixelated; background:white; }
 </style>
 </head>
 <body>
@@ -19,6 +21,10 @@
   <button id="bucketBtn">Paint Bucket</button>
   <button id="undoBtn">Undo</button>
   <button id="downloadBtn">Download Skin</button>
+</div>
+
+<div id="previewContainer">
+  <canvas id="preview2D" width="64" height="64"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
@@ -50,6 +56,7 @@ skinCtx.fillRect(0,0,64,64);
 let skinTexture = new THREE.CanvasTexture(skinCanvas);
 let skinMaterial = new THREE.MeshBasicMaterial({map: skinTexture});
 
+// --- Minecraft Player parts ---
 let parts = [];
 function createBox(w,h,d,x,y,z){
   let box = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), skinMaterial);
@@ -79,6 +86,7 @@ function restoreState(){
   if(undoStack.length==0) return;
   skinCtx.putImageData(undoStack.pop(),0,0);
   skinTexture.needsUpdate=true;
+  updatePreview2D();
 }
 
 // --- Paint / bucket logic ---
@@ -127,6 +135,7 @@ function bucketFill(x, y, fillColor){
   }
   skinCtx.putImageData(imgData,0,0);
   skinTexture.needsUpdate=true;
+  updatePreview2D();
 }
 
 function hexToRGBA(hex){
@@ -147,6 +156,7 @@ renderer.domElement.addEventListener('mousemove',(e)=>{
       skinCtx.fillStyle = erasing?"#ffffff":document.getElementById('colorPicker').value;
       skinCtx.fillRect(uv.x, uv.y,1,1);
       skinTexture.needsUpdate=true;
+      updatePreview2D();
     }
   }
 });
@@ -165,6 +175,17 @@ document.getElementById('downloadBtn').addEventListener('click',()=>{
   link.href=skinCanvas.toDataURL();
   link.click();
 });
+
+// --- 2D Preview ---
+let previewCanvas = document.getElementById('preview2D');
+let previewCtx = previewCanvas.getContext('2d');
+function updatePreview2D(){
+  previewCtx.clearRect(0,0,64,64);
+  previewCtx.drawImage(skinCanvas,0,0);
+}
+
+// Initialize preview
+updatePreview2D();
 
 function animate(){ requestAnimationFrame(animate); renderer.render(scene,camera); }
 animate();
