@@ -1,241 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎨 Minecraft Skin Studio</title>
-<style>
-body { margin:0; overflow:hidden; font-family:Arial,sans-serif;
-  background: linear-gradient(270deg, #ff4e50, #f9d423, #24c6dc, #abecd6);
-  background-size: 800% 800%; animation: rainbowBG 15s ease infinite;
-  color:white; display:flex; flex-direction:column; align-items:center;
-}
-@keyframes rainbowBG { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
-#main { display:flex; margin-top:20px; gap:20px; }
-#editor { display:flex; flex-direction:column; align-items:center; }
-#paintingPad { width:512px; height:512px; background:white; image-rendering:pixelated; border:6px solid; border-image: linear-gradient(to right, #ff4e50, #f9d423, #24c6dc, #abecd6) 1; border-radius:12px; }
-#ui { margin-top:10px; display:flex; gap:5px; flex-wrap:wrap; justify-content:center; }
-button,input[type=color],select{ padding:8px 12px; border-radius:12px; border:none; font-weight:bold; cursor:pointer; font-size:14px; transition:0.3s; box-shadow:0 0 10px rgba(255,255,255,0.6); }
-button:hover,input[type=color]:hover,select:hover{ transform:scale(1.1); box-shadow:0 0 20px white; }
-#bucketBtn.active{ background:#0077ff; color:white; }
-#preview3D { width:600px; height:600px; border:6px solid; border-image: linear-gradient(to right, #ff4e50, #f9d423, #24c6dc, #abecd6) 1; border-radius:12px; box-shadow:0 0 20px #fff; margin-bottom:10px; }
-#animationControls { margin-bottom:20px; display:flex; gap:10px; }
-#marketplace { display:flex; gap:10px; overflow-x:auto; padding:10px; margin-top:10px; border-top:2px solid white; width:90vw; }
-.skinCard { width:80px; height:80px; border:2px solid white; border-radius:12px; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; text-align:center; background:white; color:black; }
-.skinCard img { width:64px; height:64px; image-rendering:pixelated; border-radius:6px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Our Discord!</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #5865F2, #2C2F33);
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+    }
+    .container {
+      background: rgba(0,0,0,0.5);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      animation: fadeIn 1.2s ease;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 15px;
+    }
+    p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+    }
+    a.button {
+      display: inline-block;
+      padding: 15px 40px;
+      font-size: 1.2em;
+      color: white;
+      background: #5865F2;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: 0.3s;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(88,101,242,0.6);
+    }
+    a.button:hover {
+      background: #4752C4;
+      box-shadow: 0 0 25px rgba(88,101,242,0.9);
+      transform: scale(1.05);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-
-<div id="main">
-  <div id="editor">
-    <canvas id="paintingPad" width="64" height="64"></canvas>
-    <div id="ui">
-      <input type="color" id="colorPicker" value="#00ff00">
-      <button id="eraserBtn">Eraser</button>
-      <button id="bucketBtn">Bucket</button>
-      <button id="undoBtn">Undo</button>
-      <button id="downloadBtn">Download</button>
-      <select id="mirrorSelect">
-        <option value="none">Mirror: None</option>
-        <option value="horizontal">Mirror: Horizontal</option>
-        <option value="vertical">Mirror: Vertical</option>
-      </select>
-      <select id="layerSelect">
-        <option value="all">Layer: All</option>
-        <option value="head">Layer: Head</option>
-        <option value="body">Layer: Body</option>
-        <option value="arms">Layer: Arms</option>
-        <option value="legs">Layer: Legs</option>
-      </select>
-      <select id="zoomSelect">
-        <option value="1">Zoom: 1x</option>
-        <option value="2">Zoom: 2x</option>
-        <option value="4">Zoom: 4x</option>
-        <option value="8">Zoom: 8x</option>
-      </select>
-    </div>
+  <div class="container">
+    <h1>🎮 Join Our Discord!</h1>
+    <p>Be part of the community, chat, play, and have fun!</p>
+    <a class="button" href="https://discord.gg/cpvp" target="_blank">Join Now</a>
   </div>
-  <div>
-    <div id="preview3D"></div>
-    <div id="animationControls">
-      <button id="spinBtn">Toggle Spin</button>
-      <button id="waveBtn">Toggle Wave</button>
-    </div>
-  </div>
-</div>
-
-<div id="marketplace"></div>
-<canvas id="skinCanvas" width="64" height="64" style="display:none;"></canvas>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
-<script>
-// --- Skin setup ---
-let skinCanvas=document.getElementById('skinCanvas');
-let skinCtx=skinCanvas.getContext('2d');
-skinCtx.fillStyle="#ffffff"; skinCtx.fillRect(0,0,64,64);
-let paintingPad=document.getElementById('paintingPad');
-let padCtx=paintingPad.getContext('2d');
-function updatePad(){ padCtx.drawImage(skinCanvas,0,0); }
-updatePad();
-
-// --- Undo ---
-let undoStack=[];
-function saveState(){ if(undoStack.length>20) undoStack.shift(); undoStack.push(skinCtx.getImageData(0,0,64,64)); }
-function undo(){ if(undoStack.length===0) return; skinCtx.putImageData(undoStack.pop(),0,0); updatePad(); update3D(); }
-
-// --- Tools ---
-let painting=false, erasing=false, bucketMode=false;
-let colorPicker=document.getElementById('colorPicker');
-let mirrorMode='none';
-let layerMode='all';
-let zoomLevel=1;
-function hexToRGBA(hex){ let bigint=parseInt(hex.slice(1),16); return [(bigint>>16)&255,(bigint>>8)&255,bigint&255,255]; }
-function colorsMatch(a,b){ return a[0]===b[0] && a[1]===b[1] && a[2]===b[2] && a[3]===b[3]; }
-function bucketFill(x,y,fillColor){
-    let imgData=skinCtx.getImageData(0,0,64,64);
-    let data=imgData.data;
-    let targetIndex=(y*64+x)*4;
-    let targetColor=data.slice(targetIndex,targetIndex+4);
-    let newColor=hexToRGBA(fillColor);
-    if(colorsMatch(targetColor,newColor)) return;
-    let stack=[[x,y]];
-    while(stack.length){
-        let [px,py]=stack.pop();
-        let index=(py*64+px)*4;
-        let currColor=data.slice(index,index+4);
-        if(!colorsMatch(currColor,targetColor)) continue;
-        data[index]=newColor[0]; data[index+1]=newColor[1]; data[index+2]=newColor[2]; data[index+3]=255;
-        if(px>0) stack.push([px-1,py]);
-        if(px<63) stack.push([px+1,py]);
-        if(py>0) stack.push([px,py-1]);
-        if(py<63) stack.push([px,py+1]);
-    }
-    skinCtx.putImageData(imgData,0,0);
-    updatePad(); update3D();
-}
-
-// --- 2D Pad Painting ---
-paintingPad.addEventListener('mousedown', (e)=>{ painting=true; paintOnPad(e,true); saveState(); });
-paintingPad.addEventListener('mouseup', ()=>{ painting=false; });
-paintingPad.addEventListener('mousemove', (e)=>{ if(painting) paintOnPad(e,false); });
-function paintOnPad(e,isDown){
-    let rect=paintingPad.getBoundingClientRect();
-    let x=Math.floor((e.clientX-rect.left)/rect.width*64);
-    let y=Math.floor((e.clientY-rect.top)/rect.height*64);
-    let points=[[x,y]];
-    if(mirrorMode==='horizontal') points.push([63-x,y]);
-    if(mirrorMode==='vertical') points.push([x,63-y]);
-    for(let [px,py] of points){
-        if(bucketMode){ bucketFill(px,py,colorPicker.value); continue; }
-        skinCtx.fillStyle=erasing?"#ffffff":colorPicker.value;
-        skinCtx.fillRect(px,py,1,1);
-    }
-    updatePad(); update3D();
-}
-
-// --- UI Buttons ---
-document.getElementById('eraserBtn').addEventListener('click',()=>{ erasing=!erasing; bucketMode=false; document.getElementById('bucketBtn').classList.remove('active'); });
-document.getElementById('bucketBtn').addEventListener('click',()=>{ bucketMode=!bucketMode; erasing=false; document.getElementById('bucketBtn').classList.toggle('active',bucketMode); });
-document.getElementById('undoBtn').addEventListener('click',undo);
-document.getElementById('downloadBtn').addEventListener('click',()=>{ let link=document.createElement('a'); link.download="minecraft_skin.png"; link.href=skinCanvas.toDataURL(); link.click(); });
-document.getElementById('mirrorSelect').addEventListener('change',(e)=>{ mirrorMode=e.target.value; });
-document.getElementById('layerSelect').addEventListener('change',(e)=>{ layerMode=e.target.value; });
-document.getElementById('zoomSelect').addEventListener('change',(e)=>{ zoomLevel=parseInt(e.target.value); paintingPad.style.width=64*zoomLevel+'px'; paintingPad.style.height=64*zoomLevel+'px'; });
-
-// --- 3D Scene Setup ---
-let scene=new THREE.Scene();
-let camera=new THREE.PerspectiveCamera(45,1,0.1,1000);
-let renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(600,600);
-document.getElementById('preview3D').appendChild(renderer.domElement);
-let controls=new THREE.OrbitControls(camera,renderer.domElement);
-camera.position.set(3,3,5); controls.update();
-scene.add(new THREE.DirectionalLight(0xffffff,1).position.set(5,10,7));
-
-// --- 3D Player ---
-let skinTexture=new THREE.CanvasTexture(skinCanvas);
-let skinMaterial=new THREE.MeshBasicMaterial({map:skinTexture});
-let parts=[];
-function createBox(w,h,d,x,y,z){
-    let mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),skinMaterial);
-    let geo=new THREE.EdgesGeometry(mesh.geometry);
-    let grid=new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:0x000000}));
-    mesh.add(grid); mesh.position.set(x,y,z); scene.add(mesh); parts.push(mesh);
-}
-createBox(1,1,1,0,2.5,0); createBox(1,1.5,0.5,0,1.25,0); createBox(0.5,1.5,0.5,-0.75,1.25,0);
-createBox(0.5,1.5,0.5,0.75,1.25,0); createBox(0.5,1.5,0.5,-0.25,-0.5,0); createBox(0.5,1.5,0.5,0.25,-0.5,0);
-
-// --- Hover Highlight ---
-let raycaster=new THREE.Raycaster();
-let mouse=new THREE.Vector2();
-let highlight=new THREE.Mesh(new THREE.BoxGeometry(1/64,1/64,0.001),new THREE.MeshBasicMaterial({color:0xffff00,transparent:true,opacity:0.6}));
-scene.add(highlight); highlight.visible=false;
-
-renderer.domElement.addEventListener('mousemove',(e)=>{
-    mouse.x=(e.offsetX/renderer.domElement.clientWidth)*2-1;
-    mouse.y=-(e.offsetY/renderer.domElement.clientHeight)*2+1;
-    raycaster.setFromCamera(mouse,camera);
-    let intersects=raycaster.intersectObjects(parts,true);
-    if(intersects.length>0 && intersects[0].uv){
-        let uv=intersects[0].uv;
-        highlight.position.copy(intersects[0].point);
-        highlight.visible=true;
-    } else { highlight.visible=false; }
-});
-
-// --- Click to paint ---
-renderer.domElement.addEventListener('mousedown',(e)=>{
-    mouse.x=(e.offsetX/renderer.domElement.clientWidth)*2-1;
-    mouse.y=-(e.offsetY/renderer.domElement.clientHeight)*2+1;
-    raycaster.setFromCamera(mouse,camera);
-    let intersects=raycaster.intersectObjects(parts,true);
-    if(intersects.length>0 && intersects[0].uv){
-        let uv=intersects[0].uv;
-        let px=Math.floor(uv.x*64);
-        let py=Math.floor((1-uv.y)*64);
-        skinCtx.fillStyle=erasing?"#ffffff":colorPicker.value;
-        skinCtx.fillRect(px,py,1,1);
-        updatePad(); update3D(); saveState();
-    }
-});
-
-// --- Animation Controls ---
-let spinning=false, waving=false;
-document.getElementById('spinBtn').addEventListener('click',()=>{ spinning=!spinning; });
-document.getElementById('waveBtn').addEventListener('click',()=>{ waving=!waving; });
-function animate(){
-    requestAnimationFrame(animate);
-    if(spinning) scene.rotation.y += 0.01;
-    if(waving){
-        let time=Date.now()*0.002;
-        parts[2].rotation.x=Math.sin(time)*0.5; // left arm
-        parts[3].rotation.x=-Math.sin(time)*0.5; // right arm
-    } else { parts[2].rotation.x=parts[3].rotation.x=0; }
-    renderer.render(scene,camera);
-}
-animate();
-function update3D(){ skinTexture.needsUpdate=true; }
-
-// --- Marketplace ---
-let skins=[ // example skins
-    {name:"Steve", url:"https://i.imgur.com/TqS4tW1.png"},
-    {name:"Alex", url:"https://i.imgur.com/7s1rQzv.png"},
-    {name:"Cool Blue", url:"https://i.imgur.com/3J9yZyC.png"},
-    {name:"Red Warrior", url:"https://i.imgur.com/YR1mQXn.png"}
-];
-let marketplace=document.getElementById('marketplace');
-skins.forEach(s=>{
-    let div=document.createElement('div'); div.className="skinCard";
-    div.innerHTML=`<img src="${s.url}"><br>${s.name}`;
-    div.addEventListener('click',()=>{
-        let img=new Image();
-        img.crossOrigin="anonymous"; img.src=s.url;
-        img.onload=()=>{ skinCtx.clearRect(0,0,64,64); skinCtx.drawImage(img,0,0,64,64); updatePad(); update3D(); saveState(); }
-    });
-    marketplace.appendChild(div);
-});
-</script>
 </body>
 </html>
