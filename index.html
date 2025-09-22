@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌈 Party Skindex 3D Minecraft Skin Editor</title>
+<title>🎨 Minecraft Skin Painter on Player Grid</title>
 <style>
 body {
   margin:0;
@@ -156,7 +156,7 @@ document.getElementById('mirrorSelect').addEventListener('change',(e)=>{ mirrorM
 document.getElementById('layerSelect').addEventListener('change',(e)=>{ layerMode=e.target.value; });
 document.getElementById('zoomSelect').addEventListener('change',(e)=>{ zoomLevel=parseInt(e.target.value); paintingPad.style.width=64*zoomLevel+'px'; paintingPad.style.height=64*zoomLevel+'px'; });
 
-// --- 3D preview ---
+// --- 3D preview with grid ---
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45,1,0.1,1000);
 let renderer = new THREE.WebGLRenderer({antialias:true});
@@ -165,17 +165,30 @@ document.getElementById('preview3D').appendChild(renderer.domElement);
 let controls = new THREE.OrbitControls(camera, renderer.domElement);
 camera.position.set(3,3,5); controls.update();
 let light = new THREE.DirectionalLight(0xffffff,1); light.position.set(5,10,7); scene.add(light);
+
 let skinTexture = new THREE.CanvasTexture(skinCanvas);
 let skinMaterial = new THREE.MeshBasicMaterial({map:skinTexture});
-let parts=[];
-function createBox(w,h,d,x,y,z){ let box=new THREE.Mesh(new THREE.BoxGeometry(w,h,d), skinMaterial); box.position.set(x,y,z); scene.add(box); parts.push(box); }
+
+// Create player body parts with grid overlay
+let parts = [];
+function createBox(w,h,d,x,y,z){
+    let mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), skinMaterial);
+    let geo = new THREE.EdgesGeometry(mesh.geometry);
+    let grid = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({color:0x000000, linewidth:1}));
+    mesh.add(grid); // overlay grid
+    mesh.position.set(x,y,z);
+    scene.add(mesh);
+    parts.push(mesh);
+}
 createBox(1,1,1,0,2.5,0); // head
 createBox(1,1.5,0.5,0,1.25,0); // body
 createBox(0.5,1.5,0.5,-0.75,1.25,0); // left arm
 createBox(0.5,1.5,0.5,0.75,1.25,0); // right arm
 createBox(0.5,1.5,0.5,-0.25,-0.5,0); // left leg
 createBox(0.5,1.5,0.5,0.25,-0.5,0); // right leg
+
 function update3D(){ skinTexture.needsUpdate=true; }
+
 function animate(){ requestAnimationFrame(animate); renderer.render(scene,camera); }
 animate();
 </script>
