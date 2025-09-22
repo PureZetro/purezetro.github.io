@@ -6,19 +6,25 @@
   <title>Minecraft Skin Creator</title>
   <style>
     body {
-      background: #111;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
       color: white;
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 20px;
+      height: 100vh;
+      margin: 0;
     }
-    h1 { color: lime; }
+    h1 {
+      color: #00ffcc;
+      text-shadow: 0 0 8px #00ffcc, 0 0 16px #00ffcc;
+    }
     #skinCanvas {
       border: 2px solid white;
       image-rendering: pixelated;
       cursor: crosshair;
+      background: repeating-conic-gradient(#444 0% 25%, #555 0% 50%) 50% / 20px 20px;
     }
     .controls {
       margin-top: 10px;
@@ -26,17 +32,36 @@
       gap: 10px;
     }
     button {
-      padding: 10px;
+      padding: 10px 15px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
     }
-    #downloadBtn { background: lime; }
-    #clearBtn { background: crimson; color: white; }
+    #downloadBtn {
+      background: lime;
+    }
+    #downloadBtn:hover {
+      background: #00cc00;
+    }
+    #clearBtn {
+      background: crimson;
+      color: white;
+    }
+    #clearBtn:hover {
+      background: darkred;
+    }
+    input[type="color"] {
+      border: none;
+      width: 50px;
+      height: 40px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>Minecraft Skin Creator</h1>
+  <h1>✨ Minecraft Skin Creator ✨</h1>
   <canvas id="skinCanvas" width="64" height="64"></canvas>
   <div class="controls">
     <input type="color" id="colorPicker" value="#00ff00">
@@ -56,18 +81,27 @@
     canvas.style.width = canvas.width * scale + "px";
     canvas.style.height = canvas.height * scale + "px";
 
-    // Default background transparent
-    ctx.fillStyle = "rgba(0,0,0,0)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    let painting = false;
 
-    // Draw pixels on click
-    canvas.addEventListener("click", (e) => {
+    function paintPixel(e) {
       const rect = canvas.getBoundingClientRect();
       const x = Math.floor((e.clientX - rect.left) / scale);
       const y = Math.floor((e.clientY - rect.top) / scale);
       ctx.fillStyle = colorPicker.value;
       ctx.fillRect(x, y, 1, 1);
+    }
+
+    canvas.addEventListener("mousedown", (e) => {
+      painting = true;
+      paintPixel(e);
     });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (painting) paintPixel(e);
+    });
+
+    canvas.addEventListener("mouseup", () => painting = false);
+    canvas.addEventListener("mouseleave", () => painting = false);
 
     // Clear canvas
     clearBtn.addEventListener("click", () => {
