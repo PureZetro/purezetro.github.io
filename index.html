@@ -3,127 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Chat Website</title>
+  <title>Zetro AI Chat</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1f1c2c, #928dab);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .chat-container {
-      width: 90%;
-      max-width: 500px;
-      background: #2a2a40;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      height: 80vh;
-      overflow: hidden;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-    }
-    .chat-box {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-    }
-    .message {
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 10px;
-      max-width: 75%;
-    }
-    .user {
-      background: #4caf50;
-      align-self: flex-end;
-    }
-    .ai {
-      background: #3e3e5e;
-      align-self: flex-start;
-    }
-    .input-area {
-      display: flex;
-      padding: 10px;
-      background: #1e1e2f;
-    }
-    input {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      outline: none;
-    }
-    button {
-      margin-left: 10px;
-      padding: 12px 18px;
-      border: none;
-      border-radius: 8px;
-      background: #ff9800;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background: #e68900;
-    }
+    body { font-family: Arial, sans-serif; background: #111; color: white; display: flex; flex-direction: column; align-items: center; height: 100vh; margin: 0; }
+    h1 { margin: 10px; color: cyan; }
+    #chat-box { flex: 1; width: 90%; max-width: 600px; background: #222; padding: 15px; border-radius: 10px; overflow-y: auto; }
+    .message { margin: 5px 0; padding: 8px; border-radius: 8px; max-width: 80%; }
+    .user { background: #0d6efd; align-self: flex-end; }
+    .bot { background: #444; align-self: flex-start; }
+    #input-box { display: flex; width: 90%; max-width: 600px; margin: 10px 0; }
+    #user-input { flex: 1; padding: 10px; border-radius: 8px; border: none; }
+    button { padding: 10px; margin-left: 5px; border: none; border-radius: 8px; background: cyan; cursor: pointer; }
+    button:hover { background: deepskyblue; }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div id="chat-box" class="chat-box"></div>
-    <div class="input-area">
-      <input type="text" id="user-input" placeholder="Type a message...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
+  <h1>Zetro AI 🤖</h1>
+  <div id="chat-box"></div>
+  <div id="input-box">
+    <input type="text" id="user-input" placeholder="Ask me anything...">
+    <button onclick="sendMessage()">Send</button>
   </div>
 
   <script>
     const chatBox = document.getElementById("chat-box");
-    const userInput = document.getElementById("user-input");
-
-    function addMessage(text, sender) {
-      const msg = document.createElement("div");
-      msg.classList.add("message", sender);
-      msg.textContent = text;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    const apiKey = "YOUR_OPENAI_API_KEY"; // 🔑 put your API key here
 
     async function sendMessage() {
-      const text = userInput.value.trim();
-      if (!text) return;
-      addMessage(text, "user");
-      userInput.value = "";
+      const input = document.getElementById("user-input");
+      const userText = input.value.trim();
+      if (!userText) return;
 
-      // Show "thinking..."
-      const thinking = document.createElement("div");
-      thinking.classList.add("message", "ai");
-      thinking.textContent = "🤔 Thinking...";
-      chatBox.appendChild(thinking);
+      addMessage(userText, "user");
+      input.value = "";
 
+      // Call OpenAI API
       try {
-        // Call OpenAI API
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer YOUR_API_KEY_HERE"
+            "Authorization": `Bearer ${apiKey}`
           },
           body: JSON.stringify({
-            model: "gpt-4o-mini", 
-            messages: [{ role: "user", content: text }]
+            model: "gpt-4o-mini", // you can use gpt-4o-mini or gpt-3.5-turbo
+            messages: [{ role: "user", content: userText }]
           })
         });
 
         const data = await response.json();
-        thinking.textContent = data.choices[0].message.content;
+        const botReply = data.choices[0].message.content;
+        addMessage(botReply, "bot");
       } catch (err) {
-        thinking.textContent = "⚠️ Error: Unable to connect to AI.";
+        addMessage("⚠️ Error: " + err.message, "bot");
       }
+    }
+
+    function addMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.classList.add("message", sender);
+      msg.innerText = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
   </script>
 </body>
