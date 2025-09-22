@@ -64,6 +64,8 @@
     #eraserBtn.active { background: gold; }
     #bucketBtn { background: deepskyblue; color: black; }
     #bucketBtn.active { background: dodgerblue; color: white; }
+    #undoBtn { background: violet; color: white; }
+    #undoBtn:hover { background: purple; }
     input[type="color"] {
       border: none;
       width: 50px;
@@ -93,6 +95,7 @@
     <input type="color" id="colorPicker" value="#00ff00">
     <button id="eraserBtn">Eraser</button>
     <button id="bucketBtn">Paint Bucket</button>
+    <button id="undoBtn">Undo</button>
     <button id="clearBtn">Clear</button>
     <button id="downloadBtn">Download Skin</button>
   </div>
@@ -111,6 +114,7 @@
     const downloadBtn = document.getElementById("downloadBtn");
     const eraserBtn = document.getElementById("eraserBtn");
     const bucketBtn = document.getElementById("bucketBtn");
+    const undoBtn = document.getElementById("undoBtn");
     const zoomRange = document.getElementById("zoomRange");
 
     let scale = parseInt(zoomRange.value);
@@ -121,9 +125,28 @@
     let erasing = false;
     let bucketMode = false;
 
+    // Undo stack
+    let undoStack = [];
+    const maxUndo = 20;
+
     // fill canvas with white background at start
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    saveState();
+    drawGrid();
+
+    function saveState() {
+      if (undoStack.length >= maxUndo) undoStack.shift();
+      undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    }
+
+    function restoreState() {
+      if (undoStack.length === 0) return;
+      const imageData = undoStack.pop();
+      ctx.putImageData(imageData, 0, 0);
+      drawGrid();
+      updateSkinTexture();
+    }
 
     function hexToRgba(hex) {
       const bigint = parseInt(hex.slice(1), 16);
@@ -155,25 +178,26 @@
 
         if (!colorsMatch(currentColor, targetColor)) continue;
 
-        // set pixel to new color
         data[index] = fillColor[0];
         data[index + 1] = fillColor[1];
         data[index + 2] = fillColor[2];
         data[index + 3] = fillColor[3];
 
-        // neighbors
         if (px > 0) stack.push([px - 1, py]);
         if (px < canvas.width - 1) stack.push([px + 1, py]);
         if (py > 0) stack.push([px, py - 1]);
         if (py < canvas.height - 1) stack.push([px, py + 1]);
       }
       ctx.putImageData(imgData, 0, 0);
+      drawGrid();
     }
 
     function paintPixel(e) {
       const rect = canvas.getBoundingClientRect();
       const x = Math.floor((e.clientX - rect.left) / scale);
       const y = Math.floor((e.clientY - rect.top) / scale);
+
+      saveState();
 
       if (bucketMode) {
         bucketFill(x, y, hexToRgba(colorPicker.value));
@@ -184,6 +208,7 @@
         ctx.fillStyle = colorPicker.value;
         ctx.fillRect(x, y, 1, 1);
       }
+      drawGrid();
       updateSkinTexture();
     }
 
@@ -192,9 +217,13 @@
     canvas.addEventListener("mouseup", () => painting = false);
     canvas.addEventListener("mouseleave", () => painting = false);
 
+    undoBtn.addEventListener("click", restoreState);
+
     clearBtn.addEventListener("click", () => {
+      saveState();
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
       updateSkinTexture();
     });
 
@@ -223,7 +252,29 @@
       scale = parseInt(zoomRange.value);
       canvas.style.width = canvas.width * scale + "px";
       canvas.style.height = canvas.height * scale + "px";
+      drawGrid();
     });
+
+    // --- Draw grid overlay ---
+    function drawGrid() {
+      const gridColor = "rgba(0,0,0,0.2)";
+      ctx.save();
+      ctx.strokeStyle = gridColor;
+      ctx.lineWidth = 0.1;
+      for (let i = 0; i <= canvas.width; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i + 0.5, 0);
+        ctx.lineTo(i + 0.5, canvas.height);
+        ctx.stroke();
+      }
+      for (let i = 0; i <= canvas.height; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, i + 0.5);
+        ctx.lineTo(canvas.width, i + 0.5);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
 
     // --- THREE.JS FULL PLAYER PREVIEW ---
     const preview3D = document.getElementById("preview3D");
