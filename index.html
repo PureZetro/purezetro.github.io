@@ -3,34 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎨 Minecraft Skin Painter on Player Grid</title>
+<title>🎨 Interactive 3D Minecraft Skin Painter</title>
 <style>
 body {
-  margin:0;
-  overflow:hidden;
-  font-family:Arial,sans-serif;
+  margin:0; overflow:hidden; font-family:Arial,sans-serif;
   background: linear-gradient(270deg, #ff4e50, #f9d423, #24c6dc, #abecd6);
   background-size: 800% 800%;
   animation: rainbowBG 15s ease infinite;
-  color:white;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  height:100vh;
+  color:white; display:flex; justify-content:center; align-items:flex-start; height:100vh;
 }
-@keyframes rainbowBG {
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
-}
+@keyframes rainbowBG { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
 #container { display:flex; margin-top:20px; gap:20px; }
 #editor { display:flex; flex-direction:column; align-items:center; }
 #paintingPad { width:512px; height:512px; background:white; image-rendering:pixelated; border:6px solid; border-image: linear-gradient(to right, #ff4e50, #f9d423, #24c6dc, #abecd6) 1; border-radius:12px; }
 #ui { margin-top:10px; display:flex; gap:5px; flex-wrap:wrap; justify-content:center; }
-button,input[type=color],select{
-  padding:8px 12px; border-radius:12px; border:none; font-weight:bold; cursor:pointer; font-size:14px;
-  transition:0.3s; box-shadow:0 0 10px rgba(255,255,255,0.6);
-}
+button,input[type=color],select{ padding:8px 12px; border-radius:12px; border:none; font-weight:bold; cursor:pointer; font-size:14px; transition:0.3s; box-shadow:0 0 10px rgba(255,255,255,0.6); }
 button:hover,input[type=color]:hover,select:hover{ transform:scale(1.1); box-shadow:0 0 20px white; }
 #bucketBtn.active{ background:#0077ff; color:white; }
 #preview3D { width:600px; height:600px; border:6px solid; border-image: linear-gradient(to right, #ff4e50, #f9d423, #24c6dc, #abecd6) 1; border-radius:12px; box-shadow:0 0 20px #fff; }
@@ -79,7 +66,6 @@ button:hover,input[type=color]:hover,select:hover{ transform:scale(1.1); box-sha
 let skinCanvas = document.getElementById('skinCanvas');
 let skinCtx = skinCanvas.getContext('2d');
 skinCtx.fillStyle = "#ffffff"; skinCtx.fillRect(0,0,64,64);
-
 let paintingPad = document.getElementById('paintingPad');
 let padCtx = paintingPad.getContext('2d');
 function updatePad(){ padCtx.drawImage(skinCanvas,0,0); }
@@ -122,8 +108,7 @@ function bucketFill(x,y,fillColor){
         if(py<63) stack.push([px,py+1]);
     }
     skinCtx.putImageData(imgData,0,0);
-    updatePad();
-    update3D();
+    updatePad(); update3D();
 }
 
 // --- Painting on pad ---
@@ -143,8 +128,7 @@ function paintOnPad(e,isDown){
         skinCtx.fillStyle=erasing?"#ffffff":colorPicker.value;
         skinCtx.fillRect(px,py,1,1);
     }
-    updatePad();
-    update3D();
+    updatePad(); update3D();
 }
 
 // --- Buttons & selectors ---
@@ -156,7 +140,7 @@ document.getElementById('mirrorSelect').addEventListener('change',(e)=>{ mirrorM
 document.getElementById('layerSelect').addEventListener('change',(e)=>{ layerMode=e.target.value; });
 document.getElementById('zoomSelect').addEventListener('change',(e)=>{ zoomLevel=parseInt(e.target.value); paintingPad.style.width=64*zoomLevel+'px'; paintingPad.style.height=64*zoomLevel+'px'; });
 
-// --- 3D preview with grid ---
+// --- 3D preview with interactive painting ---
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45,1,0.1,1000);
 let renderer = new THREE.WebGLRenderer({antialias:true});
@@ -168,14 +152,13 @@ let light = new THREE.DirectionalLight(0xffffff,1); light.position.set(5,10,7); 
 
 let skinTexture = new THREE.CanvasTexture(skinCanvas);
 let skinMaterial = new THREE.MeshBasicMaterial({map:skinTexture});
+let parts=[];
 
-// Create player body parts with grid overlay
-let parts = [];
 function createBox(w,h,d,x,y,z){
     let mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), skinMaterial);
     let geo = new THREE.EdgesGeometry(mesh.geometry);
     let grid = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({color:0x000000, linewidth:1}));
-    mesh.add(grid); // overlay grid
+    mesh.add(grid);
     mesh.position.set(x,y,z);
     scene.add(mesh);
     parts.push(mesh);
@@ -187,8 +170,29 @@ createBox(0.5,1.5,0.5,0.75,1.25,0); // right arm
 createBox(0.5,1.5,0.5,-0.25,-0.5,0); // left leg
 createBox(0.5,1.5,0.5,0.25,-0.5,0); // right leg
 
-function update3D(){ skinTexture.needsUpdate=true; }
+// --- Raycaster for interactive painting on 3D player ---
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
 
+renderer.domElement.addEventListener('mousedown', (e)=>{
+    mouse.x = (e.offsetX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = -(e.offsetY / renderer.domElement.clientHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse,camera);
+    let intersects = raycaster.intersectObjects(parts,true);
+    if(intersects.length>0){
+        // Determine UV coordinate from intersection
+        let uv = intersects[0].uv;
+        if(uv){
+            let px = Math.floor(uv.x*64);
+            let py = Math.floor((1-uv.y)*64);
+            skinCtx.fillStyle = erasing?"#ffffff":colorPicker.value;
+            skinCtx.fillRect(px,py,1,1);
+            updatePad(); update3D();
+        }
+    }
+});
+
+function update3D(){ skinTexture.needsUpdate=true; }
 function animate(){ requestAnimationFrame(animate); renderer.render(scene,camera); }
 animate();
 </script>
