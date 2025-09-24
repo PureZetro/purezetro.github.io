@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unstable SMP</title>
+  <title>Unstable SMP - Closed</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background: black;
       color: white;
-      overflow-x: hidden;
+      overflow: hidden;
     }
 
-    /* Background animated gradient */
+    /* Background rainbow swirl */
     body::before {
       content: "";
       position: fixed;
@@ -32,7 +32,7 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Scanline glitch overlay */
+    /* Scanline overlay */
     body::after {
       content: "";
       position: fixed;
@@ -54,16 +54,42 @@
       50% { opacity: 0.25; }
     }
 
-    header {
+    .closed-box {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
       text-align: center;
-      padding: 60px 20px;
       background: rgba(0,0,0,0.6);
-      border-bottom: 3px solid #ff0000;
+      border: 3px solid red;
+      padding: 40px 60px;
+      border-radius: 15px;
+      animation: shake 0.5s infinite alternate;
     }
 
-    header h1 {
-      font-size: 3.8em;
-      animation: rgb-glitch 2s infinite, glitch-shift 0.3s infinite;
+    .closed-box h1 {
+      font-size: 3em;
+      margin: 0;
+      animation: glitch 1s infinite, rgb-glitch 5s infinite;
+    }
+
+    .closed-box p {
+      margin-top: 15px;
+      font-size: 1.2em;
+      color: #ddd;
+    }
+
+    #countdown {
+      font-size: 1.5em;
+      margin-top: 20px;
+      animation: glitch 1s infinite;
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 2px 2px red, -2px -2px cyan; }
+      25% { text-shadow: -2px 2px lime, 2px -2px magenta; }
+      50% { text-shadow: 2px -2px blue, -2px 2px yellow; }
+      75% { text-shadow: -2px -2px pink, 2px 2px orange; }
+      100% { text-shadow: 2px 2px red, -2px -2px cyan; }
     }
 
     @keyframes rgb-glitch {
@@ -75,89 +101,43 @@
       100% { color: red; }
     }
 
-    @keyframes glitch-shift {
-      0% { text-shadow: 2px 2px red, -2px -2px cyan; }
-      25% { text-shadow: -2px 2px lime, 2px -2px magenta; }
-      50% { text-shadow: 2px -2px blue, -2px 2px yellow; }
-      75% { text-shadow: -2px -2px pink, 2px 2px orange; }
-      100% { text-shadow: 2px 2px red, -2px -2px cyan; }
-    }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 40px 20px;
-      text-align: center;
-    }
-
-    .server-ip {
-      background: #111;
-      border: 2px solid #ff0000;
-      padding: 18px 28px;
-      border-radius: 14px;
-      margin: 30px auto;
-      width: fit-content;
-      cursor: pointer;
-      transition: 0.2s;
-      font-size: 1.3em;
-      animation: rgb-glitch 5s infinite;
-    }
-    .server-ip:hover {
-      background: #222;
-      transform: scale(1.05) rotate(-1deg);
-      animation: shake 0.2s infinite;
-    }
-
-    button {
-      background: linear-gradient(90deg, red, orange, yellow, lime, cyan, blue, magenta, red);
-      background-size: 400% 400%;
-      border: none;
-      padding: 16px 34px;
-      border-radius: 12px;
-      color: white;
-      font-size: 1.3em;
-      cursor: pointer;
-      margin-top: 20px;
-      animation: unstable 8s infinite linear;
-      transition: 0.2s;
-    }
-    button:hover {
-      transform: scale(1.1) rotate(1deg);
-      animation: shake 0.15s infinite;
-    }
-
     @keyframes shake {
-      0% { transform: translate(1px, 1px) rotate(0deg); }
-      25% { transform: translate(-1px, -2px) rotate(-1deg); }
-      50% { transform: translate(-3px, 0px) rotate(1deg); }
-      75% { transform: translate(3px, 2px) rotate(0deg); }
-      100% { transform: translate(1px, -1px) rotate(1deg); }
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      25% { transform: translate(-52%, -49%) rotate(-2deg); }
+      50% { transform: translate(-50%, -51%) rotate(2deg); }
+      75% { transform: translate(-48%, -49%) rotate(-1deg); }
+      100% { transform: translate(-50%, -50%) rotate(0deg); }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🔥 UNSTABLE SMP 🔥</h1>
-    <p>The chaos never ends.</p>
-  </header>
-
-  <div class="container">
-    <h2>Welcome to the Madness</h2>
-    <p>No ranks. No pay-to-win. Just pure, colorful chaos.  
-       Can you survive the instability?</p>
-
-    <div class="server-ip" onclick="copyIP()">
-      <strong>Server IP:</strong> Unstable_Smp_Free.aternos.me
-    </div>
-
-    <button onclick="window.open('https://discord.gg/N34Jg34swk', '_blank')">⚡ Join the Discord ⚡</button>
+  <div class="closed-box">
+    <h1>🚧 SERVER CLOSED 🚧</h1>
+    <p>Unstable SMP is currently down.</p>
+    <div id="countdown">⏳ Reopening in: --:--:--:--</div>
   </div>
 
   <script>
-    function copyIP() {
-      navigator.clipboard.writeText("play.unstablesmp.net");
-      alert("✅ Server IP copied to clipboard!");
-    }
+    // Set countdown target: 1.5 days (36 hours) from now
+    let reopenTime = new Date().getTime() + (36 * 60 * 60 * 1000);
+
+    let timer = setInterval(function() {
+      let now = new Date().getTime();
+      let distance = reopenTime - now;
+
+      if (distance < 0) {
+        clearInterval(timer);
+        document.getElementById("countdown").innerHTML = "✅ Server is Reopening!";
+      } else {
+        let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("countdown").innerHTML =
+          `⏳ Reopening in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+    }, 1000);
   </script>
 </body>
 </html>
