@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unstable SMP - Closed</title>
+  <title>Unstable SMP - Open</title>
   <style>
     body {
       margin: 0;
@@ -54,33 +54,39 @@
       50% { opacity: 0.25; }
     }
 
-    .closed-box {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      background: rgba(0,0,0,0.6);
-      border: 3px solid red;
-      padding: 40px 60px;
-      border-radius: 15px;
-    }
-
-    .closed-box h1 {
-      font-size: 3em;
-      margin: 0;
+    h1 {
+      text-align:center;
+      font-size:3em;
+      margin-top:30px;
       animation: glitch 1s infinite, rgb-glitch 5s infinite;
     }
 
-    .closed-box p {
-      margin-top: 15px;
-      font-size: 1.2em;
-      color: #ddd;
+    .open-banner {
+      text-align: center;
+      font-size: 2em;
+      margin: 20px 0;
+      animation: glitch 0.8s infinite, rgb-glitch 4s infinite;
+      font-weight: bold;
     }
 
-    #countdown {
-      font-size: 1.5em;
-      margin-top: 20px;
-      animation: glitch 1s infinite;
+    p {
+      text-align:center;
+      font-size:1.2em;
+    }
+
+    .join-btn {
+      display: block;
+      margin: 40px auto;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: linear-gradient(90deg, red, orange, yellow, lime, cyan, blue, magenta);
+      background-size: 400% 400%;
+      animation: unstable 10s infinite linear;
+      color: white;
+      text-shadow: 2px 2px 5px black;
     }
 
     @keyframes glitch {
@@ -102,33 +108,10 @@
   </style>
 </head>
 <body>
-  <div class="closed-box">
-    <h1>🚧 SERVER CLOSED 🚧</h1>
-    <p>Unstable SMP is currently down.</p>
-    <div id="countdown">⏳ Reopening in: --:--:--:--</div>
-  </div>
-
-  <script>
-    // Set countdown target: 1.5 days (36 hours) from now
-    let reopenTime = new Date().getTime() + (36 * 60 * 60 * 1000);
-
-    let timer = setInterval(function() {
-      let now = new Date().getTime();
-      let distance = reopenTime - now;
-
-      if (distance < 0) {
-        clearInterval(timer);
-        document.getElementById("countdown").innerHTML = "✅ Server is Reopening!";
-      } else {
-        let days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        document.getElementById("countdown").innerHTML =
-          `⏳ Reopening in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-      }
-    }, 1000);
-  </script>
+  <!-- OPEN SMP PAGE -->
+  <h1>🌈 Welcome to the Unstable SMP 🌈</h1>
+  <div class="open-banner">🚀 UNSTABLE SMP IS OPEN NOW 🚀</div>
+  <p>The most chaotic, colorful, and glitchy SMP experience ever.</p>
+  <button class="join-btn">Join Now</button>
 </body>
 </html>
