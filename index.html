@@ -1,4 +1,4 @@
-<!doctype html>I
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -7,13 +7,14 @@
   <style>
     :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#ff3b30}
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,#071029 0%, #071827 100%);color:#e6eef6;padding:24px}
-    .wrap{max-width:1100px;margin:0 auto}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;background:url('background.jpg') no-repeat center center fixed;background-size:cover;color:#e6eef6;padding:24px;position:relative;min-height:100vh;}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:-1}
+    .wrap{max-width:1100px;margin:0 auto;padding-bottom:100px;}
     header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
     h1{margin:0;font-size:20px}
-    .panel{background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;box-shadow:0 6px 14px rgba(2,6,23,0.6)}
+    .panel{background:rgba(0,0,0,0.6);padding:14px;border-radius:10px;box-shadow:0 6px 14px rgba(2,6,23,0.6)}
     form{display:flex;gap:8px;flex-wrap:wrap}
-    input[type=text]{flex:1;min-width:220px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+    input[type=text],input[type=password]{flex:1;min-width:220px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
     button{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:white;cursor:pointer}
     .muted{color:var(--muted);font-size:13px}
     .controls{display:flex;gap:8px;align-items:center}
@@ -28,7 +29,6 @@
     .card .actions{display:flex;gap:6px;margin-top:8px}
     .icon-btn{padding:6px 8px;border-radius:7px;border:0;background:rgba(255,255,255,0.04);color:inherit;cursor:pointer}
 
-    /* modal */
     .modal{position:fixed;inset:0;background:rgba(2,6,23,0.7);display:none;align-items:center;justify-content:center;padding:24px}
     .modal.open{display:flex}
     .player{width:min(1100px,95%);height:min(620px,60vh);background:#000;border-radius:10px;overflow:hidden}
@@ -37,12 +37,17 @@
     .toolbar{display:flex;gap:8px;align-items:center}
     .small-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:var(--muted);cursor:pointer}
 
-    footer{margin-top:18px;color:var(--muted);font-size:13px}
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center;}
+    .zetros-banner{position:fixed;bottom:0;left:0;width:100%;text-align:center;font-size:48px;font-weight:900;color:white;text-shadow:0 0 20px rgba(255,255,255,0.8);padding:20px;background:rgba(0,0,0,0.3);backdrop-filter:blur(6px);letter-spacing:3px;}
 
-    @media (max-width:520px){header{flex-direction:column;align-items:stretch}form{flex-direction:column}}
+    #addForm{display:none;}
+    #showFormBtn{margin-top:8px;}
+
+    @media (max-width:520px){header{flex-direction:column;align-items:stretch}form{flex-direction:column}.zetros-banner{font-size:32px;padding:16px;}}
   </style>
 </head>
 <body>
+  <div class="overlay"></div>
   <div class="wrap">
     <header>
       <div>
@@ -57,12 +62,14 @@
     </header>
 
     <section class="panel">
+      <button id="showFormBtn">Add Video</button>
       <form id="addForm">
         <input id="urlInput" type="text" placeholder="YouTube URL (or ID) — e.g. https://youtu.be/dQw4w9WgXcQ" required />
         <input id="titleInput" type="text" placeholder="Optional title (leave blank to fetch)" />
+        <input id="passwordInput" type="password" placeholder="Password required" required />
         <button type="submit">Add</button>
       </form>
-      <div class="muted" style="margin-top:8px">You can drag cards to reorder. Click a thumbnail to play.</div>
+      <div class="muted" style="margin-top:8px">Password to add videos is <b>Cheese</b>. You can drag cards to reorder. Click a thumbnail to play.</div>
     </section>
 
     <div id="gallery" class="gallery" aria-live="polite"></div>
@@ -75,25 +82,19 @@
 
     <footer class="muted">Built with a single static file. Host anywhere (GitHub Pages works). Thumbnails are fetched from YouTube.</footer>
   </div>
+  <div class="zetros-banner">ZETROS GALLERY</div>
 
   <script>
-    // Simple YouTube ID extractor
     function extractYouTubeID(url){
       if(!url) return null;
-      // if user enters just an ID
       if(/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
       try{
         const u = new URL(url);
         if(u.hostname === 'youtu.be') return u.pathname.slice(1);
         if(u.searchParams.get('v')) return u.searchParams.get('v');
-        // sometimes embed urls: /embed/ID
         const m = u.pathname.match(/\/embed\/([-_a-zA-Z0-9]{11})/);
         if(m) return m[1];
-      }catch(e){
-        // not a URL, maybe it's an ID
-        if(/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
-      }
-      // fallback regex
+      }catch(e){if(/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;}
       const rg = url.match(/(?:v=|\/v\/|youtu\.be\/|embed\/)([-_a-zA-Z0-9]{11})/);
       return rg ? rg[1] : null;
     }
@@ -103,14 +104,18 @@
 
     const gallery = document.getElementById('gallery');
     const form = document.getElementById('addForm');
+    const showFormBtn = document.getElementById('showFormBtn');
     const urlInput = document.getElementById('urlInput');
     const titleInput = document.getElementById('titleInput');
+    const passInput = document.getElementById('passwordInput');
     const modal = document.getElementById('modal');
     const playerFrame = document.getElementById('playerFrame');
 
-    function save(){
-      localStorage.setItem(LS_KEY, JSON.stringify(items));
-    }
+    showFormBtn.addEventListener('click', ()=>{
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    function save(){localStorage.setItem(LS_KEY, JSON.stringify(items));}
 
     function createCard(item, index){
       const card = document.createElement('div');
@@ -129,124 +134,58 @@
             <button class="icon-btn edit">Edit</button>
             <button class="icon-btn del">Delete</button>
           </div>
-        </div>
-      `;
+        </div>`;
 
-      // events
       card.querySelector('.play').addEventListener('click',()=>openPlayer(item.id));
       card.querySelector('.copy').addEventListener('click',()=>{
-        navigator.clipboard.writeText('https://youtu.be/'+item.id).then(()=>{
-          flash('Copied to clipboard');
-        });
+        navigator.clipboard.writeText('https://youtu.be/'+item.id).then(()=>flash('Copied to clipboard'));
       });
       card.querySelector('.del').addEventListener('click',()=>{
-        if(confirm('Delete this video?')){
-          items.splice(index,1); rerender(); save();
-        }
+        if(confirm('Delete this video?')){items.splice(index,1);rerender();save();}
       });
       card.querySelector('.edit').addEventListener('click',()=>{
         const newTitle = prompt('Edit title', item.title||'');
-        if(newTitle !== null){ item.title = newTitle; save(); rerender(); }
+        if(newTitle!==null){item.title=newTitle;save();rerender();}
       });
-
-      // drag events
-      card.addEventListener('dragstart', (e)=>{
-        e.dataTransfer.setData('text/plain', index);
-        card.style.opacity = '0.5';
-      });
-      card.addEventListener('dragend', ()=>{ card.style.opacity=''; });
-
-      // allow drop on cards
-      card.addEventListener('dragover', (e)=>{ e.preventDefault(); card.style.outline = '2px dashed rgba(255,255,255,0.06)'; });
-      card.addEventListener('dragleave', ()=>{ card.style.outline=''; });
-      card.addEventListener('drop', (e)=>{
-        e.preventDefault(); card.style.outline='';
-        const srcIndex = Number(e.dataTransfer.getData('text/plain'));
-        const dstIndex = Number(card.dataset.index);
-        if(!isNaN(srcIndex) && !isNaN(dstIndex) && srcIndex !== dstIndex){
-          const [moved] = items.splice(srcIndex,1);
-          items.splice(dstIndex,0,moved);
-          save(); rerender();
-        }
-      });
-
+      card.addEventListener('dragstart',(e)=>{e.dataTransfer.setData('text/plain',index);card.style.opacity='0.5';});
+      card.addEventListener('dragend',()=>{card.style.opacity='';});
+      card.addEventListener('dragover',(e)=>{e.preventDefault();card.style.outline='2px dashed rgba(255,255,255,0.06)';});
+      card.addEventListener('dragleave',()=>{card.style.outline='';});
+      card.addEventListener('drop',(e)=>{e.preventDefault();card.style.outline='';const src=Number(e.dataTransfer.getData('text/plain'));const dst=Number(card.dataset.index);if(!isNaN(src)&&!isNaN(dst)&&src!==dst){const [m]=items.splice(src,1);items.splice(dst,0,m);save();rerender();}});
       return card;
     }
 
-    function rerender(){
-      gallery.innerHTML = '';
-      items.forEach((it,i)=>gallery.appendChild(createCard(it,i)));
-    }
+    function rerender(){gallery.innerHTML='';items.forEach((it,i)=>gallery.appendChild(createCard(it,i)));}
+    function openPlayer(id){playerFrame.src=`https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;modal.classList.add('open');modal.setAttribute('aria-hidden','false');}
+    modal.addEventListener('click',(e)=>{if(e.target===modal){playerFrame.src='';modal.classList.remove('open');modal.setAttribute('aria-hidden','true');}});
 
-    function openPlayer(id){
-      playerFrame.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
-      modal.classList.add('open');
-      modal.setAttribute('aria-hidden','false');
-    }
-
-    modal.addEventListener('click',(e)=>{
-      if(e.target === modal){
-        playerFrame.src = '';
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden','true');
-      }
-    });
-
-    form.addEventListener('submit', async (e)=>{
+    form.addEventListener('submit',(e)=>{
       e.preventDefault();
-      const raw = urlInput.value.trim();
-      const id = extractYouTubeID(raw);
-      if(!id){ alert('Could not find a YouTube ID in that URL.'); return; }
-      const thumb = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-      const title = titleInput.value.trim() || `YouTube video (${id})`;
-
-      items.push({id, title, thumb, added:Date.now()});
-      save(); rerender();
-      form.reset(); urlInput.focus();
+      if(passInput.value!=='Cheese'){alert('Wrong password!');return;}
+      const raw=urlInput.value.trim();const id=extractYouTubeID(raw);
+      if(!id){alert('Could not find a YouTube ID in that URL.');return;}
+      const thumb=`https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+      const title=titleInput.value.trim()||`YouTube video (${id})`;
+      items.push({id,title,thumb,added:Date.now()});save();rerender();form.reset();urlInput.focus();form.style.display='none';
     });
 
-    // export/import
-    document.getElementById('exportBtn').addEventListener('click', ()=>{
-      const blob = new Blob([JSON.stringify(items, null, 2)], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'yt-gallery.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    document.getElementById('exportBtn').addEventListener('click',()=>{
+      const blob=new Blob([JSON.stringify(items,null,2)],{type:'application/json'});
+      const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='yt-gallery.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
     });
 
-    document.getElementById('importBtn').addEventListener('click', ()=>{
-      const input = document.createElement('input'); input.type='file'; input.accept='application/json';
-      input.addEventListener('change', ()=>{
-        const f = input.files[0]; if(!f) return;
-        const reader = new FileReader(); reader.onload = ()=>{
-          try{
-            const arr = JSON.parse(reader.result);
-            if(Array.isArray(arr)){
-              items = arr; save(); rerender(); flash('Imported');
-            }else alert('Invalid JSON format');
-          }catch(err){ alert('Failed to parse JSON'); }
-        }; reader.readAsText(f);
-      });
-      input.click();
+    document.getElementById('importBtn').addEventListener('click',()=>{
+      const input=document.createElement('input');input.type='file';input.accept='application/json';
+      input.addEventListener('change',()=>{
+        const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const arr=JSON.parse(r.result);if(Array.isArray(arr)){items=arr;save();rerender();flash('Imported');}else alert('Invalid JSON format');}catch(err){alert('Failed to parse JSON');}};r.readAsText(f);
+      });input.click();
     });
 
-    document.getElementById('clearBtn').addEventListener('click', ()=>{
-      if(confirm('Clear all videos from this gallery?')){ items = []; save(); rerender(); }
-    });
+    document.getElementById('clearBtn').addEventListener('click',()=>{if(confirm('Clear all videos?')){items=[];save();rerender();}});
 
-    function flash(msg){
-      const el = document.createElement('div');
-      el.textContent = msg; el.style.position='fixed'; el.style.bottom='20px'; el.style.left='50%'; el.style.transform='translateX(-50%)';
-      el.style.padding='10px 14px'; el.style.background='rgba(0,0,0,0.5)'; el.style.border='1px solid rgba(255,255,255,0.06)'; el.style.borderRadius='8px'; el.style.zIndex=9999;
-      document.body.appendChild(el);
-      setTimeout(()=>el.style.opacity='0',1200);
-      setTimeout(()=>el.remove(),1800);
-    }
-
-    function escapeHtml(s){ return (s+'').replace(/[&<>\"']/g, (c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]); }
-
-    // initial render
+    function flash(msg){const el=document.createElement('div');el.textContent=msg;el.style.position='fixed';el.style.bottom='80px';el.style.left='50%';el.style.transform='translateX(-50%)';el.style.padding='10px 14px';el.style.background='rgba(0,0,0,0.5)';el.style.border='1px solid rgba(255,255,255,0.06)';el.style.borderRadius='8px';el.style.zIndex=9999;document.body.appendChild(el);setTimeout(()=>el.style.opacity='0',1200);setTimeout(()=>el.remove(),1800);}
+    function escapeHtml(s){return(s+'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]);}
     rerender();
-
   </script>
 </body>
 </html>
