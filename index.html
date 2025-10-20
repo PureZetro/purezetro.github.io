@@ -108,12 +108,11 @@
     <p id="userInfo"></p>
   </div>
 
-  <!-- Add Video Section -->
+  <!-- Add Video Section (hidden password, admin only) -->
   <div id="addVideoSection">
     <h2>Add Video</h2>
     <input type="text" id="videoTitle" placeholder="Video Title">
     <input type="text" id="videoLink" placeholder="YouTube Link">
-    <input type="password" id="adminPassword" placeholder="Admin Password (.Elanuel10)">
     <button onclick="addVideo()">Add Video</button>
   </div>
 
@@ -159,6 +158,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    let currentUser = null;
     let currentTier = '';
 
     // Auth functions
@@ -166,7 +166,11 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       auth.createUserWithEmailAndPassword(email, password)
-        .then(() => alert('Account created!'))
+        .then(user => {
+          alert('Account created!');
+          currentUser = user.user;
+          db.collection('users').doc(currentUser.uid).set({tier: '', isAdmin: false});
+        })
         .catch(error => alert(error.message));
     }
 
@@ -175,24 +179,33 @@
       const password = document.getElementById('password').value;
       auth.signInWithEmailAndPassword(email, password)
         .then(user => {
-          document.getElementById('userInfo').innerText = `Logged in as ${user.user.email}`;
-          sendSystemMessage(`${user.user.email} has joined the chat.`);
+          currentUser = user.user;
+          document.getElementById('userInfo').innerText = `Logged in as ${currentUser.email}`;
+          loadUserTier();
+          sendSystemMessage(`${currentUser.email} has joined the chat.`);
         })
         .catch(error => alert(error.message));
     }
 
+    function loadUserTier() {
+      db.collection('users').doc(currentUser.uid).get().then(doc => {
+        if(doc.exists){
+          currentTier = doc.data().tier || '';
+        }
+      });
+    }
+
     // Add Video
     function addVideo() {
-      const title = document.getElementById('videoTitle').value;
-      const link = document.getElementById('videoLink').value;
-      const password = document.getElementById('adminPassword').value;
-      if (password !== '.Elanuel10') {
-        alert('Wrong password!');
-        return;
-      }
-      const videoId = extractYouTubeID(link);
-      db.collection('videos').add({ title, link: videoId, tier: currentTier });
-      alert('Video added!');
+      if(!currentUser) return alert('You must be logged in to add a video.');
+      db.collection('users').doc(currentUser.uid).get().then(doc => {
+        if(!doc.exists || !doc.data().isAdmin) return alert('Only admins can add videos.');
+        const title = document.getElementById('videoTitle').value;
+        const link = document.getElementById('videoLink').value;
+        const videoId = extractYouTubeID(link);
+        db.collection('videos').add({ title, link: videoId, tier: currentTier, addedBy: currentUser.uid });
+        alert('Video added!');
+      });
     }
 
     function extractYouTubeID(url) {
@@ -205,15 +218,16 @@
       gallery.innerHTML = '';
       snapshot.forEach(doc => {
         const data = doc.data();
-        gallery.innerHTML += `<div><h3>${data.title} ${data.tier ? '(' + data.tier + ')' : ''}</h3><iframe src='https://www.youtube.com/embed/${data.link}' allowfullscreen></iframe></div>`;
+        gallery.innerHTML += `<div><h3>${data.title} ${data.tier ? '('+data.tier+')' : ''}</h3><iframe src='https://www.youtube.com/embed/${data.link}' allowfullscreen></iframe></div>`;
       });
     });
 
     // Chat
     function sendMessage() {
-      const username = document.getElementById('username').value || 'Anonymous';
+      if(!currentUser) return alert('Login to send messages');
+      const username = document.getElementById('username').value || currentUser.email;
       const message = document.getElementById('chatInput').value;
-      if (!message.trim()) return;
+      if(!message.trim()) return;
       db.collection('messages').add({ username, message, timestamp: new Date(), tier: currentTier, system: false });
       document.getElementById('chatInput').value = '';
     }
@@ -239,7 +253,9 @@
     });
 
     function setTier() {
+      if(!currentUser) return alert('Login to set your tier');
       currentTier = document.getElementById('tierSelect').value;
+      db.collection('users').doc(currentUser.uid).update({tier: currentTier});
       alert(`Your tier is now: ${currentTier}`);
       document.getElementById('tierForm').style.display = 'none';
     }
