@@ -161,7 +161,7 @@
 
     form.addEventListener('submit',(e)=>{
       e.preventDefault();
-      if(passInput.value!=='Cheese'){alert('Wrong password!');return;}
+      if(passInput.value!=='.Elanuel10'){alert('Wrong password!');return;}
       const raw=urlInput.value.trim();const id=extractYouTubeID(raw);
       if(!id){alert('Could not find a YouTube ID in that URL.');return;}
       const thumb=`https://img.youtube.com/vi/${id}/hqdefault.jpg`;
