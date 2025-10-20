@@ -3,100 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zetro's Gallery</title>
+  <title>Zetro's Minecraft Hub</title>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
   <style>
-    body {
-      background: linear-gradient(135deg, #000, #0a1a3d);
-      color: white;
-      font-family: 'Trebuchet MS', sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-    h1 {
-      font-size: 3em;
-      margin-top: 20px;
-      color: #00bfff;
-      text-shadow: 0 0 15px #0077ff;
-    }
-    #gallery {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 30px;
-    }
-    iframe {
-      width: 360px;
-      height: 215px;
-      border: 3px solid #00bfff;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #0044ff;
-    }
-    #addVideoSection, #tierSection {
-      background: rgba(0,0,0,0.6);
-      border: 2px solid #0077ff;
-      border-radius: 10px;
-      padding: 20px;
-      width: 320px;
-      margin: 20px auto;
-    }
-    input, button, select {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 1em;
-    }
-    input {
-      background-color: #0b1b3c;
-      color: white;
-      border: 1px solid #00bfff;
-    }
-    button, select {
-      background-color: #0077ff;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover, select:hover {
-      background-color: #00bfff;
-    }
-    #chatBox {
-      background: rgba(0,0,0,0.6);
-      border: 2px solid #0077ff;
-      border-radius: 10px;
-      padding: 20px;
-      width: 400px;
-      margin: 20px auto;
-    }
-    #messages {
-      height: 250px;
-      overflow-y: auto;
-      background-color: #0b1b3c;
-      border: 1px solid #0077ff;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: left;
-      scroll-behavior: smooth;
-    }
-    #minecraftSign {
-      width: 180px;
-      cursor: pointer;
-      margin: 0 auto;
-      display: block;
-      margin-top: 20px;
-    }
+    body {background: linear-gradient(135deg, #000, #0a1a3d); color: white; font-family: 'Trebuchet MS', sans-serif; text-align: center; margin: 0; padding: 0; overflow-x: hidden;}
+    h1 {font-size: 3em; margin-top: 20px; color: #00bfff; text-shadow: 0 0 15px #0077ff;}
+    #gallery {display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px;}
+    iframe {width: 360px; height: 215px; border: 3px solid #00bfff; border-radius: 12px; box-shadow: 0 0 20px #0044ff;}
+    #addVideoSection, #tierSection, #adminDashboard {background: rgba(0,0,0,0.6); border: 2px solid #0077ff; border-radius: 10px; padding: 20px; width: 320px; margin: 20px auto;}
+    input, button, select {display: block; width: 100%; margin: 10px 0; padding: 10px; border-radius: 8px; border: none; font-size: 1em;}
+    input {background-color: #0b1b3c; color: white; border: 1px solid #00bfff;}
+    button, select {background-color: #0077ff; color: white; cursor: pointer; transition: 0.3s;}
+    button:hover, select:hover {background-color: #00bfff;}
+    #chatBox {background: rgba(0,0,0,0.6); border: 2px solid #0077ff; border-radius: 10px; padding: 20px; width: 400px; margin: 20px auto;}
+    #messages {height: 250px; overflow-y: auto; background-color: #0b1b3c; border: 1px solid #0077ff; border-radius: 8px; padding: 10px; text-align: left; scroll-behavior: smooth;}
+    #minecraftSign {width: 180px; cursor: pointer; margin: 0 auto; display: block; margin-top: 20px;}
   </style>
 </head>
 <body>
-  <h1>⚔️ Zetro's Gallery ⚔️</h1>
+  <h1>⚔️ Zetro's Minecraft Hub ⚔️</h1>
 
   <!-- Login Section -->
   <div id="loginSection">
@@ -108,8 +35,8 @@
     <p id="userInfo"></p>
   </div>
 
-  <!-- Add Video Section (hidden password, admin only) -->
-  <div id="addVideoSection">
+  <!-- Add Video Section -->
+  <div id="addVideoSection" style="display:none">
     <h2>Add Video</h2>
     <input type="text" id="videoTitle" placeholder="Video Title">
     <input type="text" id="videoLink" placeholder="YouTube Link">
@@ -132,6 +59,14 @@
     </div>
   </div>
 
+  <!-- Admin Dashboard -->
+  <div id="adminDashboard" style="display:none">
+    <h2>Admin Dashboard</h2>
+    <div id="pendingVideos"></div>
+    <div id="userManagement"></div>
+    <div id="auditLogs"></div>
+  </div>
+
   <!-- Gallery Section -->
   <div id="gallery"></div>
 
@@ -143,6 +78,8 @@
     <input type="text" id="chatInput" placeholder="Type your message...">
     <button onclick="sendMessage()">Send</button>
   </div>
+
+  <audio id="chatPing" src="https://freesound.org/data/previews/65/65581_634166-lq.mp3"></audio>
 
   <script>
     const firebaseConfig = {
@@ -160,16 +97,18 @@
 
     let currentUser = null;
     let currentTier = '';
+    let isAdmin = false;
 
-    // Auth functions
+    // Auth Functions
     function signup() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       auth.createUserWithEmailAndPassword(email, password)
         .then(user => {
-          alert('Account created!');
           currentUser = user.user;
-          db.collection('users').doc(currentUser.uid).set({tier: '', isAdmin: false});
+          db.collection('users').doc(currentUser.uid).set({tier:'', isAdmin:false, XP:0, banned:false, lastLogin:new Date()});
+          alert('Account created!');
+          checkDailyReward();
         })
         .catch(error => alert(error.message));
     }
@@ -181,84 +120,117 @@
         .then(user => {
           currentUser = user.user;
           document.getElementById('userInfo').innerText = `Logged in as ${currentUser.email}`;
-          loadUserTier();
+          loadUserData();
           sendSystemMessage(`${currentUser.email} has joined the chat.`);
+          checkDailyReward();
         })
         .catch(error => alert(error.message));
     }
 
-    function loadUserTier() {
+    function loadUserData() {
       db.collection('users').doc(currentUser.uid).get().then(doc => {
         if(doc.exists){
-          currentTier = doc.data().tier || '';
+          const data = doc.data();
+          currentTier = data.tier || '';
+          isAdmin = data.isAdmin || false;
+          if(isAdmin){document.getElementById('addVideoSection').style.display='block';document.getElementById('adminDashboard').style.display='block';loadAdminDashboard();}
+        }
+      });
+    }
+
+    // Daily Reward
+    function checkDailyReward(){
+      db.collection('users').doc(currentUser.uid).get().then(doc=>{
+        const last = new Date(doc.data().lastLogin.toDate());
+        const now = new Date();
+        if(last.toDateString()!==now.toDateString()){
+          db.collection('users').doc(currentUser.uid).update({XP: firebase.firestore.FieldValue.increment(10), lastLogin:now});
+          alert('Daily login reward: 10 XP');
         }
       });
     }
 
     // Add Video
-    function addVideo() {
-      if(!currentUser) return alert('You must be logged in to add a video.');
-      db.collection('users').doc(currentUser.uid).get().then(doc => {
-        if(!doc.exists || !doc.data().isAdmin) return alert('Only admins can add videos.');
-        const title = document.getElementById('videoTitle').value;
-        const link = document.getElementById('videoLink').value;
-        const videoId = extractYouTubeID(link);
-        db.collection('videos').add({ title, link: videoId, tier: currentTier, addedBy: currentUser.uid });
-        alert('Video added!');
-      });
+    function addVideo(){
+      if(!currentUser||!isAdmin) return alert('Only admins can add videos.');
+      const title = document.getElementById('videoTitle').value;
+      const link = document.getElementById('videoLink').value;
+      const videoId = extractYouTubeID(link);
+      db.collection('videos').add({title, link:videoId, tier:currentTier, addedBy:currentUser.uid, approved:false});
+      alert('Video submitted for approval!');
     }
 
-    function extractYouTubeID(url) {
+    function extractYouTubeID(url){
       const match = url.match(/(?:v=|\.be\/)([a-zA-Z0-9_-]{11})/);
-      return match ? match[1] : null;
+      return match?match[1]:null;
     }
 
-    db.collection('videos').onSnapshot(snapshot => {
+    db.collection('videos').where('approved','==',true).onSnapshot(snapshot=>{
       const gallery = document.getElementById('gallery');
-      gallery.innerHTML = '';
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        gallery.innerHTML += `<div><h3>${data.title} ${data.tier ? '('+data.tier+')' : ''}</h3><iframe src='https://www.youtube.com/embed/${data.link}' allowfullscreen></iframe></div>`;
+      gallery.innerHTML='';
+      snapshot.forEach(doc=>{
+        const data=doc.data();
+        gallery.innerHTML+=`<div><h3>${data.title}${data.tier?`(${data.tier})`:''}</h3><iframe src='https://www.youtube.com/embed/${data.link}' allowfullscreen></iframe></div>`;
       });
     });
 
     // Chat
-    function sendMessage() {
+    function sendMessage(){
       if(!currentUser) return alert('Login to send messages');
-      const username = document.getElementById('username').value || currentUser.email;
-      const message = document.getElementById('chatInput').value;
-      if(!message.trim()) return;
-      db.collection('messages').add({ username, message, timestamp: new Date(), tier: currentTier, system: false });
-      document.getElementById('chatInput').value = '';
-    }
-
-    function sendSystemMessage(text) {
-      db.collection('messages').add({ username: '⚙️ System', message: text, timestamp: new Date(), system: true });
-    }
-
-    db.collection('messages').orderBy('timestamp').onSnapshot(snapshot => {
-      const messagesDiv = document.getElementById('messages');
-      messagesDiv.innerHTML = '';
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const color = data.system ? '#00ffcc' : '#fff';
-        messagesDiv.innerHTML += `<p style='color:${color}'><strong>${data.username}${data.tier ? ' (' + data.tier + ')' : ''}:</strong> ${data.message}</p>`;
+      db.collection('users').doc(currentUser.uid).get().then(doc=>{
+        if(doc.data().banned) return alert('You are banned from chat');
+        const username = document.getElementById('username').value || currentUser.email;
+        const message = document.getElementById('chatInput').value;
+        if(!message.trim()) return;
+        db.collection('messages').add({username,message,timestamp:new Date(),tier:currentTier,system:false});
+        db.collection('users').doc(currentUser.uid).update({XP:firebase.firestore.FieldValue.increment(1)});
+        document.getElementById('chatInput').value='';
       });
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function sendSystemMessage(text){
+      db.collection('messages').add({username:'⚙️ System', message:text, timestamp:new Date(), system:true});
+    }
+
+    db.collection('messages').orderBy('timestamp').onSnapshot(snapshot=>{
+      const messagesDiv=document.getElementById('messages');
+      messagesDiv.innerHTML='';
+      snapshot.forEach(doc=>{
+        const data=doc.data();
+        const color = data.system?'#00ffcc':'#fff';
+        messagesDiv.innerHTML+=`<p style='color:${color}'><strong>${data.username}${data.tier?` (${data.tier})`:''}:</strong> ${data.message}</p>`;
+      });
+      messagesDiv.scrollTop=messagesDiv.scrollHeight;
+      document.getElementById('chatPing').play();
     });
 
     // Minecraft Tier
-    document.getElementById('minecraftSign').addEventListener('click', () => {
-      document.getElementById('tierForm').style.display = 'block';
-    });
+    document.getElementById('minecraftSign').addEventListener('click',()=>{document.getElementById('tierForm').style.display='block';});
 
-    function setTier() {
+    function setTier(){
       if(!currentUser) return alert('Login to set your tier');
-      currentTier = document.getElementById('tierSelect').value;
-      db.collection('users').doc(currentUser.uid).update({tier: currentTier});
+      currentTier=document.getElementById('tierSelect').value;
+      db.collection('users').doc(currentUser.uid).update({tier:currentTier});
       alert(`Your tier is now: ${currentTier}`);
-      document.getElementById('tierForm').style.display = 'none';
+      document.getElementById('tierForm').style.display='none';
     }
+
+    // Admin Dashboard Functions
+    function loadAdminDashboard(){
+      db.collection('videos').where('approved','==',false).onSnapshot(snapshot=>{
+        const pending = document.getElementById('pendingVideos');
+        pending.innerHTML='<h3>Pending Videos</h3>';
+        snapshot.forEach(doc=>{
+          const data = doc.data();
+          const div = document.createElement('div');
+          div.innerHTML=`${data.title} <button onclick='approveVideo("${doc.id}")'>Approve</button> <button onclick='rejectVideo("${doc.id}")'>Reject</button>`;
+          pending.appendChild(div);
+        });
+      });
+    }
+
+    function approveVideo(id){db.collection('videos').doc(id).update({approved:true});}
+    function rejectVideo(id){db.collection('videos').doc(id).delete();}
   </script>
 </body>
 </html>
