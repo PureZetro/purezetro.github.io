@@ -37,7 +37,7 @@
       border-radius: 12px;
       box-shadow: 0 0 20px #0044ff;
     }
-    #addVideoSection {
+    #addVideoSection, #tierSection {
       background: rgba(0,0,0,0.6);
       border: 2px solid #0077ff;
       border-radius: 10px;
@@ -45,7 +45,7 @@
       width: 320px;
       margin: 20px auto;
     }
-    input, button, textarea {
+    input, button, select {
       display: block;
       width: 100%;
       margin: 10px 0;
@@ -59,13 +59,13 @@
       color: white;
       border: 1px solid #00bfff;
     }
-    button {
+    button, select {
       background-color: #0077ff;
       color: white;
       cursor: pointer;
       transition: 0.3s;
     }
-    button:hover {
+    button:hover, select:hover {
       background-color: #00bfff;
     }
     #chatBox {
@@ -85,6 +85,13 @@
       padding: 10px;
       text-align: left;
       scroll-behavior: smooth;
+    }
+    #minecraftSign {
+      width: 180px;
+      cursor: pointer;
+      margin: 0 auto;
+      display: block;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -108,6 +115,22 @@
     <input type="text" id="videoLink" placeholder="YouTube Link">
     <input type="password" id="adminPassword" placeholder="Admin Password (.Elanuel10)">
     <button onclick="addVideo()">Add Video</button>
+  </div>
+
+  <!-- Minecraft Tier Section -->
+  <div id="tierSection">
+    <h2>Enter the Realms</h2>
+    <img src="https://i.imgur.com/Zk0Aq2D.png" id="minecraftSign" alt="Minecraft Sign" title="Click to set your tier">
+    <div id="tierForm" style="display:none">
+      <select id="tierSelect">
+        <option value="Stone">Stone</option>
+        <option value="Iron">Iron</option>
+        <option value="Gold">Gold</option>
+        <option value="Diamond">Diamond</option>
+        <option value="Netherite">Netherite</option>
+      </select>
+      <button onclick="setTier()">Set Tier</button>
+    </div>
   </div>
 
   <!-- Gallery Section -->
@@ -135,6 +158,8 @@
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+
+    let currentTier = '';
 
     // Auth functions
     function signup() {
@@ -166,7 +191,7 @@
         return;
       }
       const videoId = extractYouTubeID(link);
-      db.collection('videos').add({ title, link: videoId });
+      db.collection('videos').add({ title, link: videoId, tier: currentTier });
       alert('Video added!');
     }
 
@@ -180,7 +205,7 @@
       gallery.innerHTML = '';
       snapshot.forEach(doc => {
         const data = doc.data();
-        gallery.innerHTML += `<div><h3>${data.title}</h3><iframe src='https://www.youtube.com/embed/${data.link}' allowfullscreen></iframe></div>`;
+        gallery.innerHTML += `<div><h3>${data.title} ${data.tier ? '(' + data.tier + ')' : ''}</h3><iframe src='https://www.youtube.com/embed/${data.link}' allowfullscreen></iframe></div>`;
       });
     });
 
@@ -189,7 +214,7 @@
       const username = document.getElementById('username').value || 'Anonymous';
       const message = document.getElementById('chatInput').value;
       if (!message.trim()) return;
-      db.collection('messages').add({ username, message, timestamp: new Date(), system: false });
+      db.collection('messages').add({ username, message, timestamp: new Date(), tier: currentTier, system: false });
       document.getElementById('chatInput').value = '';
     }
 
@@ -203,10 +228,21 @@
       snapshot.forEach(doc => {
         const data = doc.data();
         const color = data.system ? '#00ffcc' : '#fff';
-        messagesDiv.innerHTML += `<p style='color:${color}'><strong>${data.username}:</strong> ${data.message}</p>`;
+        messagesDiv.innerHTML += `<p style='color:${color}'><strong>${data.username}${data.tier ? ' (' + data.tier + ')' : ''}:</strong> ${data.message}</p>`;
       });
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     });
+
+    // Minecraft Tier
+    document.getElementById('minecraftSign').addEventListener('click', () => {
+      document.getElementById('tierForm').style.display = 'block';
+    });
+
+    function setTier() {
+      currentTier = document.getElementById('tierSelect').value;
+      alert(`Your tier is now: ${currentTier}`);
+      document.getElementById('tierForm').style.display = 'none';
+    }
   </script>
 </body>
 </html>
