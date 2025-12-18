@@ -20,6 +20,7 @@
       background: rgba(0,0,0,0.4);
       position: sticky;
       top: 0;
+      z-index: 1000;
     }
 
     button {
@@ -80,6 +81,7 @@
       border-radius: 15px;
       padding: 10px;
       position: relative;
+      z-index: 999;
     }
 
     #windowTitle {
@@ -99,6 +101,7 @@
       padding: 0 10px;
       font-size: 14px;
       color: white;
+      z-index: 1000;
     }
 
     #startMenu {
@@ -110,6 +113,7 @@
       background: rgba(50,50,50,0.95);
       border-radius: 10px;
       padding: 10px;
+      z-index: 1000;
     }
 
   </style>
@@ -117,11 +121,11 @@
 <body>
 
 <header>
-  <button onclick="showSection('home')">Home</button>
-  <button onclick="showSection('demo')">Demo</button>
-  <button onclick="showSection('creator')">Creator</button>
-  <button onclick="showSection('shop')">Shop</button>
-  <button onclick="showSection('upgrades')">Upgrades</button>
+  <button id="btnHome">Home</button>
+  <button id="btnDemo">Demo</button>
+  <button id="btnCreator">Creator</button>
+  <button id="btnShop">Shop</button>
+  <button id="btnUpgrades">Upgrades</button>
 </header>
 
 <section id="home" class="active">
@@ -196,40 +200,34 @@
 </div>
 
 <script>
-  function showSection(id) {
-    document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+  // Button functionality fix
+  document.getElementById('btnHome').addEventListener('click',()=>showSection('home'));
+  document.getElementById('btnDemo').addEventListener('click',()=>showSection('demo'));
+  document.getElementById('btnCreator').addEventListener('click',()=>showSection('creator'));
+  document.getElementById('btnShop').addEventListener('click',()=>showSection('shop'));
+  document.getElementById('btnUpgrades').addEventListener('click',()=>showSection('upgrades'));
+
+  function showSection(id){
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
 
-  function openApp(app) {
-    const win = document.getElementById('window');
-    const title = document.getElementById('windowTitle');
-    const content = document.getElementById('windowContent');
-    win.style.display = 'block';
-
-    if(app==='browser'){
-      title.innerText='Microsoft Edge';
-      content.innerHTML='<iframe src="https://www.bing.com" style="width:100%;height:400px;border:none;"></iframe>';
-    }
-    if(app==='notes'){
-      title.innerText='Notepad';
-      content.innerHTML='<textarea style="width:100%;height:300px;">Type here...</textarea>';
-    }
-    if(app==='store'){
-      title.innerText='App Store';
-      content.innerHTML='<p>Apps coming soon...</p>';
-    }
-    if(app==='settings'){
-      title.innerText='Settings';
-      content.innerHTML='<p>Change settings on Settings page.</p>';
-    }
+  function openApp(app){
+    const win=document.getElementById('window');
+    const title=document.getElementById('windowTitle');
+    const content=document.getElementById('windowContent');
+    win.style.display='block';
+    if(app==='browser'){title.innerText='Microsoft Edge';content.innerHTML='<iframe src="https://www.bing.com" style="width:100%;height:400px;border:none;"></iframe>'}
+    if(app==='notes'){title.innerText='Notepad';content.innerHTML='<textarea style="width:100%;height:300px;">Type here...</textarea>'}
+    if(app==='store'){title.innerText='App Store';content.innerHTML='<p>Apps coming soon...</p>'}
+    if(app==='settings'){title.innerText='Settings';content.innerHTML='<p>Change settings on Settings page.</p>'}
   }
 
-  function closeWindow(){ document.getElementById('window').style.display='none'; }
+  function closeWindow(){document.getElementById('window').style.display='none';}
 
   function toggleStartMenu(){
     const menu=document.getElementById('startMenu');
-    menu.style.display = menu.style.display==='block' ? 'none' : 'block';
+    menu.style.display=(menu.style.display==='block'?'none':'block');
   }
 
   function updateClock(){
