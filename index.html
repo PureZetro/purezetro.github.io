@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS-style Website with Default Apps</title>
+<title>iOS-style Website with Customization</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -13,6 +13,7 @@
     background-size: cover;
     color: white;
     min-height: 100vh;
+    transition: color 0.3s;
   }
   .nav { display: flex; justify-content: center; padding: 10px; background: rgba(0,0,0,0.5); }
   .nav button { padding: 10px 16px; border: none; border-radius: 12px; background: #1e90ff; color: white; cursor: pointer; margin: 0 5px; transition: 0.2s; }
@@ -25,6 +26,7 @@
   .screen.active { display: block; }
   .back-btn { margin-bottom: 10px; padding: 8px 12px; border: none; border-radius: 8px; background: #ff6347; color: white; cursor: pointer; }
   .file-item, .app-item { background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; margin: 5px 0; }
+  select, input { margin-top: 5px; padding: 5px; border-radius: 6px; border: none; }
 </style>
 </head>
 <body>
@@ -35,24 +37,7 @@
 </div>
 
 <div id="home" class="screen active">
-  <div class="home-screen" id="appContainer">
-    <div class="app" onclick="openApp('browser')">
-      <img src="https://img.icons8.com/ios-filled/100/ffffff/internet.png" />
-      <p>Browser</p>
-    </div>
-    <div class="app" onclick="openApp('gallery')">
-      <img src="https://img.icons8.com/ios-filled/100/ffffff/picture.png" />
-      <p>Gallery</p>
-    </div>
-    <div class="app" onclick="openApp('files')">
-      <img src="https://img.icons8.com/ios-filled/100/ffffff/folder-invoices.png" />
-      <p>Files</p>
-    </div>
-    <div class="app" onclick="openApp('appstore')">
-      <img src="https://img.icons8.com/ios-filled/100/ffffff/apple-app-store.png" />
-      <p>App Store</p>
-    </div>
-  </div>
+  <div class="home-screen" id="appContainer"></div>
 </div>
 
 <div id="browser" class="screen">
@@ -87,31 +72,39 @@
 <div id="settings" class="screen">
   <button class="back-btn" onclick="showScreen('home')">Back</button>
   <h2>Settings</h2>
-  <p>Choose background or theme.</p>
-  <select id="bgSelect" onchange="changeBackground()">
-    <option value="nature">Nature</option>
-    <option value="space">Space</option>
-    <option value="ocean">Ocean</option>
-    <option value="abstract">Abstract</option>
-  </select>
+  <p>Choose background or theme (20 options) and text color.</p>
+  <select id="bgSelect" onchange="changeBackground()"></select>
+  <br>
+  <label for="textColor">Text Color:</label>
+  <input type="color" id="textColor" onchange="changeTextColor()" />
 </div>
 
 <script>
 let apps = JSON.parse(localStorage.getItem('apps')) || [];
 let files = JSON.parse(localStorage.getItem('files')) || [];
-
-// Add default simple apps if not already present
-const defaultApps = [
+let defaultApps = [
   {name: 'Calculator', content: 'calc'},
   {name: 'Map', content: 'map'},
   {name: 'Siri', content: 'siri'},
   {name: 'Notes', content: 'notes'}
 ];
+
 if(!localStorage.getItem('defaultAppsAdded')){
   apps = [...defaultApps, ...apps];
   localStorage.setItem('apps', JSON.stringify(apps));
   localStorage.setItem('defaultAppsAdded', true);
 }
+
+const bgOptions = [
+  'nature','space','ocean','abstract','city','mountain','forest','desert','beach','snow','flowers','sunset','night','waterfall','river','clouds','stars','galaxy','rain','lava'
+];
+const bgSelect = document.getElementById('bgSelect');
+bgOptions.forEach(bg => {
+  const option = document.createElement('option');
+  option.value = bg;
+  option.text = bg.charAt(0).toUpperCase() + bg.slice(1);
+  bgSelect.appendChild(option);
+});
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -129,20 +122,23 @@ function openApp(appId) {
 }
 
 function changeBackground() {
-  const bg = document.getElementById('bgSelect').value;
-  const urls = {
-    nature: 'https://source.unsplash.com/1600x900/?nature',
-    space: 'https://source.unsplash.com/1600x900/?space',
-    ocean: 'https://source.unsplash.com/1600x900/?ocean',
-    abstract: 'https://source.unsplash.com/1600x900/?abstract'
-  };
-  document.body.style.backgroundImage = `url('${urls[bg]}')`;
-  localStorage.setItem('background', urls[bg]);
+  const bg = bgSelect.value;
+  const url = `https://source.unsplash.com/1600x900/?${bg}`;
+  document.body.style.backgroundImage = `url('${url}')`;
+  localStorage.setItem('background', url);
 }
 
-// Load background
+function changeTextColor() {
+  const color = document.getElementById('textColor').value;
+  document.body.style.color = color;
+  localStorage.setItem('textColor', color);
+}
+
+// Load saved settings
 const savedBg = localStorage.getItem('background');
 if(savedBg) document.body.style.backgroundImage = `url('${savedBg}')`;
+const savedColor = localStorage.getItem('textColor');
+if(savedColor) document.body.style.color = savedColor;
 
 function addApp() {
   const name = document.getElementById('appName').value;
