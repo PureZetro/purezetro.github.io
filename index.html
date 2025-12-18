@@ -320,14 +320,27 @@ function openApp(appName) {
       <button class="close-btn" onclick="closeApp()">Close</button>
     `;
   } else if(appName === 'Browser') {
+    const sites = {
+      "Google": "https://www.google.com",
+      "YouTube": "https://www.youtube.com",
+      "Facebook": "https://www.facebook.com",
+      "Twitter": "https://www.twitter.com",
+      "Reddit": "https://www.reddit.com",
+      "Wikipedia": "https://www.wikipedia.org",
+      "Instagram": "https://www.instagram.com",
+      "OpenStreetMap": "https://www.openstreetmap.org"
+    };
+
     appContent.innerHTML = `
       <button class="close-btn browser-close" onclick="closeApp()">✖</button>
-      <div style="display:flex;padding:10px;flex-shrink:0;">
-        <input type="text" id="urlInput" placeholder="Enter URL" style="flex:1;padding:5px;">
-        <button onclick="loadURL()">Go</button>
+      <div style="padding:10px; flex-shrink:0;">
+        <input type="text" id="siteInput" placeholder="Enter site name" style="width:70%; padding:5px;">
+        <button onclick="searchSite()">Search</button>
+        <div id="siteOptions" style="margin-top:10px;"></div>
       </div>
       <iframe id="browserFrame" src=""></iframe>
     `;
+    window.sites = sites;
   } else if(appName === 'Settings') {
     let bgOptionsHTML = '';
     presetBackgrounds.forEach((bg,index)=>{
@@ -368,14 +381,31 @@ function calculate() {
   }
 }
 
-/* Browser function */
-function loadURL() {
-  const url = document.getElementById('urlInput').value;
-  let frame = document.getElementById('browserFrame');
-  if (!/^https?:\/\//i.test(url)) {
-    frame.src = 'https://' + url;
-  } else {
-    frame.src = url;
+/* Browser search functions */
+function searchSite() {
+  const input = document.getElementById('siteInput').value.toLowerCase();
+  const optionsDiv = document.getElementById('siteOptions');
+  optionsDiv.innerHTML = "";
+
+  for (const [name, url] of Object.entries(window.sites)) {
+    if (name.toLowerCase().includes(input)) {
+      const btn = document.createElement('button');
+      btn.textContent = name;
+      btn.style.margin = "5px";
+      btn.style.padding = "5px 10px";
+      btn.style.borderRadius = "5px";
+      btn.style.border = "1px solid #007aff";
+      btn.style.background = "white";
+      btn.style.cursor = "pointer";
+      btn.onclick = () => {
+        document.getElementById('browserFrame').src = url;
+      };
+      optionsDiv.appendChild(btn);
+    }
+  }
+
+  if (optionsDiv.innerHTML === "") {
+    optionsDiv.textContent = "No matching sites found.";
   }
 }
 
