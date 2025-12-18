@@ -3,54 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zetro Demo OS - Original Version</title>
+<title>iOS Website Demo</title>
 <style>
-body { margin: 0; font-family: Arial, sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: white; overflow: hidden; }
-header { display: flex; justify-content: center; gap: 15px; padding: 10px; background: rgba(0,0,0,0.4); }
-button { padding: 8px 16px; border: none; border-radius: 8px; background: #1e90ff; color: white; font-size: 14px; cursor: pointer; }
-section { display: none; padding: 20px; }
-section.active { display: block; }
-.apps { display: grid; grid-template-columns: repeat(auto-fill, 90px); gap: 20px; margin-top: 20px; }
-.app { background: rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; text-align: center; cursor: pointer; }
-.app img { width: 60px; height: 60px; }
-.window { position: absolute; background: white; color: black; border-radius: 10px; border: 1px solid #999; width: 500px; height: 400px; display: none; overflow: hidden; z-index: 1000; resize: both; }
-.window-header { background: #1e90ff; color: white; padding: 5px; cursor: move; display: flex; justify-content: space-between; align-items: center; }
-.window-header button { background: red; border-radius: 50%; width: 25px; height: 25px; font-weight: bold; }
-#taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 14px; color: white; }
-#startMenu { display: none; position: fixed; bottom: 40px; left: 10px; width: 200px; background: rgba(50,50,50,0.95); border-radius: 10px; padding: 10px; }
-textarea { width: 100%; height: 100%; resize: none; border: none; padding: 5px; box-sizing: border-box; font-family: monospace; font-size: 14px; }
+  /* General body styles */
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f2f2f7;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: #ffffff;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* Button container */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-around;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* Buttons */
+  .nav-buttons button {
+    flex: 1;
+    padding: 15px;
+    font-size: 1em;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .nav-buttons button:hover {
+    background: #e0e0e0;
+  }
+
+  .nav-buttons button.active {
+    background: #007aff;
+    color: white;
+    border-radius: 10px;
+  }
+
+  /* Content area */
+  #content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
 </style>
 </head>
 <body>
-<header>
-  <button id="btnHome">Home</button>
-  <button id="btnDemo">Demo</button>
-  <button id="btnCreator">Creator</button>
-  <button id="btnShop">Shop</button>
-  <button id="btnUpgrades">Upgrades</button>
-</header>
-<section id="home" class="active"><h1>Welcome to Zetro Demo OS</h1></section>
-<section id="demo"><div id="desktopContainer"><div id="desktop" class="apps"></div></div></section>
-<section id="creator"><h1>About Zetro</h1><p>11 years old</p></section>
-<section id="shop"><h1>Shop</h1></section>
-<section id="upgrades"><h1>Upgrades</h1></section>
-<div id="taskbar"><button onclick="toggleStartMenu()">Start</button><span id="clock"></span></div>
-<div id="startMenu"><ul><li onclick="openApp('browser')">Edge</li><li onclick="openApp('notes')">Notepad</li><li onclick="openApp('store')">Store</li><li onclick="openApp('settings')">Settings</li></ul></div>
+
+<header>iOS Website Demo</header>
+
+<div class="nav-buttons">
+  <button id="homeBtn" class="active">Home</button>
+  <button id="infoBtn">Info</button>
+  <button id="demoBtn">Demo</button>
+</div>
+
+<div id="content">
+  <h2>Home</h2>
+  <p>Welcome to the Home page!</p>
+</div>
+
 <script>
-const sections=['home','demo','creator','shop','upgrades'];
-sections.forEach(id=>{document.getElementById('btn'+id.charAt(0).toUpperCase()+id.slice(1)).addEventListener('click',()=>{sections.forEach(sid=>document.getElementById(sid).classList.remove('active'));document.getElementById(id).classList.add('active');});});
-function toggleStartMenu(){const menu=document.getElementById('startMenu');menu.style.display=menu.style.display==='block'?'none':'block';}
-function makeDraggable(el){let pos1=0,pos2=0,pos3=0,pos4=0;const header=el.querySelector('.window-header');header.onmousedown=dragMouseDown;function dragMouseDown(e){e=e||window.event;e.preventDefault();pos3=e.clientX;pos4=e.clientY;document.onmouseup=closeDrag;document.onmousemove=elementDrag;}function elementDrag(e){e=e||window.event;e.preventDefault();pos1=pos3-e.clientX;pos2=pos4-e.clientY;pos3=e.clientX;pos4=e.clientY;el.style.top=(el.offsetTop-pos2)+'px';el.style.left=(el.offsetLeft-pos1)+'px';}function closeDrag(){document.onmouseup=null;document.onmousemove=null;}}
-function openApp(app){let win=document.createElement('div');win.className='window';let content='';
-if(app==='browser') content=`<iframe src='https://www.google.com' style='width:100%;height:100%;border:none;'></iframe>`;
-else if(app==='notes') content=`<textarea placeholder='Type notes here...'></textarea>`;
-else if(app==='settings') content=`Settings content`;
-else if(app==='store') content=`Store content`;
-else content=`Content of ${app} app`;
-win.innerHTML=`<div class='window-header'><span>${app.charAt(0).toUpperCase()+app.slice(1)}</span><button onclick='this.parentElement.parentElement.remove()'>×</button></div><div class='window-content' style='padding:10px;height:calc(100% - 40px);'>${content}</div>`;
-document.body.appendChild(win);win.style.display='block';win.style.top='100px';win.style.left='100px';makeDraggable(win);}
-function updateClock(){document.getElementById('clock').innerText=new Date().toLocaleTimeString();}
-setInterval(updateClock,1000);updateClock();
+  const content = document.getElementById('content');
+  const buttons = document.querySelectorAll('.nav-buttons button');
+
+  const pages = {
+    home: `<h2>Home</h2><p>Welcome to the Home page!</p>`,
+    info: `<h2>Info</h2><p>Here is some information about this iOS-style website.</p>`,
+    demo: `<h2>Demo</h2><p>Click the buttons to explore the demo functionality!</p>`
+  };
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Remove active from all buttons
+      buttons.forEach(b => b.classList.remove('active'));
+      // Add active to clicked button
+      btn.classList.add('active');
+
+      // Change content based on button
+      if(btn.id === 'homeBtn') content.innerHTML = pages.home;
+      if(btn.id === 'infoBtn') content.innerHTML = pages.info;
+      if(btn.id === 'demoBtn') content.innerHTML = pages.demo;
+    });
+  });
 </script>
+
 </body>
 </html>
