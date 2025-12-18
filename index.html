@@ -1,203 +1,214 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>iOS Website Demo with App Store</title>
+<title>iOS Demo</title>
 <style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  margin: 0; padding: 0; background: #f2f2f7; display: flex; flex-direction: column; height: 100vh;
-}
-header { background: #fff; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2em; box-shadow: 0 1px 3px rgba(0,0,0,0.1);}
-.nav-buttons { display: flex; justify-content: space-around; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);}
-.nav-buttons button { flex: 1; padding: 15px; font-size: 1em; border: none; background: none; cursor: pointer; transition: background 0.2s;}
-.nav-buttons button:hover { background: #e0e0e0;}
-.nav-buttons button.active { background: #007aff; color: white; border-radius: 10px;}
-#content { flex: 1; padding: 20px; overflow-y: auto; position: relative;}
-.home-screen { display: grid; grid-template-columns: repeat(3,1fr); gap:20px; justify-items:center; padding-top:50px; width:100%; height:100%; position:relative;}
-.app-icon { width:80px; height:80px; background:white; border-radius:20px; display:flex; align-items:center; justify-content:center; flex-direction:column; box-shadow:0 3px 6px rgba(0,0,0,0.2); cursor:grab; text-align:center; font-size:0.8em; position:absolute;}
-.app-icon:active { cursor:grabbing;}
-.app-modal { position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000;}
-.app-content { background:white; border-radius:0; width:100%; height:100%; display:flex; flex-direction:column; position:relative;}
-.close-btn { padding:10px 20px; background:#007aff; color:white; border:none; border-radius:10px; cursor:pointer;}
-iframe { width:100%; flex:1; border:none;}
-.background-option { width:60px; height:60px; margin:5px; border-radius:10px; cursor:pointer; object-fit:cover; border:2px solid transparent;}
-.background-option.selected { border-color:#007aff;}
-.browser-close { position:absolute; top:10px; right:10px; z-index:10;}
-#aiHelper { position:fixed; bottom:20px; right:20px; z-index:1100;}
-#aiModal { position:fixed; bottom:70px; right:20px; width:300px; height:400px; background:white; border-radius:15px; box-shadow:0 5px 10px rgba(0,0,0,0.3); display:none; flex-direction:column; overflow:hidden; z-index:1200;}
-#aiMessages { flex:1; padding:10px; overflow-y:auto;}
-#aiInputDiv { display:flex; padding:5px; border-top:1px solid #ccc;}
-#aiInputDiv input { flex:1; padding:5px;}
-#aiInputDiv button { padding:5px 10px; margin-left:5px; background:#007aff; color:white; border:none; border-radius:5px; cursor:pointer;}
-.app-store-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-top:10px; }
-.app-store-tile { display:flex; flex-direction:column; align-items:center; padding:10px; background:#f7f7f7; border-radius:10px; cursor:pointer; }
-.app-store-tile:hover { background:#e0e0e0; }
-.app-store-tile span { margin-top:5px; font-size:0.8em; text-align:center; }
+body{margin:0;font-family:Arial;background:#111;color:white}
+.nav{display:flex;justify-content:center;background:#222}
+.nav button{margin:10px;padding:10px}
+.home-screen{position:relative;width:100vw;height:calc(100vh - 50px)}
+.app-icon{position:absolute;width:80px;text-align:center;cursor:pointer}
+.modal{position:fixed;inset:0;background:#000;display:none;flex-direction:column}
+.close-btn{position:absolute;top:10px;right:10px}
+iframe{flex:1;border:none}
+.app-store-grid{display:grid;grid-template-columns:repeat(auto-fill,120px);gap:10px;padding:20px}
+.app-store-tile{background:#222;padding:10px;text-align:center}
+input,textarea{width:90%;margin:5px}
+.star{cursor:pointer}
 </style>
 </head>
+
 <body>
 
-<header>iOS Website Demo</header>
-<div class="nav-buttons">
-  <button id="homeBtn" class="active">Home</button>
-  <button id="infoBtn">Info</button>
-  <button id="demoBtn">Demo</button>
+<div class="nav">
+  <button onclick="showHome()">Home</button>
+  <button onclick="showInfo()">Info</button>
+  <button onclick="showDemo()">Demo</button>
+  <button onclick="showAccount()">Account</button>
 </div>
 
-<div id="content"><h2>Home</h2><p>Welcome to the Home page!</p></div>
+<div id="content"></div>
 
-<div id="appModal" class="app-modal">
-  <div class="app-content" id="appContent"><h2>App</h2><p>App content goes here.</p><button class="close-btn" onclick="closeApp()">Close</button></div>
-</div>
-
-<button id="aiHelper" onclick="toggleAI()">AI Helper 🤖</button>
-<div id="aiModal">
-  <div id="aiMessages"></div>
-  <div id="aiInputDiv">
-    <input id="aiInput" placeholder="Ask me anything..." />
-    <button onclick="sendAI()">Send</button>
-  </div>
+<div class="modal" id="appModal">
+  <button class="close-btn" onclick="closeApp()">✖</button>
+  <div id="appContent" style="flex:1;display:flex;flex-direction:column"></div>
 </div>
 
 <script>
 const content=document.getElementById('content');
-const buttons=document.querySelectorAll('.nav-buttons button');
 const appModal=document.getElementById('appModal');
 const appContent=document.getElementById('appContent');
 
-let appPositions=[{id:'Settings',left:20,top:50},{id:'Calculator',left:120,top:50},{id:'Maps',left:220,top:50},{id:'Browser',left:20,top:150},{id:'App Store',left:120,top:150}];
-
-const presetBackgrounds=[];
-for(let i=1;i<=20;i++){presetBackgrounds.push(`https://picsum.photos/seed/bg${i}/100/100`);}
-
-let userApps=[]; // Stores user uploaded apps
+let currentUser=localStorage.getItem('currentUser');
+let users=JSON.parse(localStorage.getItem('users'))||{};
+let devApps=JSON.parse(localStorage.getItem('devApps'))||[];
 
 const preloadedApps=[
-  {name:'Minecraft', icon:'🟩', url:'https://classic.minecraft.net/'},
-  {name:'Candy Crush', icon:'🍬', url:'https://www.candycrushsaga.com/'},
-  {name:'Subway Surfers', icon:'🚆', url:'https://subwaysurfers.com/'}
+ {name:'Minecraft',icon:'🟩',url:'https://classic.minecraft.net/',dev:'Official'},
+ {name:'Candy Crush',icon:'🍬',url:'https://www.candycrushsaga.com/',dev:'King'},
+ {name:'Subway Surfers',icon:'🚆',url:'https://subwaysurfers.com/',dev:'SYBO'}
 ];
 
-const pages={home:`<h2>Home</h2><p>Welcome to the Home page!</p>`,
-info:`<h2>Info</h2><p>Here is some information about this iOS-style website.</p>`,
-demo:generateHomeScreenHTML()};
+function getUserData(){
+ if(!users[currentUser]){
+  users[currentUser]={installed:[],ratings:{},permissions:{},isDev:false};
+ }
+ return users[currentUser];
+}
 
-buttons.forEach(btn=>{btn.addEventListener('click',()=>{buttons.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); if(btn.id==='homeBtn') content.innerHTML=pages.home; if(btn.id==='infoBtn') content.innerHTML=pages.info; if(btn.id==='demoBtn') content.innerHTML=generateHomeScreenHTML();});});
+function saveUsers(){
+ localStorage.setItem('users',JSON.stringify(users));
+}
 
-function generateHomeScreenHTML(){let html=`<h2>Demo Home Screen</h2><div class="home-screen" id="homeScreen">`; appPositions.forEach(app=>{html+=`<div class="app-icon" id="${app.id}" style="left:${app.left}px;top:${app.top}px;" onmousedown="startDrag(event,'${app.id}')" onclick="openApp('${app.id}')">${getAppEmoji(app.id)}<br>${app.id}</div>`}); html+=`</div>`; return html;}
-function getAppEmoji(name){if(name==='Settings')return '⚙️'; if(name==='Calculator')return '🧮'; if(name==='Maps')return '🗺️'; if(name==='Browser')return '🌐'; if(name==='App Store')return '🛒'; return '❓';}
+function showAccount(){
+ if(!currentUser){
+  content.innerHTML=`
+   <h2>Login / Sign Up</h2>
+   <input id="userName" placeholder="Username">
+   <button onclick="login()">Login / Sign Up</button>`;
+ }else{
+  const u=getUserData();
+  content.innerHTML=`
+   <h2>Account: ${currentUser}</h2>
+   <p>Developer Mode: ${u.isDev?'ON ✅':'OFF'}</p>
+   <button onclick="toggleDev()">Toggle Developer Mode</button>
+   <button onclick="logout()">Logout</button>
+   ${u.isDev?developerPanel():''}`;
+ }
+}
 
-/* Drag */
-let currentDrag=null, offsetX=0, offsetY=0;
-function startDrag(e,id){currentDrag=document.getElementById(id); offsetX=e.clientX-currentDrag.offsetLeft; offsetY=e.clientY-currentDrag.offsetTop; document.onmousemove=drag; document.onmouseup=stopDrag;}
-function drag(e){if(currentDrag){currentDrag.style.left=(e.clientX-offsetX)+'px'; currentDrag.style.top=(e.clientY-offsetY)+'px';}}
-function stopDrag(){if(currentDrag){const app=appPositions.find(a=>a.id===currentDrag.id); app.left=parseInt(currentDrag.style.left); app.top=parseInt(currentDrag.style.top);} currentDrag=null; document.onmousemove=null; document.onmouseup=null;}
+function login(){
+ const name=document.getElementById('userName').value.trim();
+ if(!name) return;
+ currentUser=name;
+ localStorage.setItem('currentUser',name);
+ showHome();
+}
 
-/* Open apps */
-function openApp(appName){
-  if(appName==='Calculator'){appContent.innerHTML=`<h2>Calculator</h2><div class="calculator"><input type="text" id="calcDisplay" readonly><button onclick="addToCalc('7')">7</button><button onclick="addToCalc('8')">8</button><button onclick="addToCalc('9')">9</button><button onclick="addToCalc('/')">/</button><button onclick="addToCalc('4')">4</button><button onclick="addToCalc('5')">5</button><button onclick="addToCalc('6')">6</button><button onclick="addToCalc('*')">*</button><button onclick="addToCalc('1')">1</button><button onclick="addToCalc('2')">2</button><button onclick="addToCalc('3')">3</button><button onclick="addToCalc('-')">-</button><button onclick="addToCalc('0')">0</button><button onclick="addToCalc('.')">.</button><button onclick="calculate()">=</button><button onclick="clearCalc()">C</button></div><button class="close-btn" onclick="closeApp()">Close</button>`;}
-  else if(appName==='Maps'){appContent.innerHTML=`<h2>Maps</h2><iframe src="https://www.openstreetmap.org/export/embed.html"></iframe><button class="close-btn" onclick="closeApp()">Close</button>`;}
-  else if(appName==='Browser'){
-    const sites={"Google":"https://www.google.com","YouTube":"https://www.youtube.com","Facebook":"https://www.facebook.com","Twitter":"https://www.twitter.com","Reddit":"https://www.reddit.com","Wikipedia":"https://www.wikipedia.org","Instagram":"https://www.instagram.com","OpenStreetMap":"https://www.openstreetmap.org"};
-    window.sites=sites;
-    appContent.innerHTML=`<button class="close-btn browser-close" onclick="closeApp()">✖</button>
-      <div style="padding:10px; flex-shrink:0; display:flex; flex-wrap:wrap; align-items:center;">
-      <input type="text" id="siteInput" placeholder="Enter site name or URL" style="flex:1;padding:5px; margin-right:5px;">
-      <button onclick="searchOrOpenSite()">Go</button></div>
-      <div id="siteOptions" style="padding:10px; display:flex; flex-wrap:wrap;"></div>
-      <iframe id="browserFrame" src=""></iframe>`;
-    // Enter key triggers search
-    const siteInput = document.getElementById('siteInput');
-    siteInput.addEventListener('keydown', function(e){if(e.key==='Enter') searchOrOpenSite();});
-  }
-  else if(appName==='Settings'){let bgOptionsHTML=''; presetBackgrounds.forEach(bg=>{bgOptionsHTML+=`<img src="${bg}" class="background-option" onclick="setBackground('${bg}',this)">`}); appContent.innerHTML=`<h2>Settings</h2><p>Choose a background:</p><div><input type="file" id="bgUpload" accept="image/*" onchange="uploadBackground(event)"></div><div style="display:flex;flex-wrap:wrap;margin-top:10px;">${bgOptionsHTML}</div><button class="close-btn" onclick="closeApp()">Close</button>`;}
-  else if(appName==='App Store'){openAppStore();}
+function logout(){
+ localStorage.removeItem('currentUser');
+ currentUser=null;
+ showAccount();
+}
+
+function toggleDev(){
+ const u=getUserData();
+ u.isDev=!u.isDev;
+ saveUsers();
+ showAccount();
+}
+
+function developerPanel(){
+ return `
+ <h3>Developer Upload</h3>
+ <input id="appName" placeholder="App Name">
+ <input id="appIcon" placeholder="Icon (emoji)">
+ <input id="appURL" placeholder="App URL">
+ <textarea id="appDesc" placeholder="Description"></textarea>
+ <button onclick="uploadApp()">Upload App</button>`;
+}
+
+function uploadApp(){
+ const app={
+  name:appName.value,
+  icon:appIcon.value||'📦',
+  url:appURL.value,
+  desc:appDesc.value,
+  dev:currentUser,
+  verified:true
+ };
+ devApps.push(app);
+ localStorage.setItem('devApps',JSON.stringify(devApps));
+ alert('App uploaded!');
+}
+
+function showHome(){
+ if(!currentUser){showAccount();return;}
+ let html='<div class="home-screen">';
+ const u=getUserData();
+ const system=['Settings','Browser','App Store'];
+ [...system,...u.installed.map(a=>a.name)].forEach((a,i)=>{
+  html+=`
+  <div class="app-icon"
+   style="left:${20+(i%4)*90}px;top:${20+Math.floor(i/4)*100}px"
+   onclick="openApp('${a}')">
+   📱<br>${a}</div>`;
+ });
+ html+='</div>';
+ content.innerHTML=html;
+}
+
+function openApp(name){
+ const u=getUserData();
+ const app=[...preloadedApps,...devApps].find(a=>a.name===name);
+ if(app){
+  if(!requestPermission(name,'browser'))return;
+  appContent.innerHTML=`<iframe src="${app.url}"></iframe>`;
   appModal.style.display='flex';
+ }
+ if(name==='App Store'){openStore();}
 }
 
-function openAppStore(){
-  let html=`<h2>App Store</h2>
-  <div>
-    <input type="file" id="appUpload" accept=".html" />
-    <button onclick="uploadUserApp()">Upload App</button>
-    <input type="text" id="appURL" placeholder="Or enter app URL" />
-    <button onclick="addAppByURL()">Add by URL</button>
-  </div>
-  <div class="app-store-grid" id="appStoreGrid"></div>`;
-  appContent.innerHTML=html;
-  displayApps();
+function openStore(){
+ const u=getUserData();
+ appContent.innerHTML=`<div class="app-store-grid" id="grid"></div>`;
+ appModal.style.display='flex';
+ const grid=document.getElementById('grid');
+ [...preloadedApps,...devApps].forEach(app=>{
+  const r=u.ratings[app.name]||0;
+  const installed=u.installed.some(a=>a.name===app.name);
+  const tile=document.createElement('div');
+  tile.className='app-store-tile';
+  tile.innerHTML=`
+   <div style="font-size:30px">${app.icon}</div>
+   <b>${app.name}</b><br>
+   <small>${app.dev}${app.verified?' ✅':''}</small>
+   <p style="font-size:12px">${app.desc||''}</p>
+   <div>${[1,2,3,4,5].map(s=>`
+    <span class="star" style="color:${s<=r?'gold':'gray'}"
+     onclick="rate('${app.name}',${s})">★</span>`).join('')}</div>
+   <button onclick="${installed?`remove('${app.name}')`:`install('${app.name}')`}">
+    ${installed?'Remove':'Install'}
+   </button>`;
+  grid.appendChild(tile);
+ });
 }
 
-function displayApps(){
-  const grid=document.getElementById('appStoreGrid'); grid.innerHTML='';
-  const allApps=[...preloadedApps,...userApps];
-  allApps.forEach(app=>{
-    const tile=document.createElement('div'); tile.className='app-store-tile';
-    tile.innerHTML=`<div style="font-size:40px;">${app.icon||'📦'}</div><span>${app.name}</span>`;
-    tile.onclick=()=>openUserApp(app);
-    grid.appendChild(tile);
-  });
+function install(name){
+ const u=getUserData();
+ const app=[...preloadedApps,...devApps].find(a=>a.name===name);
+ u.installed.push(app);
+ saveUsers(); showHome(); openStore();
 }
 
-function openUserApp(app){
-  appContent.innerHTML=`<button class="close-btn browser-close" onclick="closeApp()">✖</button>
-  <iframe src="${app.url}" style="flex:1;width:100%;"></iframe>`;
+function remove(name){
+ const u=getUserData();
+ u.installed=u.installed.filter(a=>a.name!==name);
+ saveUsers(); showHome(); openStore();
 }
 
-function uploadUserApp(){
-  const fileInput=document.getElementById('appUpload');
-  if(fileInput.files.length>0){
-    const file=fileInput.files[0];
-    const reader=new FileReader();
-    reader.onload=function(e){
-      const blob = new Blob([e.target.result], {type:'text/html'});
-      const url = URL.createObjectURL(blob);
-      userApps.push({name:file.name, url:url, icon:'📦'});
-      displayApps();
-    }
-    reader.readAsText(file);
+function rate(name,r){
+ const u=getUserData();
+ u.ratings[name]=r;
+ saveUsers(); openStore();
+}
+
+function requestPermission(app,p){
+ const u=getUserData();
+ if(!u.permissions[app])u.permissions[app]=[];
+ if(!u.permissions[app].includes(p)){
+  if(confirm(`${app} wants ${p} access. Allow?`)){
+   u.permissions[app].push(p); saveUsers(); return true;
   }
+  return false;
+ }
+ return true;
 }
 
-function addAppByURL(){
-  const urlInput=document.getElementById('appURL').value.trim();
-  if(urlInput){
-    userApps.push({name:urlInput, url:urlInput, icon:'🌐'});
-    displayApps();
-  }
-}
+function closeApp(){appModal.style.display='none'}
 
-/* Close app */
-function closeApp(){appModal.style.display='none';}
-
-/* Calculator */
-function addToCalc(val){document.getElementById('calcDisplay').value+=val;}
-function clearCalc(){document.getElementById('calcDisplay').value='';}
-function calculate(){const d=document.getElementById('calcDisplay'); try{d.value=eval(d.value);}catch{d.value='Error';}}
-
-/* Browser + AI */
-function searchOrOpenSite(){
-  const input=document.getElementById('siteInput').value.trim();
-  const optionsDiv=document.getElementById('siteOptions'); optionsDiv.innerHTML='';
-  const matchedSites=Object.entries(window.sites).filter(([name])=>name.toLowerCase().includes(input.toLowerCase()));
-  if(matchedSites.length>0){matchedSites.forEach(([name,link])=>{const btn=document.createElement('button'); btn.textContent=name; btn.style.margin='5px'; btn.style.padding='5px 10px'; btn.style.borderRadius='5px'; btn.style.border='1px solid #007aff'; btn.style.background='white'; btn.style.cursor='pointer'; btn.onclick=()=>document.getElementById('browserFrame').src=link; optionsDiv.appendChild(btn);});}
-  if(/^(https?:\/\/)/i.test(input)||input.includes(".")){let url=input; if(!/^https?:\/\//i.test(url)) url='https://'+input; document.getElementById('browserFrame').src=url;}
-  const aiSuggestions=generateAISuggestions(input);
-  aiSuggestions.forEach(suggestion=>{const aiBtn=document.createElement('button'); aiBtn.textContent='AI: '+suggestion.label; aiBtn.style.margin='5px'; aiBtn.style.padding='5px 10px'; aiBtn.style.borderRadius='5px'; aiBtn.style.border='1px solid green'; aiBtn.style.background='#e0ffe0'; aiBtn.style.cursor='pointer'; aiBtn.onclick=()=>document.getElementById('browserFrame').src=suggestion.url; optionsDiv.appendChild(aiBtn);});
-}
-
-function generateAISuggestions(input){const suggestions=[]; const query=input.toLowerCase(); if(!query) return suggestions; if(query.includes("search")) suggestions.push({label:"Google Search", url:"https://www.google.com"}); if(query.includes("video")||query.includes("youtube")) suggestions.push({label:"YouTube", url:"https://www.youtube.com"}); if(query.includes("map")||query.includes("location")) suggestions.push({label:"OpenStreetMap", url:"https://www.openstreetmap.org"}); if(query.includes("wiki")||query.includes("information")) suggestions.push({label:"Wikipedia", url:"https://www.wikipedia.org"}); if(suggestions.length===0) suggestions.push({label:"Try Google", url:"https://www.google.com"}); return suggestions;}
-
-/* Settings */
-function setBackground(url,imgElement){document.getElementById('content').style.background=`url('${url}') center/cover no-repeat`; document.querySelectorAll('.background-option').forEach(img=>img.classList.remove('selected')); imgElement.classList.add('selected');}
-function uploadBackground(event){const file=event.target.files[0]; if(file){const reader=new FileReader(); reader.onload=function(e){document.getElementById('content').style.background=`url('${e.target.result}') center/cover no-repeat`; document.querySelectorAll('.background-option').forEach(img=>img.classList.remove('selected'));}; reader.readAsDataURL(file); }}
-
-/* AI Helper */
-function toggleAI(){const m=document.getElementById('aiModal'); m.style.display=m.style.display==='flex'?'none':'flex';}
-function sendAI(){const input=document.getElementById('aiInput').value.trim(); if(!input)return; const messages=document.getElementById('aiMessages'); const userMsg=document.createElement('div'); userMsg.textContent="You: "+input; userMsg.style.marginBottom="5px"; messages.appendChild(userMsg); const aiMsg=document.createElement('div'); aiMsg.textContent="AI: "+"This is a demo response for '"+input+"'"; aiMsg.style.marginBottom="10px"; aiMsg.style.color="blue"; messages.appendChild(aiMsg); messages.scrollTop=messages.scrollHeight; document.getElementById('aiInput').value="";}
+showHome();
 </script>
-
 </body>
 </html>
