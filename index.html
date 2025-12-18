@@ -1,86 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>iOS for Windows</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: url('https://picsum.photos/1920/1080') no-repeat center center fixed;
-        background-size: cover;
-        display: 
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        color: white;
-        text-shadow: 1px 1px 3px black;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom OS Download & Demo</title>
+  <style>
+    :root{
+      --accent:#0a84ff;
+      --bg:#0f172a;
+      --card:#111827;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
     }
-    .container {
-        background: rgba(0,0,0,0.6);
-        padding: 30px;
-        border-radius: 15px;
-        text-align: center;
-        width: 350px;
-    }
-    input[type="password"] {
-        padding: 10px;
-        width: 80%;
-        margin-bottom: 15px;
-        border-radius: 5px;
-        border: none;
-    }
-    select {
-        padding: 10px;
-        width: 85%;
-        margin-bottom: 15px;
-        border-radius: 5px;
-        border: none;
-    }
-    button {
-        padding: 10px 25px;
-        background: #1E90FF;
-        border: none;
-        border-radius: 8px;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-    button:hover {
-        background: #63B8FF;
-    }
-</style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(120deg,#020617,#0b1220 40%,#020617);color:var(--text)}
+    header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(2,6,23,.8);backdrop-filter:blur(8px);position:sticky;top:0;z-index:5}
+    header h1{font-size:1.1rem;margin:0}
+    nav button{margin-left:8px}
+    main{padding:20px;max-width:1200px;margin:auto}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+    .card{background:rgba(17,24,39,.9);border:1px solid #1f2937;border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    h2{margin:.2rem 0 .6rem 0}
+    p{color:var(--muted)}
+    button{background:var(--accent);border:none;color:white;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+    button.secondary{background:#1f2937}
+    button.ghost{background:transparent;border:1px solid #1f2937}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    input,select{background:#020617;color:var(--text);border:1px solid #1f2937;border-radius:10px;padding:10px}
+    .badge{display:inline-block;background:#022c22;color:#86efac;border:1px solid #064e3b;border-radius:999px;padding:4px 10px;font-size:.75rem}
+    footer{opacity:.6;text-align:center;padding:20px}
+
+    /* Demo OS */
+    #demoWrap{display:none}
+    .phone{margin:auto;width:360px;max-width:100%;aspect-ratio:9/19;border-radius:30px;background:#000;position:relative;overflow:hidden;border:6px solid #0b1220}
+    .status{height:28px;color:#fff;font-size:.75rem;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:rgba(0,0,0,.5)}
+    .home{height:calc(100% - 28px);background-size:cover;background-position:center;padding:14px}
+    .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+    .app{background:rgba(255,255,255,.12);border-radius:14px;padding:10px;text-align:center;font-size:.7rem}
+    .dock{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(255,255,255,.15);border-radius:20px;padding:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:10}
+    .modal .card{max-width:520px}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>iOS for Windows</h1>
-        <p>Create your setup:</p>
-        <input type="password" id="password" placeholder="Enter a password"><br>
-        <select id="backgroundSelect">
-            <option value="https://picsum.photos/1920/1080">Random Background</option>
-            <option value="https://picsum.photos/1920/1080?grayscale">Grayscale</option>
-            <option value="https://picsum.photos/1920/1080?blur">Blurred</option>
-        </select><br>
-        <button onclick="downloadDemo()">Download</button>
-        <p id="message" style="margin-top:15px;"></p>
+  <header>
+    <h1>Custom OS Downloads & Demo</h1>
+    <nav>
+      <button class="secondary" onclick="showSection('home')">Home</button>
+      <button class="secondary" onclick="showSection('demo')">Demo</button>
+      <button class="secondary" onclick="showSection('customize')">Customize</button>
+      <button class="secondary" onclick="showSection('login')">Admin</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="grid">
+      <div class="card">
+        <h2>Downloads</h2>
+        <p>Official links only.</p>
+        <div class="row">
+          <a href="https://www.microsoft.com/software-download/windows11" target="_blank"><button>Windows 11</button></a>
+          <a href="https://www.microsoft.com/software-download/windows10" target="_blank"><button>Windows 10</button></a>
+          <a href="https://pcsupport.lenovo.com/us/en/downloads" target="_blank"><button>Lenovo Drivers</button></a>
+        </div>
+        <p class="badge">Legal & Safe</p>
+      </div>
+      <div class="card">
+        <h2>About the Demo</h2>
+        <p>This is a <b>visual demo UI</b> inspired by mobile OS designs. It is <b>not real iOS</b> and does not run Apple software.</p>
+        <button onclick="showSection('demo')">Try Demo</button>
+      </div>
+      <div class="card">
+        <h2>Background Chooser</h2>
+        <select id="bgPick" onchange="setBG(this.value)">
+          <option value="https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc">Dark Waves</option>
+          <option value="https://images.unsplash.com/photo-1519681393784-d120267933ba">Blue Mountain</option>
+          <option value="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee">Purple Sky</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- DEMO -->
+    <section id="demoWrap">
+      <div class="card">
+        <h2>OS Demo (Preview)</h2>
+        <p>Interactive preview only.</p>
+        <div class="phone">
+          <div class="status"><span>12:00</span><span>🔋</span></div>
+          <div id="homeBG" class="home">
+            <div class="apps">
+              <div class="app">Settings</div>
+              <div class="app">Photos</div>
+              <div class="app">Games</div>
+              <div class="app" onclick="openBrowser()">Browser</div>
+            </div>
+            <div class="dock">
+              <div class="app">Phone</div>
+              <div class="app">Messages</div>
+              <div class="app">Music</div>
+              <div class="app">Store</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOMIZE -->
+    <section id="customize" class="grid" style="display:none">
+      <div class="card">
+        <h2>Profile Presets</h2>
+        <p>Choose how your OS looks & feels.</p>
+        <div class="row">
+          <button onclick="preset('gaming')">Gaming</button>
+          <button onclick="preset('school')">School</button>
+          <button onclick="preset('work')">Work</button>
+        </div>
+        <p id="presetOut" class="badge">None</p>
+      </div>
+      <div class="card">
+        <h2>Create Password</h2>
+        <input id="pw" type="password" placeholder="Create password" />
+        <button onclick="savePW()">Save</button>
+        <p id="pwMsg" class="badge"></p>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section id="login" class="grid" style="display:none">
+      <div class="card">
+        <h2>Admin Login (Local Demo)</h2>
+        <input id="loginPw" type="password" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <p id="loginMsg"></p>
+      </div>
+    </section>
+  </main>
+
+  <div id="browserModal" class="modal" onclick="closeBrowser()">
+    <div class="card" onclick="event.stopPropagation()">
+      <h2>Browser (Coming Soon)</h2>
+      <p>This browser is not functional yet.</p>
+      <button class="secondary" onclick="closeBrowser()">Close</button>
     </div>
+  </div>
 
-<script>
-    const bgSelect = document.getElementById('backgroundSelect');
-    bgSelect.addEventListener('change', () => {
-        document.body.style.backgroundImage = `url('${bgSelect.value}')`;
-    });
+  <footer>Demo UI only • No real iOS software</footer>
 
-    function downloadDemo() {
-        const password = document.getElementById('password').value;
-        if(!password) {
-            document.getElementById('message').innerText = "Please enter a password!";
-            return;
-        }
-        document.getElementById('message').innerText = "Download started... (demo, does nothing)";
-    }
-</script>
+  <script>
+    const sections = ['home','demoWrap','customize','login'];
+    function showSection(s){sections.forEach(id=>document.getElementById(id).style.display=(id===s|| (s==='demo'&&id==='demoWrap'))?'block':'none')}
+    function setBG(url){document.getElementById('homeBG').style.backgroundImage=`url(${url})`}
+    function openBrowser(){document.getElementById('browserModal').style.display='flex'}
+    function closeBrowser(){document.getElementById('browserModal').style.display='none'}
+    function preset(p){document.getElementById('presetOut').textContent=p.toUpperCase()}
+    function savePW(){localStorage.setItem('demoPW',document.getElementById('pw').value);document.getElementById('pwMsg').textContent='Saved'}
+    function login(){const ok=localStorage.getItem('demoPW')===document.getElementById('loginPw').value;document.getElementById('loginMsg').textContent= ok?'Logged in':'Wrong password'}
+    // defaults
+    setBG(document.getElementById('bgPick').value)
+  </script>
 </body>
 </html>
