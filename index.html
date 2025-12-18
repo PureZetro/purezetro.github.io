@@ -64,9 +64,10 @@
 <div id="settingsScreen" class="ios-screen settings">
   <button class="back-btn" onclick="backHome()">Back</button>
   <h2>Settings</h2>
-  <p>Change background color or upload your own image:</p>
+  <p>Change background color, choose a picture, or upload your own:</p>
   <input type="color" id="bgColorInput" onchange="changeBgColor()">
   <input type="file" id="bgUpload" accept="image/*" onchange="uploadBgImage(event)">
+  <select id="bgImageSelect" onchange="changeBgImage()"></select>
 </div>
 
 <script>
@@ -86,13 +87,20 @@ const siriResponse = document.getElementById('siriResponse');
 const bgSelectMenu = document.getElementById('bgSelectMenu');
 const bgColorInput = document.getElementById('bgColorInput');
 const bgUpload = document.getElementById('bgUpload');
+const bgImageSelect = document.getElementById('bgImageSelect');
 
-const bgOptions = ['nature','space','ocean','abstract','city','mountain','forest','desert','beach','snow','flowers','sunset','night','waterfall','river','clouds','stars','galaxy','rain','lava'];
+const bgOptions = ['nature','space','ocean','abstract','city','mountain','forest','desert','beach','snow','flowers','sunset','night','waterfall','river','clouds','stars','galaxy','rain','lava','mountains2','beach2','forest2','city2','ocean2','sunrise','sunset2','night2','stars2','flowers2','desert2'];
+
 bgOptions.forEach(bg => {
-  const option = document.createElement('option');
-  option.value = `https://source.unsplash.com/1600x900/?${bg}`;
-  option.text = bg.charAt(0).toUpperCase() + bg.slice(1);
-  bgSelectMenu.appendChild(option);
+  const optionMenu = document.createElement('option');
+  optionMenu.value = `https://source.unsplash.com/1600x900/?${bg}`;
+  optionMenu.text = bg.charAt(0).toUpperCase() + bg.slice(1);
+  bgSelectMenu.appendChild(optionMenu);
+
+  const optionSettings = document.createElement('option');
+  optionSettings.value = `https://source.unsplash.com/1600x900/?${bg}`;
+  optionSettings.text = bg.charAt(0).toUpperCase() + bg.slice(1);
+  bgImageSelect.appendChild(optionSettings);
 });
 
 let apps = [
@@ -166,8 +174,8 @@ function loadURL(){
 
 // Settings
 function changeBgColor(){
-  document.body.style.background = bgColorInput.value;
-  document.body.style.backgroundImage = '';
+  iosScreen.style.background = bgColorInput.value;
+  iosScreen.style.backgroundImage = '';
 }
 
 function uploadBgImage(event){
@@ -177,6 +185,11 @@ function uploadBgImage(event){
     iosScreen.style.backgroundColor = '';
   }
   reader.readAsDataURL(event.target.files[0]);
+}
+
+function changeBgImage(){
+  iosScreen.style.backgroundImage = `url('${bgImageSelect.value}')`;
+  iosScreen.style.backgroundColor = '';
 }
 </script>
 
