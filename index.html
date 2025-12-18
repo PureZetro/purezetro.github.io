@@ -103,6 +103,14 @@
   <h1>Welcome to Zetro Demo OS</h1>
   <p>This is a demo website that looks and feels like a phone OS.</p>
   <div class="apps">
+    <div class="app" onclick="showSection('settings')">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6d/Settings_icon_ios.svg" />
+      <p>Settings</p>
+    </div>
+    <div class="app" onclick="showSection('store')">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/App_Store_%28iOS%29.svg" />
+      <p>App Store</p>
+    </div>
     <div class="app" onclick="showSection('demo')">
       <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_edge_logo.svg" />
       <p>Browser</p>
@@ -141,11 +149,28 @@
 <section id="upgrades">
   <h1>Upgrades</h1>
   <ul>
-    <li>More apps</li>
-    <li>Better browser</li>
-    <li>User accounts</li>
-    <li>Save settings</li>
+    <li>✅ Settings saved (no reset on refresh)</li>
+    <li>✅ Lock Screen</li>
+    <li>✅ Background Changer</li>
+    <li>🛒 Fake App Store</li>
+    <li>🔒 User profiles (coming soon)</li>
   </ul>
+  <button onclick="lockScreen()">Lock Screen</button>
+</section>
+
+<section id="settings">
+  <h1>Settings</h1>
+  <p>Choose Background</p>
+  <button onclick="setBg('bg1')">Blue</button>
+  <button onclick="setBg('bg2')">Purple</button>
+  <button onclick="setBg('bg3')">Dark</button>
+</section>
+
+<section id="store">
+  <h1>App Store</h1>
+  <div class="shop-item">Calculator App – Installed</div>
+  <div class="shop-item">Music Player – Installed</div>
+  <div class="shop-item">Games Pack – Coming Soon</div>
 </section>
 
 <script>
@@ -153,6 +178,27 @@
     document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
+
+  function setBg(bg) {
+    localStorage.setItem('bg', bg);
+    applyBg();
+  }
+
+  function applyBg() {
+    const bg = localStorage.getItem('bg');
+    if (bg === 'bg1') document.body.style.background = 'linear-gradient(135deg,#1e3c72,#2a5298)';
+    if (bg === 'bg2') document.body.style.background = 'linear-gradient(135deg,#41295a,#2F0743)';
+    if (bg === 'bg3') document.body.style.background = 'linear-gradient(135deg,#000000,#434343)';
+  }
+
+  function lockScreen() {
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:black;color:white;flex-direction:column;">
+      <h1>🔒 Locked</h1>
+      <button onclick="location.reload()">Unlock</button>
+    </div>`;
+  }
+
+  applyBg();
 </script>
 
 </body>
