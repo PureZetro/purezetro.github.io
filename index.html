@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS Demo Website with Persistent Data</title>
+<title>iOS Demo Website with Browser Background</title>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; color: white; transition: color 0.3s, background 0.3s; }
@@ -17,7 +17,7 @@
   .app img { width: 60px; height: 60px; border-radius: 12px; }
   .back-btn { padding: 8px 12px; border: none; border-radius: 8px; background: #ff6347; color: white; cursor: pointer; margin-bottom: 10px; }
   input, select { padding: 5px; border-radius: 6px; border: none; margin-top: 5px; }
-  iframe { width: 100%; height: 80vh; border: none; }
+  iframe { width: 100%; height: 80vh; border: none; background: white; }
   .calculator input, .settings input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: none; }
   .siri input { width: 100%; padding: 10px; border-radius: 8px; border: none; }
 </style>
@@ -41,6 +41,7 @@
   <button class="back-btn" onclick="backHome()">Back</button>
   <h2>Browser</h2>
   <input type="text" id="urlInput" placeholder="Enter URL or site name">
+  <input type="color" id="browserBgColor" onchange="changeBrowserBg()" title="Set Browser Background">
   <button class="button" onclick="loadURL()">Go</button>
   <iframe id="browserFrame"></iframe>
 </div>
@@ -80,6 +81,7 @@ const siriScreen = document.getElementById('siriScreen');
 const settingsScreen = document.getElementById('settingsScreen');
 const urlInput = document.getElementById('urlInput');
 const browserFrame = document.getElementById('browserFrame');
+const browserBgColor = document.getElementById('browserBgColor');
 const calcInput = document.getElementById('calcInput');
 const calcResult = document.getElementById('calcResult');
 const siriInput = document.getElementById('siriInput');
@@ -114,13 +116,16 @@ let apps = [
 function saveState(){
   localStorage.setItem('bgImage', iosScreen.style.backgroundImage);
   localStorage.setItem('bgColor', iosScreen.style.backgroundColor);
+  localStorage.setItem('browserBg', browserFrame.style.backgroundColor);
 }
 
 function loadState(){
   const savedBgImage = localStorage.getItem('bgImage');
   const savedBgColor = localStorage.getItem('bgColor');
+  const savedBrowserBg = localStorage.getItem('browserBg');
   if(savedBgImage) iosScreen.style.backgroundImage = savedBgImage;
   if(savedBgColor) iosScreen.style.backgroundColor = savedBgColor;
+  if(savedBrowserBg) browserFrame.style.backgroundColor = savedBrowserBg;
 }
 
 function startIOS(){
@@ -201,6 +206,11 @@ function uploadBgImage(event){
 function changeBgImage(){
   iosScreen.style.backgroundImage = `url('${bgImageSelect.value}')`;
   iosScreen.style.backgroundColor = '';
+  saveState();
+}
+
+function changeBrowserBg(){
+  browserFrame.style.backgroundColor = browserBgColor.value;
   saveState();
 }
 
