@@ -1,106 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Future SMP</title>
-  <style>
-    body{margin:0;font-family:'Trebuchet MS',Arial,sans-serif;background:url('https://i.imgur.com/8bKQ8tN.png') repeat,color:white;min-height:100vh}
-    header{text-align:center;padding:20px;background:rgba(0,0,0,.75);border-bottom:4px solid #3aff3a}
-    header h1{color:#3aff3a;text-shadow:0 0 10px #3aff3a}
-    nav button{margin:8px;padding:12px 24px;border:2px solid #3aff3a;border-radius:6px;cursor:pointer;background:#1b1b1b;color:#3aff3a;font-weight:bold}
-    nav button:hover{background:#3aff3a;color:black;box-shadow:0 0 12px #3aff3a}
-    .container{padding:30px;max-width:900px;margin:auto}
-    .section{display:none;background:rgba(0,0,0,.7);padding:20px;border-radius:10px;border:2px solid #2ecc71}
-    .post{margin-top:15px;padding:15px;border-radius:8px;background:rgba(0,0,0,.6);position:relative;border:1px solid #555}
-    .post img{max-width:100%;border-radius:6px}
-    .delete{position:absolute;top:6px;right:6px;background:#c0392b;border:none;color:white;border-radius:4px;cursor:pointer;display:none}
-    .admin .delete{display:block}
-    .upload-btn{position:absolute;top:15px;right:15px;padding:6px 14px;font-size:.8rem;border-radius:6px;border:2px solid #00ffea;background:#003333;color:#00ffea;cursor:pointer;display:none;transition:.3s}
-    .upload-btn:hover{transform:scale(1.15);box-shadow:0 0 15px #00ffea}
-    .admin .upload-btn{display:block}
-    .badge{display:none;margin-left:10px;padding:4px 8px;background:#f1c40f;color:black;border-radius:6px;font-size:.8rem;font-weight:bold;box-shadow:0 0 10px #f1c40f}
-    .admin .badge{display:inline-block}
-    footer{text-align:center;padding:12px;margin-top:30px;opacity:.85;background:rgba(0,0,0,.7)}
-    textarea,input{width:100%;padding:8px;border-radius:6px;border:none;margin-bottom:8px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iOS for Windows</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: url('https://picsum.photos/1920/1080') no-repeat center center fixed;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        color: white;
+        text-shadow: 1px 1px 3px black;
+    }
+    .container {
+        background: rgba(0,0,0,0.6);
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        width: 350px;
+    }
+    input[type="password"] {
+        padding: 10px;
+        width: 80%;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: none;
+    }
+    select {
+        padding: 10px;
+        width: 85%;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: none;
+    }
+    button {
+        padding: 10px 25px;
+        background: #1E90FF;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: #63B8FF;
+    }
+</style>
 </head>
 <body>
-<header>
-  <h1>Future SMP <span class="badge">ADMIN</span></h1>
-  <nav>
-    <button onclick="show('home')">Home</button>
-    <button onclick="show('blades')">Blades</button>
-    <button onclick="show('about')">About</button>
-  </nav>
-</header>
-
-<div class="container">
-
-<div id="home" class="section">
-  <h2>Home</h2>
-  <textarea id="homeText" placeholder="Write something..."></textarea>
-  <input type="file" id="homeImage" accept="image/*">
-  <button onclick="addHome()">Post</button>
-  <div id="homePosts"></div>
-</div>
-
-<div id="blades" class="section" style="position:relative;">
-  <h2>Blades Gallery</h2>
-  <button class="upload-btn" onclick="document.getElementById('bladeInput').click()">Upload</button>
-  <input type="file" id="bladeInput" accept="image/*" style="display:none" onchange="addBlade()">
-  <div id="bladePosts"></div>
-</div>
-
-<div id="about" class="section">
-  <h2>Server Info</h2>
-  <p><b>Server IP:</b> FutureSmp2025.aternos.me</p>
-  <p><b>Port:</b> 58543</p>
-  <p><b>Owner:</b> Zetro</p>
-
-  <div class="login">
-    <input type="password" id="adminPass" placeholder="Admin password">
-    <button onclick="login()">Login</button>
-  </div>
-</div>
-
-</div>
-<footer>© 2025 Future SMP</footer>
+    <div class="container">
+        <h1>iOS for Windows</h1>
+        <p>Create your setup:</p>
+        <input type="password" id="password" placeholder="Enter a password"><br>
+        <select id="backgroundSelect">
+            <option value="https://picsum.photos/1920/1080">Random Background</option>
+            <option value="https://picsum.photos/1920/1080?grayscale">Grayscale</option>
+            <option value="https://picsum.photos/1920/1080?blur">Blurred</option>
+        </select><br>
+        <button onclick="downloadDemo()">Download</button>
+        <p id="message" style="margin-top:15px;"></p>
+    </div>
 
 <script>
-const ADMIN_PASS = '.Zetro1791';
-let admin = localStorage.getItem('admin') === 'true';
-if(admin) document.body.classList.add('admin');
+    const bgSelect = document.getElementById('backgroundSelect');
+    bgSelect.addEventListener('change', () => {
+        document.body.style.backgroundImage = `url('${bgSelect.value}')`;
+    });
 
-function show(id){document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.getElementById(id).style.display='block'}
-show('home');
-
-function login(){
-  if(document.getElementById('adminPass').value === ADMIN_PASS){
-    admin=true;localStorage.setItem('admin','true');document.body.classList.add('admin');alert('Admin logged in');
-  } else alert('Wrong password');
-}
-
-function save(key,data){localStorage.setItem(key,JSON.stringify(data))}
-function load(key){return JSON.parse(localStorage.getItem(key)||'[]')}
-
-let blades = load('blades');
-renderBlades();
-
-function addBlade(){
-  const f=document.getElementById('bladeInput').files[0];if(!f)return;
-  const r=new FileReader();r.onload=()=>{blades.push(r.result);save('blades',blades);renderBlades()};r.readAsDataURL(f)
-}
-
-function renderBlades(){
-  const c=document.getElementById('bladePosts');c.innerHTML='';
-  blades.forEach((img,i)=>{
-    const d=document.createElement('div');d.className='post';
-    d.innerHTML=`<button class='delete' onclick='delBlade(${i})'>X</button><img src='${img}'>`;
-    c.appendChild(d)
-  })
-}
-function delBlade(i){blades.splice(i,1);save('blades',blades);renderBlades()}
+    function downloadDemo() {
+        const password = document.getElementById('password').value;
+        if(!password) {
+            document.getElementById('message').innerText = "Please enter a password!";
+            return;
+        }
+        document.getElementById('message').innerText = "Download started... (demo, does nothing)";
+    }
 </script>
 </body>
 </html>
