@@ -3,206 +3,114 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS-style Website with Customization</title>
+<title>iOS Demo Website</title>
 <style>
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: url('https://source.unsplash.com/1600x900/?nature') no-repeat center center fixed;
-    background-size: cover;
-    color: white;
-    min-height: 100vh;
-    transition: color 0.3s;
-  }
-  .nav { display: flex; justify-content: center; padding: 10px; background: rgba(0,0,0,0.5); }
-  .nav button { padding: 10px 16px; border: none; border-radius: 12px; background: #1e90ff; color: white; cursor: pointer; margin: 0 5px; transition: 0.2s; }
-  .nav button:hover { background: #63b3ff; transform: scale(1.05); }
-  .home-screen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; color: white; transition: color 0.3s; }
+  .button { padding: 10px 20px; border-radius: 12px; border: none; background: #1e90ff; color: white; cursor: pointer; margin: 10px; transition: 0.2s; }
+  .button:hover { background: #63b3ff; }
+  .ios-screen { display: none; padding: 20px; background-size: cover; min-height: 100vh; }
+  .ios-screen.active { display: block; }
+  .home-screen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
   .app { background: rgba(0,0,0,0.6); border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
   .app:hover { transform: scale(1.05); }
   .app img { width: 60px; height: 60px; border-radius: 12px; }
-  .screen { display: none; padding: 20px; }
-  .screen.active { display: block; }
-  .back-btn { margin-bottom: 10px; padding: 8px 12px; border: none; border-radius: 8px; background: #ff6347; color: white; cursor: pointer; }
-  .file-item, .app-item { background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; margin: 5px 0; }
-  select, input { margin-top: 5px; padding: 5px; border-radius: 6px; border: none; }
+  .back-btn { padding: 8px 12px; border: none; border-radius: 8px; background: #ff6347; color: white; cursor: pointer; margin-bottom: 10px; }
+  input, select { padding: 5px; border-radius: 6px; border: none; margin-top: 5px; }
+  iframe { width: 100%; height: 80vh; border: none; }
 </style>
 </head>
 <body>
 
-<div class="nav">
-  <button onclick="showScreen('home')">Home</button>
-  <button onclick="showScreen('settings')">Settings</button>
+<div id="mainMenu">
+  <h1>Try the iOS Demo</h1>
+  <p>Select a background and launch the iOS experience:</p>
+  <select id="bgSelectMenu"></select>
+  <br>
+  <button class="button" onclick="startIOS()">Start iOS Demo</button>
 </div>
 
-<div id="home" class="screen active">
+<div id="iosScreen" class="ios-screen">
+  <button class="back-btn" onclick="exitIOS()">Exit iOS</button>
   <div class="home-screen" id="appContainer"></div>
 </div>
 
-<div id="browser" class="screen">
-  <button class="back-btn" onclick="showScreen('home')">Back</button>
-  <h2>Browser (Demo)</h2>
-  <input type="text" placeholder="Enter URL here" style="width:100%; padding:10px; border-radius:8px; border:none;" />
-  <p>Browser functionality coming soon!</p>
-</div>
-
-<div id="gallery" class="screen">
-  <button class="back-btn" onclick="showScreen('home')">Back</button>
-  <h2>Gallery</h2>
-  <div id="galleryContent"></div>
-</div>
-
-<div id="files" class="screen">
-  <button class="back-btn" onclick="showScreen('home')">Back</button>
-  <h2>Files</h2>
-  <input type="file" id="fileInput" />
-  <div id="fileList"></div>
-</div>
-
-<div id="appstore" class="screen">
-  <button class="back-btn" onclick="showScreen('home')">Back</button>
-  <h2>App Store</h2>
-  <input type="text" id="appName" placeholder="App Name" />
-  <input type="file" id="appFile" />
-  <button onclick="addApp()">Upload App</button>
-  <div id="appList"></div>
-</div>
-
-<div id="settings" class="screen">
-  <button class="back-btn" onclick="showScreen('home')">Back</button>
-  <h2>Settings</h2>
-  <p>Choose background or theme (20 options) and text color.</p>
-  <select id="bgSelect" onchange="changeBackground()"></select>
-  <br>
-  <label for="textColor">Text Color:</label>
-  <input type="color" id="textColor" onchange="changeTextColor()" />
+<div id="browserScreen" class="ios-screen">
+  <button class="back-btn" onclick="backHome()">Back</button>
+  <h2>Browser</h2>
+  <input type="text" id="urlInput" placeholder="Enter URL or site name" style="width:100%; padding:10px; margin-bottom:10px;">
+  <button class="button" onclick="loadURL()">Go</button>
+  <iframe id="browserFrame"></iframe>
 </div>
 
 <script>
-let apps = JSON.parse(localStorage.getItem('apps')) || [];
-let files = JSON.parse(localStorage.getItem('files')) || [];
-let defaultApps = [
-  {name: 'Calculator', content: 'calc'},
-  {name: 'Map', content: 'map'},
-  {name: 'Siri', content: 'siri'},
-  {name: 'Notes', content: 'notes'}
-];
+const iosScreen = document.getElementById('iosScreen');
+const mainMenu = document.getElementById('mainMenu');
+const appContainer = document.getElementById('appContainer');
+const browserScreen = document.getElementById('browserScreen');
+const urlInput = document.getElementById('urlInput');
+const browserFrame = document.getElementById('browserFrame');
 
-if(!localStorage.getItem('defaultAppsAdded')){
-  apps = [...defaultApps, ...apps];
-  localStorage.setItem('apps', JSON.stringify(apps));
-  localStorage.setItem('defaultAppsAdded', true);
-}
-
-const bgOptions = [
-  'nature','space','ocean','abstract','city','mountain','forest','desert','beach','snow','flowers','sunset','night','waterfall','river','clouds','stars','galaxy','rain','lava'
-];
-const bgSelect = document.getElementById('bgSelect');
+const bgOptions = ['nature','space','ocean','abstract','city','mountain','forest','desert','beach','snow','flowers','sunset','night','waterfall','river','clouds','stars','galaxy','rain','lava'];
+const bgSelectMenu = document.getElementById('bgSelectMenu');
 bgOptions.forEach(bg => {
   const option = document.createElement('option');
-  option.value = bg;
+  option.value = `https://source.unsplash.com/1600x900/?${bg}`;
   option.text = bg.charAt(0).toUpperCase() + bg.slice(1);
-  bgSelect.appendChild(option);
+  bgSelectMenu.appendChild(option);
 });
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id === 'appstore') renderApps();
-  if(id === 'files') renderFiles();
+let apps = [
+  {name: 'Calculator', func: calculatorApp},
+  {name: 'Map', func: mapApp},
+  {name: 'Siri', func: siriApp}
+];
+
+function startIOS(){
+  mainMenu.style.display = 'none';
+  iosScreen.classList.add('active');
+  iosScreen.style.backgroundImage = `url('${bgSelectMenu.value}')`;
+  renderApps();
 }
 
-function openApp(appId) {
-  if(appId === 'calc') alert('Calculator app launched (demo)');
-  else if(appId === 'map') alert('Map app launched (demo)');
-  else if(appId === 'siri') alert('Siri app launched (demo)');
-  else if(appId === 'notes') alert('Notes app launched (demo)');
-  else showScreen(appId);
-}
-
-function changeBackground() {
-  const bg = bgSelect.value;
-  const url = `https://source.unsplash.com/1600x900/?${bg}`;
-  document.body.style.backgroundImage = `url('${url}')`;
-  localStorage.setItem('background', url);
-}
-
-function changeTextColor() {
-  const color = document.getElementById('textColor').value;
-  document.body.style.color = color;
-  localStorage.setItem('textColor', color);
-}
-
-// Load saved settings
-const savedBg = localStorage.getItem('background');
-if(savedBg) document.body.style.backgroundImage = `url('${savedBg}')`;
-const savedColor = localStorage.getItem('textColor');
-if(savedColor) document.body.style.color = savedColor;
-
-function addApp() {
-  const name = document.getElementById('appName').value;
-  const fileInput = document.getElementById('appFile');
-  if(name && fileInput.files.length > 0){
-    const reader = new FileReader();
-    reader.onload = () => {
-      apps.push({name, content: reader.result});
-      localStorage.setItem('apps', JSON.stringify(apps));
-      renderApps();
-    };
-    reader.readAsDataURL(fileInput.files[0]);
-    document.getElementById('appName').value = '';
-    fileInput.value = '';
-  }
+function exitIOS(){
+  iosScreen.classList.remove('active');
+  mainMenu.style.display = 'block';
 }
 
 function renderApps(){
-  const list = document.getElementById('appList');
-  list.innerHTML = '';
-  apps.forEach((app, i) => {
+  appContainer.innerHTML = '';
+  apps.forEach(app => {
     const div = document.createElement('div');
-    div.className = 'app-item';
-    div.innerHTML = `${app.name} <button onclick='installApp(${i})'>Install</button>`;
-    list.appendChild(div);
+    div.className = 'app';
+    div.innerHTML = `<img src='https://img.icons8.com/ios-filled/100/ffffff/file.png'><p>${app.name}</p>`;
+    div.onclick = () => app.func();
+    appContainer.appendChild(div);
   });
 }
 
-function installApp(index){
-  const app = apps[index];
-  const container = document.getElementById('appContainer');
-  const div = document.createElement('div');
-  div.className = 'app';
-  div.innerHTML = `<img src='https://img.icons8.com/ios-filled/100/ffffff/file.png' /><p>${app.name}</p>`;
-  div.onclick = () => openApp(app.content);
-  container.appendChild(div);
+// App functions
+function calculatorApp(){
+  const result = prompt('Calculator: Enter expression, e.g. 2+2');
+  if(result !== null){
+    try { alert('Result: ' + eval(result)); } catch(e){ alert('Invalid expression'); }
+  }
 }
+function mapApp(){ alert('Map App launched (demo)'); }
+function siriApp(){ alert('Siri App launched (demo)'); }
 
-// Files
-function renderFiles(){
-  const list = document.getElementById('fileList');
-  list.innerHTML = '';
-  files.forEach((file, i) => {
-    const div = document.createElement('div');
-    div.className = 'file-item';
-    div.innerHTML = `${file.name} <a href='${file.content}' download>Download</a>`;
-    list.appendChild(div);
-  });
+// Browser
+function backHome(){
+  browserScreen.classList.remove('active');
+  iosScreen.classList.add('active');
 }
-
-document.getElementById('fileInput').addEventListener('change', e => {
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = () => {
-    files.push({name: file.name, content: reader.result});
-    localStorage.setItem('files', JSON.stringify(files));
-    renderFiles();
-  };
-  reader.readAsDataURL(file);
-});
-
-// Initial render
-renderApps();
-renderFiles();
+function loadURL(){
+  let url = urlInput.value.trim();
+  if(!url.startsWith('http')) url = 'https://' + url;
+  browserFrame.src = url;
+  iosScreen.classList.remove('active');
+  browserScreen.classList.add('active');
+}
 </script>
 
 </body>
