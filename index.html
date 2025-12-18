@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zetro Demo OS - Browser & Background Fixed</title>
+<title>Zetro Demo OS - Normal Browser</title>
 <style>
 body { margin: 0; font-family: Arial, sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: white; overflow: hidden; transition: background 0.5s, color 0.5s; }
 header { display: flex; justify-content: center; gap: 15px; padding: 10px; background: rgba(0,0,0,0.4); position: sticky; top: 0; z-index: 1000; }
@@ -29,10 +29,6 @@ section.active { display: block; }
 textarea { width: 100%; height: 100%; resize: none; border: none; padding: 5px; box-sizing: border-box; font-family: monospace; font-size: 14px; }
 .store-item { border: 1px solid #888; border-radius: 8px; padding: 10px; margin: 5px; text-align: center; background: rgba(200,200,200,0.1); cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
 .store-item:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
-#browserControls { display:flex; gap:5px; margin-bottom:5px; }
-#browserControls input { flex:1; padding:5px; border-radius:5px; border:1px solid #ccc; }
-#browserControls button { padding:5px 10px; }
-#backgroundPreview { width: 100%; height: 200px; object-fit: cover; border: 1px solid #ccc; margin-top: 10px; border-radius:5px; }
 </style>
 </head>
 <body>
@@ -62,7 +58,7 @@ function switchWorkspace(num){document.querySelectorAll('.window').forEach(w=>w.
 function assignAppToWorkspace(win){workspaces[currentWorkspace].push(win);}
 function openApp(app){let win=document.createElement('div');win.className='window';let content='';
 if(app==='browser'){
-content=`<iframe src='https://www.google.com' style='width:100%;height:100%;border:none;'></iframe>`;
+content=`<div id='browserControls'><input type='text' placeholder='Type URL or search...' style='width:100%;padding:5px;'/><iframe src='https://www.google.com' style='width:100%;height:100%;border:none;'></iframe></div>`;
 }
 else if(app==='notes') content=`<textarea placeholder='Type notes here...'></textarea>`;
 else if(app==='settings') content=`<h3>Settings</h3><div><label>Background Color:</label><input type='color' id='bgColorPicker' value='#203a43'/></div><div><label>Text Color:</label><input type='color' id='textColorPicker' value='#ffffff'/></div><div><label>Background Image:</label><input type='file' id='bgUploader' accept='image/*'/><img id='backgroundPreview'/></div><button onclick='applySettings()'>Apply</button>`;
