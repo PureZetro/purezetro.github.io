@@ -44,7 +44,7 @@
     .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
     .app{background:rgba(255,255,255,.12);border-radius:14px;padding:10px;text-align:center;font-size:.7rem}
     .dock{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(255,255,255,.15);border-radius:20px;padding:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:10}
+    .modal{pointer-events:none;position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:10}
     .modal .card{max-width:520px}
   </style>
 </head>
@@ -207,7 +207,7 @@
     }
 
     let animations = JSON.parse(localStorage.getItem('animations') ?? 'true');
-    function openSettings(){document.getElementById('settingsModal').style.display='flex'}
+    function openSettings(){const m=document.getElementById('settingsModal');m.style.display='flex';m.style.pointerEvents='auto'}
     function closeSettings(){document.getElementById('settingsModal').style.display='none'}
     function toggleAnim(){
       animations=!animations;
@@ -224,7 +224,7 @@
     const sections = ['home','demoWrap','customize','login'];
     function showSection(s){sections.forEach(id=>document.getElementById(id).style.display=(id===s|| (s==='demo'&&id==='demoWrap'))?'block':'none')}
     function setBG(url){document.getElementById('homeBG').style.backgroundImage=`url(${url})`}
-    function openBrowser(){document.getElementById('browserModal').style.display='flex'}
+    function openBrowser(){const m=document.getElementById('browserModal');m.style.display='flex';m.style.pointerEvents='auto'}
     function closeBrowser(){document.getElementById('browserModal').style.display='none'}
     function preset(p){
       localStorage.setItem('preset',p);
