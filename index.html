@@ -55,6 +55,7 @@
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    position: relative;
   }
 
   .home-screen {
@@ -63,6 +64,9 @@
     gap: 20px;
     justify-items: center;
     padding-top: 50px;
+    width: 100%;
+    height: 100%;
+    position: relative;
   }
 
   .app-icon {
@@ -75,14 +79,14 @@
     justify-content: center;
     flex-direction: column;
     box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-    cursor: pointer;
-    transition: transform 0.2s;
+    cursor: grab;
     text-align: center;
     font-size: 0.8em;
+    position: absolute;
   }
 
-  .app-icon:hover {
-    transform: scale(1.1);
+  .app-icon:active {
+    cursor: grabbing;
   }
 
   .app-modal {
@@ -153,6 +157,20 @@
     border-radius: 10px;
   }
 
+  /* Settings styles */
+  .background-option {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    object-fit: cover;
+    border: 2px solid transparent;
+  }
+  .background-option.selected {
+    border-color: #007aff;
+  }
+
 </style>
 </head>
 <body>
@@ -184,18 +202,22 @@ const buttons = document.querySelectorAll('.nav-buttons button');
 const appModal = document.getElementById('appModal');
 const appContent = document.getElementById('appContent');
 
+let appPositions = [
+  {id: 'Settings', left: 20, top: 50},
+  {id: 'Calculator', left: 120, top: 50},
+  {id: 'Maps', left: 220, top: 50},
+  {id: 'Browser', left: 20, top: 150},
+];
+
+const presetBackgrounds = [];
+for(let i=1;i<=20;i++){
+  presetBackgrounds.push(`https://picsum.photos/seed/bg${i}/100/100`);
+}
+
 const pages = {
   home: `<h2>Home</h2><p>Welcome to the Home page!</p>`,
   info: `<h2>Info</h2><p>Here is some information about this iOS-style website.</p>`,
-  demo: `
-    <h2>Demo Home Screen</h2>
-    <div class="home-screen">
-      <div class="app-icon" onclick="openApp('Settings')">⚙️<br>Settings</div>
-      <div class="app-icon" onclick="openApp('Calculator')">🧮<br>Calculator</div>
-      <div class="app-icon" onclick="openApp('Maps')">🗺️<br>Maps</div>
-      <div class="app-icon" onclick="openApp('Browser')">🌐<br>Browser</div>
-    </div>
-  `
+  demo: generateHomeScreenHTML()
 };
 
 buttons.forEach(btn => {
@@ -205,10 +227,62 @@ buttons.forEach(btn => {
 
     if(btn.id === 'homeBtn') content.innerHTML = pages.home;
     if(btn.id === 'infoBtn') content.innerHTML = pages.info;
-    if(btn.id === 'demoBtn') content.innerHTML = pages.demo;
+    if(btn.id === 'demoBtn') content.innerHTML = generateHomeScreenHTML();
   });
 });
 
+function generateHomeScreenHTML() {
+  let html = `<h2>Demo Home Screen</h2><div class="home-screen" id="homeScreen">`;
+  appPositions.forEach(app=>{
+    html += `<div class="app-icon" id="${app.id}" style="left:${app.left}px;top:${app.top}px;" 
+              onmousedown="startDrag(event,'${app.id}')" onclick="openApp('${app.id}')">
+              ${getAppEmoji(app.id)}<br>${app.id}</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function getAppEmoji(name){
+  if(name==='Settings') return '⚙️';
+  if(name==='Calculator') return '🧮';
+  if(name==='Maps') return '🗺️';
+  if(name==='Browser') return '🌐';
+  return '❓';
+}
+
+/* Drag functions */
+let currentDrag = null;
+let offsetX = 0;
+let offsetY = 0;
+
+function startDrag(e,id){
+  currentDrag = document.getElementById(id);
+  offsetX = e.clientX - currentDrag.offsetLeft;
+  offsetY = e.clientY - currentDrag.offsetTop;
+  document.onmousemove = drag;
+  document.onmouseup = stopDrag;
+}
+
+function drag(e){
+  if(currentDrag){
+    currentDrag.style.left = (e.clientX - offsetX) + 'px';
+    currentDrag.style.top = (e.clientY - offsetY) + 'px';
+  }
+}
+
+function stopDrag(){
+  if(currentDrag){
+    // Save position
+    const app = appPositions.find(a=>a.id===currentDrag.id);
+    app.left = parseInt(currentDrag.style.left);
+    app.top = parseInt(currentDrag.style.top);
+  }
+  currentDrag = null;
+  document.onmousemove = null;
+  document.onmouseup = null;
+}
+
+/* Open apps */
 function openApp(appName) {
   if(appName === 'Calculator') {
     appContent.innerHTML = `
@@ -249,9 +323,19 @@ function openApp(appName) {
       <button class="close-btn" onclick="closeApp()">Close</button>
     `;
   } else if(appName === 'Settings') {
+    let bgOptionsHTML = '';
+    presetBackgrounds.forEach((bg,index)=>{
+      bgOptionsHTML += `<img src="${bg}" class="background-option" onclick="setBackground('${bg}',this)">`;
+    });
     appContent.innerHTML = `
       <h2>Settings</h2>
-      <p>Settings options will go here.</p>
+      <p>Choose a background:</p>
+      <div>
+        <input type="file" id="bgUpload" accept="image/*" onchange="uploadBackground(event)">
+      </div>
+      <div style="display:flex;flex-wrap:wrap;margin-top:10px;">
+        ${bgOptionsHTML}
+      </div>
       <button class="close-btn" onclick="closeApp()">Close</button>
     `;
   }
@@ -288,6 +372,26 @@ function loadURL() {
     frame.src = url;
   }
 }
+
+/* Settings functions */
+function setBackground(url,imgElement){
+  document.getElementById('content').style.background = `url('${url}') center/cover no-repeat`;
+  document.querySelectorAll('.background-option').forEach(img=>img.classList.remove('selected'));
+  imgElement.classList.add('selected');
+}
+
+function uploadBackground(event){
+  const file = event.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      document.getElementById('content').style.background = `url('${e.target.result}') center/cover no-repeat`;
+      document.querySelectorAll('.background-option').forEach(img=>img.classList.remove('selected'));
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
 </script>
 
 </body>
