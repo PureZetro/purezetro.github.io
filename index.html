@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS-style Website</title>
+<title>iOS-style Website with Default Apps</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -24,6 +24,7 @@
   .screen { display: none; padding: 20px; }
   .screen.active { display: block; }
   .back-btn { margin-bottom: 10px; padding: 8px 12px; border: none; border-radius: 8px; background: #ff6347; color: white; cursor: pointer; }
+  .file-item, .app-item { background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; margin: 5px 0; }
 </style>
 </head>
 <body>
@@ -34,7 +35,7 @@
 </div>
 
 <div id="home" class="screen active">
-  <div class="home-screen">
+  <div class="home-screen" id="appContainer">
     <div class="app" onclick="openApp('browser')">
       <img src="https://img.icons8.com/ios-filled/100/ffffff/internet.png" />
       <p>Browser</p>
@@ -64,19 +65,23 @@
 <div id="gallery" class="screen">
   <button class="back-btn" onclick="showScreen('home')">Back</button>
   <h2>Gallery</h2>
-  <p>Your images will appear here.</p>
+  <div id="galleryContent"></div>
 </div>
 
 <div id="files" class="screen">
   <button class="back-btn" onclick="showScreen('home')">Back</button>
   <h2>Files</h2>
-  <p>Your uploaded files will appear here.</p>
+  <input type="file" id="fileInput" />
+  <div id="fileList"></div>
 </div>
 
 <div id="appstore" class="screen">
   <button class="back-btn" onclick="showScreen('home')">Back</button>
-  <h2>App Store (Demo)</h2>
-  <p>Upload and manage apps here (coming soon!)</p>
+  <h2>App Store</h2>
+  <input type="text" id="appName" placeholder="App Name" />
+  <input type="file" id="appFile" />
+  <button onclick="addApp()">Upload App</button>
+  <div id="appList"></div>
 </div>
 
 <div id="settings" class="screen">
@@ -92,13 +97,35 @@
 </div>
 
 <script>
+let apps = JSON.parse(localStorage.getItem('apps')) || [];
+let files = JSON.parse(localStorage.getItem('files')) || [];
+
+// Add default simple apps if not already present
+const defaultApps = [
+  {name: 'Calculator', content: 'calc'},
+  {name: 'Map', content: 'map'},
+  {name: 'Siri', content: 'siri'},
+  {name: 'Notes', content: 'notes'}
+];
+if(!localStorage.getItem('defaultAppsAdded')){
+  apps = [...defaultApps, ...apps];
+  localStorage.setItem('apps', JSON.stringify(apps));
+  localStorage.setItem('defaultAppsAdded', true);
+}
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  if(id === 'appstore') renderApps();
+  if(id === 'files') renderFiles();
 }
 
 function openApp(appId) {
-  showScreen(appId);
+  if(appId === 'calc') alert('Calculator app launched (demo)');
+  else if(appId === 'map') alert('Map app launched (demo)');
+  else if(appId === 'siri') alert('Siri app launched (demo)');
+  else if(appId === 'notes') alert('Notes app launched (demo)');
+  else showScreen(appId);
 }
 
 function changeBackground() {
@@ -110,7 +137,76 @@ function changeBackground() {
     abstract: 'https://source.unsplash.com/1600x900/?abstract'
   };
   document.body.style.backgroundImage = `url('${urls[bg]}')`;
+  localStorage.setItem('background', urls[bg]);
 }
+
+// Load background
+const savedBg = localStorage.getItem('background');
+if(savedBg) document.body.style.backgroundImage = `url('${savedBg}')`;
+
+function addApp() {
+  const name = document.getElementById('appName').value;
+  const fileInput = document.getElementById('appFile');
+  if(name && fileInput.files.length > 0){
+    const reader = new FileReader();
+    reader.onload = () => {
+      apps.push({name, content: reader.result});
+      localStorage.setItem('apps', JSON.stringify(apps));
+      renderApps();
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+    document.getElementById('appName').value = '';
+    fileInput.value = '';
+  }
+}
+
+function renderApps(){
+  const list = document.getElementById('appList');
+  list.innerHTML = '';
+  apps.forEach((app, i) => {
+    const div = document.createElement('div');
+    div.className = 'app-item';
+    div.innerHTML = `${app.name} <button onclick='installApp(${i})'>Install</button>`;
+    list.appendChild(div);
+  });
+}
+
+function installApp(index){
+  const app = apps[index];
+  const container = document.getElementById('appContainer');
+  const div = document.createElement('div');
+  div.className = 'app';
+  div.innerHTML = `<img src='https://img.icons8.com/ios-filled/100/ffffff/file.png' /><p>${app.name}</p>`;
+  div.onclick = () => openApp(app.content);
+  container.appendChild(div);
+}
+
+// Files
+function renderFiles(){
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  files.forEach((file, i) => {
+    const div = document.createElement('div');
+    div.className = 'file-item';
+    div.innerHTML = `${file.name} <a href='${file.content}' download>Download</a>`;
+    list.appendChild(div);
+  });
+}
+
+document.getElementById('fileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    files.push({name: file.name, content: reader.result});
+    localStorage.setItem('files', JSON.stringify(files));
+    renderFiles();
+  };
+  reader.readAsDataURL(file);
+});
+
+// Initial render
+renderApps();
+renderFiles();
 </script>
 
 </body>
