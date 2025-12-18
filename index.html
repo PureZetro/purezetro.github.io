@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Custom OS Download & Demo</title>
   <style>
+    /* MINECRAFT THEME ADDITIONS */
+    body{background:url('https://i.imgur.com/8YqGkQk.png') repeat, linear-gradient(120deg,#020617,#0b1220 40%,#020617)}
+    header h1::before{content:'⛏ ';}
+    .app{font-family:monospace}
+
     :root{
       --accent:#0a84ff;
       --bg:#0f172a;
@@ -91,7 +96,11 @@
           <div class="status"><span>12:00</span><span>🔋</span></div>
           <div id="homeBG" class="home">
             <div class="apps">
-              <div class="app">Settings</div>
+              <div class="app" onclick="openSettings()">Settings</div>
+              <div class="app">Photos</div>
+              <div class="app">Games</div>
+              <div class="app" onclick="openBrowser()">Browser</div>
+            </div>
               <div class="app">Photos</div>
               <div class="app">Games</div>
               <div class="app" onclick="openBrowser()">Browser</div>
@@ -138,6 +147,26 @@
     </section>
   </main>
 
+  <div id="settingsModal" class="modal" onclick="closeSettings()">
+    <div class="card" onclick="event.stopPropagation()">
+      <h2>Settings</h2>
+      <p>Change how your OS works.</p>
+      <label>Theme</label><br>
+      <select onchange="changeTheme(this.value)">
+        <option value="dark">Dark</option>
+        <option value="blue">Blue</option>
+        <option value="green">Green</option>
+      </select><br><br>
+      <label>Show Animations</label><br>
+      <button class="secondary" onclick="toggleAnim()">Toggle</button><br><br>
+      <label>Performance Mode</label><br>
+      <button onclick="preset('gaming')">Gaming</button>
+      <button onclick="preset('school')">School</button>
+      <br><br>
+      <button class="secondary" onclick="closeSettings()">Close</button>
+    </div>
+  </div>
+
   <div id="browserModal" class="modal" onclick="closeBrowser()">
     <div class="card" onclick="event.stopPropagation()">
       <h2>Browser (Coming Soon)</h2>
@@ -149,6 +178,16 @@
   <footer>Demo UI only • No real iOS software</footer>
 
   <script>
+    let animations = true;
+    function openSettings(){document.getElementById('settingsModal').style.display='flex'}
+    function closeSettings(){document.getElementById('settingsModal').style.display='none'}
+    function toggleAnim(){animations=!animations;document.body.style.transition=animations?'all .3s':'none'}
+    function changeTheme(t){
+      if(t==='blue')document.documentElement.style.setProperty('--accent','#3b82f6');
+      if(t==='green')document.documentElement.style.setProperty('--accent','#22c55e');
+      if(t==='dark')document.documentElement.style.setProperty('--accent','#0a84ff');
+    }
+
     const sections = ['home','demoWrap','customize','login'];
     function showSection(s){sections.forEach(id=>document.getElementById(id).style.display=(id===s|| (s==='demo'&&id==='demoWrap'))?'block':'none')}
     function setBG(url){document.getElementById('homeBG').style.backgroundImage=`url(${url})`}
