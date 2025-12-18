@@ -104,18 +104,15 @@
 
   .app-content {
     background: white;
-    padding: 20px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 600px;
-    height: 80vh;
+    border-radius: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    position: relative;
   }
 
   .close-btn {
-    margin-top: 10px;
     padding: 10px 20px;
     background: #007aff;
     color: white;
@@ -154,8 +151,8 @@
 
   iframe {
     width: 100%;
-    border-radius: 10px;
     flex: 1;
+    border: none;
   }
 
   /* Settings styles */
@@ -170,6 +167,14 @@
   }
   .background-option.selected {
     border-color: #007aff;
+  }
+
+  /* Browser close button at top-right */
+  .browser-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
   }
 
 </style>
@@ -316,13 +321,12 @@ function openApp(appName) {
     `;
   } else if(appName === 'Browser') {
     appContent.innerHTML = `
-      <h2>Browser</h2>
-      <div style="display:flex;margin-bottom:10px;">
+      <button class="close-btn browser-close" onclick="closeApp()">✖</button>
+      <div style="display:flex;padding:10px;flex-shrink:0;">
         <input type="text" id="urlInput" placeholder="Enter URL" style="flex:1;padding:5px;">
         <button onclick="loadURL()">Go</button>
       </div>
       <iframe id="browserFrame" src=""></iframe>
-      <button class="close-btn" onclick="closeApp()">Close</button>
     `;
   } else if(appName === 'Settings') {
     let bgOptionsHTML = '';
