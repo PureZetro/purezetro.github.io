@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS Demo Website with App Icons</title>
+<title>iOS Demo Website with Persistent Data</title>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; color: white; transition: color 0.3s, background 0.3s; }
@@ -111,16 +111,30 @@ let apps = [
   {name: 'Settings', screen: settingsScreen, icon: 'https://img.icons8.com/ios-filled/100/ffffff/settings.png'}
 ];
 
+function saveState(){
+  localStorage.setItem('bgImage', iosScreen.style.backgroundImage);
+  localStorage.setItem('bgColor', iosScreen.style.backgroundColor);
+}
+
+function loadState(){
+  const savedBgImage = localStorage.getItem('bgImage');
+  const savedBgColor = localStorage.getItem('bgColor');
+  if(savedBgImage) iosScreen.style.backgroundImage = savedBgImage;
+  if(savedBgColor) iosScreen.style.backgroundColor = savedBgColor;
+}
+
 function startIOS(){
   mainMenu.style.display = 'none';
   iosScreen.classList.add('active');
-  iosScreen.style.backgroundImage = `url('${bgSelectMenu.value}')`;
+  if(!iosScreen.style.backgroundImage) iosScreen.style.backgroundImage = `url('${bgSelectMenu.value}')`;
   renderApps();
+  loadState();
 }
 
 function exitIOS(){
   iosScreen.classList.remove('active');
   mainMenu.style.display = 'block';
+  saveState();
 }
 
 function renderApps(){
@@ -147,13 +161,11 @@ function backHome(){
   iosScreen.classList.add('active');
 }
 
-// Calculator
 function calculate(){
   try { calcResult.innerText = 'Result: ' + eval(calcInput.value); }
   catch(e){ calcResult.innerText = 'Invalid expression'; }
 }
 
-// Siri
 function siriRespond(){
   const text = siriInput.value.toLowerCase();
   if(!text) { siriResponse.innerText = '...'; return; }
@@ -162,20 +174,18 @@ function siriRespond(){
   else siriResponse.innerText = 'I heard: ' + siriInput.value;
 }
 
-// Map demo
 function mapApp(){ alert('Map App launched (demo)'); }
 
-// Browser
 function loadURL(){
   let url = urlInput.value.trim();
   if(!url.startsWith('http')) url = 'https://' + url;
   browserFrame.src = url;
 }
 
-// Settings
 function changeBgColor(){
   iosScreen.style.background = bgColorInput.value;
   iosScreen.style.backgroundImage = '';
+  saveState();
 }
 
 function uploadBgImage(event){
@@ -183,6 +193,7 @@ function uploadBgImage(event){
   reader.onload = function(){
     iosScreen.style.backgroundImage = `url('${reader.result}')`;
     iosScreen.style.backgroundColor = '';
+    saveState();
   }
   reader.readAsDataURL(event.target.files[0]);
 }
@@ -190,7 +201,10 @@ function uploadBgImage(event){
 function changeBgImage(){
   iosScreen.style.backgroundImage = `url('${bgImageSelect.value}')`;
   iosScreen.style.backgroundColor = '';
+  saveState();
 }
+
+window.onload = loadState;
 </script>
 
 </body>
