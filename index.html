@@ -169,20 +169,53 @@
 
   <div id="browserModal" class="modal" onclick="closeBrowser()">
     <div class="card" onclick="event.stopPropagation()">
-      <h2>Browser (Coming Soon)</h2>
-      <p>This browser is not functional yet.</p>
-      <button class="secondary" onclick="closeBrowser()">Close</button>
+      <h2>Browser (Edge-powered)</h2>
+      <p class="badge">Uses Bing • Opens links in Edge by default</p>
+      <div class="row">
+        <input id="addr" placeholder="Search or enter URL" style="flex:1" />
+        <button onclick="go()">Go</button>
+        <button class="secondary" onclick="openExternal()">Open in Edge</button>
+      </div>
+      <iframe id="webview" src="https://www.bing.com" style="width:100%;height:320px;border:1px solid #1f2937;border-radius:12px;margin-top:10px"></iframe>
+      <div class="row" style="margin-top:8px">
+        <button class="ghost" onclick="nav('back')">◀</button>
+        <button class="ghost" onclick="nav('forward')">▶</button>
+        <button class="ghost" onclick="nav('reload')">⟳</button>
+      </div>
+      <button class="secondary" onclick="closeBrowser()" style="margin-top:10px">Close</button>
     </div>
   </div>
 
-  <footer>Demo UI only • No real iOS software</footer>
+  <footer>Demo UI only • Browser uses Bing (Edge-compatible)</footer>Demo UI only • No real iOS software</footer>
 
   <script>
-    let animations = true;
+    // EDGE-COMPATIBLE BROWSER LOGIC
+    function go(){
+      const v=document.getElementById('addr').value.trim();
+      const url = v.startsWith('http')? v : 'https://www.bing.com/search?q='+encodeURIComponent(v||'');
+      document.getElementById('webview').src=url;
+    }
+    function openExternal(){
+      const src=document.getElementById('webview').src;
+      window.open(src,'_blank'); // opens in Edge on Windows when Edge is default
+    }
+    function nav(d){
+      const w=document.getElementById('webview').contentWindow;
+      if(d==='back') w.history.back();
+      if(d==='forward') w.history.forward();
+      if(d==='reload') w.location.reload();
+    }
+
+    let animations = JSON.parse(localStorage.getItem('animations') ?? 'true');
     function openSettings(){document.getElementById('settingsModal').style.display='flex'}
     function closeSettings(){document.getElementById('settingsModal').style.display='none'}
-    function toggleAnim(){animations=!animations;document.body.style.transition=animations?'all .3s':'none'}
+    function toggleAnim(){
+      animations=!animations;
+      localStorage.setItem('animations',JSON.stringify(animations));
+      document.body.style.transition=animations?'all .3s':'none';
+    }
     function changeTheme(t){
+      localStorage.setItem('theme',t);
       if(t==='blue')document.documentElement.style.setProperty('--accent','#3b82f6');
       if(t==='green')document.documentElement.style.setProperty('--accent','#22c55e');
       if(t==='dark')document.documentElement.style.setProperty('--accent','#0a84ff');
@@ -193,11 +226,17 @@
     function setBG(url){document.getElementById('homeBG').style.backgroundImage=`url(${url})`}
     function openBrowser(){document.getElementById('browserModal').style.display='flex'}
     function closeBrowser(){document.getElementById('browserModal').style.display='none'}
-    function preset(p){document.getElementById('presetOut').textContent=p.toUpperCase()}
+    function preset(p){
+      localStorage.setItem('preset',p);
+      document.getElementById('presetOut').textContent=p.toUpperCase();
+    }
     function savePW(){localStorage.setItem('demoPW',document.getElementById('pw').value);document.getElementById('pwMsg').textContent='Saved'}
     function login(){const ok=localStorage.getItem('demoPW')===document.getElementById('loginPw').value;document.getElementById('loginMsg').textContent= ok?'Logged in':'Wrong password'}
-    // defaults
-    setBG(document.getElementById('bgPick').value)
-  </script>
-</body>
-</html>
+    // defaults (restore saved state)
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    changeTheme(savedTheme);
+    const savedPreset = localStorage.getItem('preset');
+    if(savedPreset) document.getElementById('presetOut').textContent=savedPreset.toUpperCase();
+    const savedBG = localStorage.getItem('bg');
+    if(savedBG) setBG(savedBG);
+    document.body.style.transition=animations?'all .3s':'none';
