@@ -3,240 +3,157 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Custom OS Download & Demo</title>
+  <title>Zetro Demo OS</title>
   <style>
-    /* MINECRAFT THEME ADDITIONS */
-    body{background:url('https://i.imgur.com/8YqGkQk.png') repeat, linear-gradient(120deg,#020617,#0b1220 40%,#020617)}
-    header h1::before{content:'⛏ ';}
-    .app{font-family:monospace}
-
-    :root{
-      --accent:#0a84ff;
-      --bg:#0f172a;
-      --card:#111827;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(120deg,#020617,#0b1220 40%,#020617);color:var(--text)}
-    header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(2,6,23,.8);backdrop-filter:blur(8px);position:sticky;top:0;z-index:5}
-    header h1{font-size:1.1rem;margin:0}
-    nav button{margin-left:8px}
-    main{padding:20px;max-width:1200px;margin:auto}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-    .card{background:rgba(17,24,39,.9);border:1px solid #1f2937;border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    h2{margin:.2rem 0 .6rem 0}
-    p{color:var(--muted)}
-    button{background:var(--accent);border:none;color:white;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
-    button.secondary{background:#1f2937}
-    button.ghost{background:transparent;border:1px solid #1f2937}
-    button:disabled{opacity:.6;cursor:not-allowed}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    input,select{background:#020617;color:var(--text);border:1px solid #1f2937;border-radius:10px;padding:10px}
-    .badge{display:inline-block;background:#022c22;color:#86efac;border:1px solid #064e3b;border-radius:999px;padding:4px 10px;font-size:.75rem}
-    footer{opacity:.6;text-align:center;padding:20px}
 
-    /* Demo OS */
-    #demoWrap{display:none}
-    .phone{margin:auto;width:360px;max-width:100%;aspect-ratio:9/19;border-radius:30px;background:#000;position:relative;overflow:hidden;border:6px solid #0b1220}
-    .status{height:28px;color:#fff;font-size:.75rem;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:rgba(0,0,0,.5)}
-    .home{height:calc(100% - 28px);background-size:cover;background-position:center;padding:14px}
-    .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
-    .app{background:rgba(255,255,255,.12);border-radius:14px;padding:10px;text-align:center;font-size:.7rem}
-    .dock{position:absolute;bottom:10px;left:10px;right:10px;background:rgba(255,255,255,.15);border-radius:20px;padding:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-    .modal{pointer-events:none;position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:10}
-    .modal .card{max-width:520px}
+    header {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      padding: 15px;
+      background: rgba(0,0,0,0.4);
+      position: sticky;
+      top: 0;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #1e90ff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    button:hover {
+      background: #63b3ff;
+      transform: scale(1.05);
+    }
+
+    section {
+      display: none;
+      padding: 30px;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    .apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .app {
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .app:hover {
+      transform: scale(1.08);
+    }
+
+    .app img {
+      width: 60px;
+      height: 60px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+      border-radius: 15px;
+      margin-top: 15px;
+      background: white;
+    }
+
+    .shop-item {
+      background: rgba(255,255,255,0.12);
+      padding: 15px;
+      border-radius: 15px;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Custom OS Downloads & Demo</h1>
-    <nav>
-      <button class="secondary" onclick="showSection('home')">Home</button>
-      <button class="secondary" onclick="showSection('demo')">Demo</button>
-      <button class="secondary" onclick="showSection('customize')">Customize</button>
-      <button class="secondary" onclick="showSection('login')">Admin</button>
-    </nav>
-  </header>
 
-  <main>
-    <!-- HOME -->
-    <section id="home" class="grid">
-      <div class="card">
-        <h2>Downloads</h2>
-        <p>Official links only.</p>
-        <div class="row">
-          <a href="https://www.microsoft.com/software-download/windows11" target="_blank"><button>Windows 11</button></a>
-          <a href="https://www.microsoft.com/software-download/windows10" target="_blank"><button>Windows 10</button></a>
-          <a href="https://pcsupport.lenovo.com/us/en/downloads" target="_blank"><button>Lenovo Drivers</button></a>
-        </div>
-        <p class="badge">Legal & Safe</p>
-      </div>
-      <div class="card">
-        <h2>About the Demo</h2>
-        <p>This is a <b>visual demo UI</b> inspired by mobile OS designs. It is <b>not real iOS</b> and does not run Apple software.</p>
-        <button onclick="showSection('demo')">Try Demo</button>
-      </div>
-      <div class="card">
-        <h2>Background Chooser</h2>
-        <select id="bgPick" onchange="setBG(this.value)">
-          <option value="https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc">Dark Waves</option>
-          <option value="https://images.unsplash.com/photo-1519681393784-d120267933ba">Blue Mountain</option>
-          <option value="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee">Purple Sky</option>
-        </select>
-      </div>
-    </section>
+<header>
+  <button onclick="showSection('home')">Home</button>
+  <button onclick="showSection('demo')">Demo</button>
+  <button onclick="showSection('creator')">Creator</button>
+  <button onclick="showSection('shop')">Shop</button>
+  <button onclick="showSection('upgrades')">Upgrades</button>
+</header>
 
-    <!-- DEMO -->
-    <section id="demoWrap">
-      <div class="card">
-        <h2>OS Demo (Preview)</h2>
-        <p>Interactive preview only.</p>
-        <div class="phone">
-          <div class="status"><span>12:00</span><span>🔋</span></div>
-          <div id="homeBG" class="home">
-            <div class="apps">
-              <div class="app" onclick="openSettings()">Settings</div>
-              <div class="app">Photos</div>
-              <div class="app">Games</div>
-              <div class="app" onclick="openBrowser()">Browser</div>
-            </div>
-              <div class="app">Photos</div>
-              <div class="app">Games</div>
-              <div class="app" onclick="openBrowser()">Browser</div>
-            </div>
-            <div class="dock">
-              <div class="app">Phone</div>
-              <div class="app">Messages</div>
-              <div class="app">Music</div>
-              <div class="app">Store</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CUSTOMIZE -->
-    <section id="customize" class="grid" style="display:none">
-      <div class="card">
-        <h2>Profile Presets</h2>
-        <p>Choose how your OS looks & feels.</p>
-        <div class="row">
-          <button onclick="preset('gaming')">Gaming</button>
-          <button onclick="preset('school')">School</button>
-          <button onclick="preset('work')">Work</button>
-        </div>
-        <p id="presetOut" class="badge">None</p>
-      </div>
-      <div class="card">
-        <h2>Create Password</h2>
-        <input id="pw" type="password" placeholder="Create password" />
-        <button onclick="savePW()">Save</button>
-        <p id="pwMsg" class="badge"></p>
-      </div>
-    </section>
-
-    <!-- LOGIN -->
-    <section id="login" class="grid" style="display:none">
-      <div class="card">
-        <h2>Admin Login (Local Demo)</h2>
-        <input id="loginPw" type="password" placeholder="Password" />
-        <button onclick="login()">Login</button>
-        <p id="loginMsg"></p>
-      </div>
-    </section>
-  </main>
-
-  <div id="settingsModal" class="modal" onclick="closeSettings()">
-    <div class="card" onclick="event.stopPropagation()">
-      <h2>Settings</h2>
-      <p>Change how your OS works.</p>
-      <label>Theme</label><br>
-      <select onchange="changeTheme(this.value)">
-        <option value="dark">Dark</option>
-        <option value="blue">Blue</option>
-        <option value="green">Green</option>
-      </select><br><br>
-      <label>Show Animations</label><br>
-      <button class="secondary" onclick="toggleAnim()">Toggle</button><br><br>
-      <label>Performance Mode</label><br>
-      <button onclick="preset('gaming')">Gaming</button>
-      <button onclick="preset('school')">School</button>
-      <br><br>
-      <button class="secondary" onclick="closeSettings()">Close</button>
+<section id="home" class="active">
+  <h1>Welcome to Zetro Demo OS</h1>
+  <p>This is a demo website that looks and feels like a phone OS.</p>
+  <div class="apps">
+    <div class="app" onclick="showSection('demo')">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_edge_logo.svg" />
+      <p>Browser</p>
+    </div>
+    <div class="app">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Apple_Notes_icon.svg" />
+      <p>Notes</p>
+    </div>
+    <div class="app">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_Calendar_icon.svg" />
+      <p>Calendar</p>
     </div>
   </div>
+</section>
 
-  <div id="browserModal" class="modal" onclick="closeBrowser()">
-    <div class="card" onclick="event.stopPropagation()">
-      <h2>Browser (Edge-powered)</h2>
-      <p class="badge">Uses Bing • Opens links in Edge by default</p>
-      <div class="row">
-        <input id="addr" placeholder="Search or enter URL" style="flex:1" />
-        <button onclick="go()">Go</button>
-        <button class="secondary" onclick="openExternal()">Open in Edge</button>
-      </div>
-      <iframe id="webview" src="https://www.bing.com" style="width:100%;height:320px;border:1px solid #1f2937;border-radius:12px;margin-top:10px"></iframe>
-      <div class="row" style="margin-top:8px">
-        <button class="ghost" onclick="nav('back')">◀</button>
-        <button class="ghost" onclick="nav('forward')">▶</button>
-        <button class="ghost" onclick="nav('reload')">⟳</button>
-      </div>
-      <button class="secondary" onclick="closeBrowser()" style="margin-top:10px">Close</button>
-    </div>
-  </div>
+<section id="demo">
+  <h1>Demo Browser</h1>
+  <p>This browser works inside the website (real browsers cannot open Edge directly).</p>
+  <iframe src="https://www.bing.com"></iframe>
+</section>
 
-  <footer>Demo UI only • Browser uses Bing (Edge-compatible)</footer>Demo UI only • No real iOS software</footer>
+<section id="creator">
+  <h1>About the Creator</h1>
+  <p><strong>Name:</strong> Zetro</p>
+  <p><strong>Age:</strong> 11 years old</p>
+  <p>This website was created as a fun demo project showing apps, a browser, and an OS-style design.</p>
+</section>
 
-  <script>
-    // EDGE-COMPATIBLE BROWSER LOGIC
-    function go(){
-      const v=document.getElementById('addr').value.trim();
-      const url = v.startsWith('http')? v : 'https://www.bing.com/search?q='+encodeURIComponent(v||'');
-      document.getElementById('webview').src=url;
-    }
-    function openExternal(){
-      const src=document.getElementById('webview').src;
-      window.open(src,'_blank'); // opens in Edge on Windows when Edge is default
-    }
-    function nav(d){
-      const w=document.getElementById('webview').contentWindow;
-      if(d==='back') w.history.back();
-      if(d==='forward') w.history.forward();
-      if(d==='reload') w.location.reload();
-    }
+<section id="shop">
+  <h1>Shop</h1>
+  <div class="shop-item">Dark Mode Theme – Free</div>
+  <div class="shop-item">Gaming Layout – Coming Soon</div>
+  <div class="shop-item">Custom Icons Pack – Coming Soon</div>
+</section>
 
-    let animations = JSON.parse(localStorage.getItem('animations') ?? 'true');
-    function openSettings(){const m=document.getElementById('settingsModal');m.style.display='flex';m.style.pointerEvents='auto'}
-    function closeSettings(){document.getElementById('settingsModal').style.display='none'}
-    function toggleAnim(){
-      animations=!animations;
-      localStorage.setItem('animations',JSON.stringify(animations));
-      document.body.style.transition=animations?'all .3s':'none';
-    }
-    function changeTheme(t){
-      localStorage.setItem('theme',t);
-      if(t==='blue')document.documentElement.style.setProperty('--accent','#3b82f6');
-      if(t==='green')document.documentElement.style.setProperty('--accent','#22c55e');
-      if(t==='dark')document.documentElement.style.setProperty('--accent','#0a84ff');
-    }
+<section id="upgrades">
+  <h1>Upgrades</h1>
+  <ul>
+    <li>More apps</li>
+    <li>Better browser</li>
+    <li>User accounts</li>
+    <li>Save settings</li>
+  </ul>
+</section>
 
-    const sections = ['home','demoWrap','customize','login'];
-    function showSection(s){sections.forEach(id=>document.getElementById(id).style.display=(id===s|| (s==='demo'&&id==='demoWrap'))?'block':'none')}
-    function setBG(url){document.getElementById('homeBG').style.backgroundImage=`url(${url})`}
-    function openBrowser(){const m=document.getElementById('browserModal');m.style.display='flex';m.style.pointerEvents='auto'}
-    function closeBrowser(){document.getElementById('browserModal').style.display='none'}
-    function preset(p){
-      localStorage.setItem('preset',p);
-      document.getElementById('presetOut').textContent=p.toUpperCase();
-    }
-    function savePW(){localStorage.setItem('demoPW',document.getElementById('pw').value);document.getElementById('pwMsg').textContent='Saved'}
-    function login(){const ok=localStorage.getItem('demoPW')===document.getElementById('loginPw').value;document.getElementById('loginMsg').textContent= ok?'Logged in':'Wrong password'}
-    // defaults (restore saved state)
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    changeTheme(savedTheme);
-    const savedPreset = localStorage.getItem('preset');
-    if(savedPreset) document.getElementById('presetOut').textContent=savedPreset.toUpperCase();
-    const savedBG = localStorage.getItem('bg');
-    if(savedBG) setBG(savedBG);
-    document.body.style.transition=animations?'all .3s':'none';
+<script>
+  function showSection(id) {
+    document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>
