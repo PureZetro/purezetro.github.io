@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS Demo Website with Settings</title>
+<title>iOS Demo Website with App Icons</title>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; color: white; transition: color 0.3s, background 0.3s; }
@@ -104,11 +104,11 @@ bgOptions.forEach(bg => {
 });
 
 let apps = [
-  {name: 'Calculator', screen: calculatorScreen},
-  {name: 'Map', func: mapApp},
-  {name: 'Siri', screen: siriScreen},
-  {name: 'Browser', screen: browserScreen},
-  {name: 'Settings', screen: settingsScreen}
+  {name: 'Calculator', screen: calculatorScreen, icon: 'https://img.icons8.com/ios-filled/100/ffffff/calculator.png'},
+  {name: 'Map', func: mapApp, icon: 'https://img.icons8.com/ios-filled/100/ffffff/map.png'},
+  {name: 'Siri', screen: siriScreen, icon: 'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png'},
+  {name: 'Browser', screen: browserScreen, icon: 'https://img.icons8.com/ios-filled/100/ffffff/internet.png'},
+  {name: 'Settings', screen: settingsScreen, icon: 'https://img.icons8.com/ios-filled/100/ffffff/settings.png'}
 ];
 
 function startIOS(){
@@ -128,7 +128,7 @@ function renderApps(){
   apps.forEach(app => {
     const div = document.createElement('div');
     div.className = 'app';
-    div.innerHTML = `<img src='https://img.icons8.com/ios-filled/100/ffffff/file.png'><p>${app.name}</p>`;
+    div.innerHTML = `<img src='${app.icon}'><p>${app.name}</p>`;
     div.onclick = () => {
       document.querySelectorAll('.ios-screen').forEach(s => s.classList.remove('active'));
       if(app.screen){
