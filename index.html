@@ -80,6 +80,10 @@ let installed=JSON.parse(localStorage.getItem('apps'))||['Browser','Calculator',
 let dark=localStorage.getItem('mode')||'dark'
 let history=[],index=-1
 
+const defaultWallpaper="linear-gradient(135deg,#1e3c72,#2a5298)";
+
+function setDefaultWallpaper(){if(!localStorage.getItem('bg')){home.style.background=defaultWallpaper}}
+
 const appData={
 Browser:{icon:'https://img.icons8.com/ios-filled/100/ffffff/internet.png',open:()=>open('browser')},
 Calculator:{icon:'https://img.icons8.com/ios-filled/100/ffffff/calculator.png',open:()=>open('calc')},
@@ -91,7 +95,7 @@ Clock:{icon:'https://img.icons8.com/ios-filled/100/ffffff/clock.png',open:()=>al
 Files:{icon:'https://img.icons8.com/ios-filled/100/ffffff/folder-invoices.png',open:()=>alert('Files soon')}
 }
 
-function start(){menu.style.display='none';open('home');render()}
+function start(){menu.style.display='none';setDefaultWallpaper();open('home');render()}}
 function open(id){screens.forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
 function goHome(){open('home')}
 
@@ -128,7 +132,4 @@ function setBg(c){home.style.background=c;localStorage.setItem('bg',c)}
 function setMode(m){dark=m;localStorage.setItem('mode',m);document.body.style.background=m==='dark'?'#000':'#eee';document.body.style.color=m==='dark'?'white':'black'}
 function toggleMode(){setMode(dark==='dark'?'light':'dark')}
 
-window.onload=()=>{setMode(dark);document.body.style.color=localStorage.getItem('text')||'white';home.style.background=localStorage.getItem('bg')||'#000'}
-</script>
-</body>
-</html>
+window.onload=()=>{setMode(dark);document.body.style.color=localStorage.getItem('text')||'white';home.style.background=localStorage.getItem('bg')||defaultWallpaper}
