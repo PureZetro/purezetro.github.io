@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS Demo v5</title>
+<title>iOS Demo v7</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:white}
@@ -11,11 +11,14 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,san
 .screen.active{display:block}
 .button{padding:10px 16px;border:none;border-radius:14px;background:#1e90ff;color:white;cursor:pointer}
 .home{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding-bottom:90px}
-.app{background:rgba(0,0,0,.6);border-radius:20px;padding:14px;text-align:center;cursor:pointer;user-select:none}
+.app{background:rgba(0,0,0,.6);border-radius:20px;padding:14px;text-align:center;cursor:pointer}
 .app img{width:56px;height:56px;border-radius:14px}
 .dock{position:fixed;bottom:0;left:0;right:0;height:80px;background:rgba(0,0,0,.7);display:flex;justify-content:center;gap:25px;padding:12px}
-.folder{background:rgba(0,0,0,.4);border-radius:20px;padding:10px;grid-column:span 2}
 .lock{display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:28px}
+.appScreen{background:rgba(0,0,0,.85)}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.calc-btn{padding:20px;font-size:20px;border-radius:14px;border:none}
+input{width:100%;padding:15px;font-size:20px;border-radius:12px;border:none;margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -25,75 +28,86 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,san
   <button class="button" onclick="unlock()">Swipe to Unlock</button>
 </div>
 
-<div id="wallpaperSetup" class="screen">
-  <h2>Choose a Wallpaper</h2>
-  <div id="wallGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:15px"></div>
-  <button class="button" onclick="finishSetup()">Continue</button>
-</div>
-
 <div id="home" class="screen">
   <div class="home" id="apps"></div>
-  <div class="dock" id="dock"></div>
+  <div class="dock"></div>
+</div>
+
+<div id="calculator" class="screen appScreen">
+  <button class="button" onclick="goHome()">Home</button>
+  <input id="calcDisplay" readonly>
+  <div class="calc-grid" id="calc"></div>
+</div>
+
+<div id="browser" class="screen appScreen">
+  <button class="button" onclick="goHome()">Home</button>
+  <input id="url" placeholder="Enter URL or search">
+  <iframe id="web" style="width:100%;height:70vh;border-radius:14px"></iframe>
+</div>
+
+<div id="siri" class="screen appScreen">
+  <button class="button" onclick="goHome()">Home</button>
+  <h2>Ask Siri</h2>
+  <input id="siriInput" placeholder="Ask something">
+  <p id="siriReply"></p>
 </div>
 
 <script>
 const screens=document.querySelectorAll('.screen')
 const appsEl=document.getElementById('apps')
-const dockEl=document.getElementById('dock')
-const wallGrid=document.getElementById('wallGrid')
 
-const wallpapers=[
- 'linear-gradient(135deg,#1e3c72,#2a5298)',
- 'linear-gradient(135deg,#0f2027,#203a43,#2c5364)',
- 'linear-gradient(135deg,#42275a,#734b6d)',
- 'linear-gradient(135deg,#134e5e,#71b280)'
-]
-
-let installed=JSON.parse(localStorage.getItem('apps'))||['Browser','Calculator','Siri','Folder']
-
-const appData={
- Browser:{icon:'https://img.icons8.com/ios-filled/100/ffffff/internet.png'},
- Calculator:{icon:'https://img.icons8.com/ios-filled/100/ffffff/calculator.png'},
- Siri:{icon:'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png'},
- Folder:{icon:'https://img.icons8.com/ios-filled/100/ffffff/folder-invoices.png'}
+const state=JSON.parse(localStorage.getItem('state'))||{
+ bg:'linear-gradient(135deg,#1e3c72,#2a5298)',
+ apps:['Browser','Calculator','Siri']
 }
 
+const icons={
+ Browser:'https://img.icons8.com/ios-filled/100/ffffff/internet.png',
+ Calculator:'https://img.icons8.com/ios-filled/100/ffffff/calculator.png',
+ Siri:'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png'
+}
+
+function save(){localStorage.setItem('state',JSON.stringify(state))}
 function show(id){screens.forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function unlock(){home.style.background=state.bg;render();show('home')}
+function goHome(){show('home')}
 
-function unlock(){
- if(!localStorage.getItem('bg')) show('wallpaperSetup')
- else show('home')
- renderApps()
-}
-
-function finishSetup(){show('home');renderApps()}
-
-function renderApps(){appsEl.innerHTML='';dockEl.innerHTML='';installed.forEach((a,i)=>{
- const d=document.createElement('div');d.className='app';d.draggable=true
- d.innerHTML=`<img src="${appData[a].icon}"><p>${a}</p>`
- d.ondragstart=e=>e.dataTransfer.setData('app',a)
+function render(){appsEl.innerHTML='';state.apps.forEach(a=>{
+ const d=document.createElement('div');d.className='app'
+ d.innerHTML=`<img src="${icons[a]}"><p>${a}</p>`
+ d.onclick=()=>openApp(a)
  appsEl.appendChild(d)
- if(i<4) dockEl.appendChild(d.cloneNode(true))
 })}
 
-appsEl?.addEventListener('dragover',e=>e.preventDefault())
-appsEl?.addEventListener('drop',e=>{
- e.preventDefault();const a=e.dataTransfer.getData('app');installed.push(a);save();renderApps()
-})
-
-wallpapers.forEach(w=>{
- const d=document.createElement('div');d.style.height='160px';d.style.borderRadius='20px';d.style.background=w
- d.onclick=()=>{home.style.background=w;localStorage.setItem('bg',w)}
- wallGrid.appendChild(d)
-})
-
-function save(){localStorage.setItem('apps',JSON.stringify(installed))}
-
-setInterval(()=>{time.innerText=new Date().toLocaleTimeString()},1000)
-
-window.onload=()=>{
- const bg=localStorage.getItem('bg');if(bg) home.style.background=bg
+function openApp(a){
+ if(a==='Calculator') show('calculator')
+ if(a==='Browser') show('browser')
+ if(a==='Siri') show('siri')
 }
+
+// Calculator
+const keys=['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+']
+keys.forEach(k=>{
+ const b=document.createElement('button');b.className='calc-btn';b.innerText=k
+ b.onclick=()=>{if(k==='=')calcDisplay.value=eval(calcDisplay.value);else calcDisplay.value+=k}
+ calc.appendChild(b)
+})
+
+// Browser
+url.onchange=()=>{
+ let v=url.value
+ if(!v.startsWith('http')) v='https://www.google.com/search?q='+v
+ web.src=v
+}
+
+// Siri
+siriInput.onchange=()=>{
+ const q=siriInput.value.toLowerCase()
+ siriReply.innerText=q.includes('time')?new Date().toLocaleTimeString():"I can't do that yet."
+}
+
+setInterval(()=>time.innerText=new Date().toLocaleTimeString(),1000)
+window.onload=()=>{home.style.background=state.bg}
 </script>
 </body>
 </html>
