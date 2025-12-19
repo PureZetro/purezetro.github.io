@@ -3,219 +3,115 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS Demo Website with Browser Background</title>
+<title>iOS Demo v2</title>
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; color: white; transition: color 0.3s, background 0.3s; }
-  .button { padding: 10px 20px; border-radius: 12px; border: none; background: #1e90ff; color: white; cursor: pointer; margin: 10px; transition: 0.2s; }
-  .button:hover { background: #63b3ff; }
-  .ios-screen { display: none; padding: 20px; background-size: cover; min-height: 100vh; }
-  .ios-screen.active { display: block; }
-  .home-screen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .app { background: rgba(0,0,0,0.6); border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
-  .app:hover { transform: scale(1.05); }
-  .app img { width: 60px; height: 60px; border-radius: 12px; }
-  .back-btn { padding: 8px 12px; border: none; border-radius: 8px; background: #ff6347; color: white; cursor: pointer; margin-bottom: 10px; }
-  input, select { padding: 5px; border-radius: 6px; border: none; margin-top: 5px; }
-  iframe { width: 100%; height: 80vh; border: none; background: white; }
-  .calculator input, .settings input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: none; }
-  .siri input { width: 100%; padding: 10px; border-radius: 8px; border: none; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:white}
+  .button{padding:8px 14px;border:none;border-radius:10px;background:#1e90ff;color:white;cursor:pointer}
+  .ios-screen{display:none;min-height:100vh;padding:15px;background-size:cover}
+  .ios-screen.active{display:block}
+  .home{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .app{background:rgba(0,0,0,.6);border-radius:20px;padding:14px;text-align:center;cursor:pointer}
+  .app img{width:56px;height:56px;border-radius:14px}
+  .back{background:#ff5555;border:none;border-radius:8px;padding:6px 10px;color:white}
+  input,select{border-radius:8px;border:none;padding:6px}
+  iframe{width:100%;height:75vh;border:none}
+  .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .calc-btn{padding:18px;border-radius:14px;background:#333;color:white;font-size:18px;cursor:pointer}
 </style>
 </head>
 <body>
 
-<div id="mainMenu">
-  <h1>Try the iOS Demo</h1>
-  <p>Select a background and launch the iOS experience:</p>
-  <select id="bgSelectMenu"></select>
-  <br>
-  <button class="button" onclick="startIOS()">Start iOS Demo</button>
+<div id="menu">
+  <h1>Try iOS Demo</h1>
+  <button class="button" onclick="startIOS()">Start</button>
 </div>
 
-<div id="iosScreen" class="ios-screen">
-  <button class="back-btn" onclick="exitIOS()">Exit iOS</button>
-  <div class="home-screen" id="appContainer"></div>
+<div id="home" class="ios-screen">
+  <button class="back" onclick="exitIOS()">Exit</button>
+  <div class="home" id="apps"></div>
 </div>
 
-<div id="browserScreen" class="ios-screen">
-  <button class="back-btn" onclick="backHome()">Back</button>
-  <h2>Browser</h2>
-  <input type="text" id="urlInput" placeholder="Enter URL or site name">
-  <input type="color" id="browserBgColor" onchange="changeBrowserBg()" title="Set Browser Background">
-  <button class="button" onclick="loadURL()">Go</button>
-  <iframe id="browserFrame"></iframe>
+<div id="browser" class="ios-screen">
+  <button class="back" onclick="goHome()">Back</button>
+  <input id="url" placeholder="Enter URL or search" />
+  <button class="button" onclick="go()">Go</button>
+  <iframe id="frame"></iframe>
 </div>
 
-<div id="calculatorScreen" class="ios-screen calculator">
-  <button class="back-btn" onclick="backHome()">Back</button>
-  <h2>Calculator</h2>
-  <input type="text" id="calcInput" placeholder="Enter expression, e.g. 2+2">
-  <button class="button" onclick="calculate()">Calculate</button>
-  <p id="calcResult"></p>
+<div id="calc" class="ios-screen">
+  <button class="back" onclick="goHome()">Back</button>
+  <input id="calcDisplay" readonly />
+  <div class="calc-grid" id="calcBtns"></div>
 </div>
 
-<div id="siriScreen" class="ios-screen siri">
-  <button class="back-btn" onclick="backHome()">Back</button>
-  <h2>Siri</h2>
-  <input type="text" id="siriInput" placeholder="Ask me anything">
-  <button class="button" onclick="siriRespond()">Speak</button>
-  <p id="siriResponse"></p>
+<div id="siri" class="ios-screen">
+  <button class="back" onclick="goHome()">Back</button>
+  <input id="siriInput" placeholder="Say a command" />
+  <button class="button" onclick="siri()">Ask</button>
+  <p id="siriOut"></p>
 </div>
 
-<div id="settingsScreen" class="ios-screen settings">
-  <button class="back-btn" onclick="backHome()">Back</button>
-  <h2>Settings</h2>
-  <p>Change background color, choose a picture, or upload your own:</p>
-  <input type="color" id="bgColorInput" onchange="changeBgColor()">
-  <input type="file" id="bgUpload" accept="image/*" onchange="uploadBgImage(event)">
-  <select id="bgImageSelect" onchange="changeBgImage()"></select>
+<div id="settings" class="ios-screen">
+  <button class="back" onclick="goHome()">Back</button>
+  <h3>Customization</h3>
+  <input type="color" onchange="setText(this.value)">
+  <input type="color" onchange="setBg(this.value)">
+</div>
+
+<div id="store" class="ios-screen">
+  <button class="back" onclick="goHome()">Back</button>
+  <h2>App Store</h2>
+  <button class="button" onclick="install('Notes')">Install Notes</button>
+  <button class="button" onclick="install('Clock')">Install Clock</button>
 </div>
 
 <script>
-const iosScreen = document.getElementById('iosScreen');
-const mainMenu = document.getElementById('mainMenu');
-const appContainer = document.getElementById('appContainer');
-const browserScreen = document.getElementById('browserScreen');
-const calculatorScreen = document.getElementById('calculatorScreen');
-const siriScreen = document.getElementById('siriScreen');
-const settingsScreen = document.getElementById('settingsScreen');
-const urlInput = document.getElementById('urlInput');
-const browserFrame = document.getElementById('browserFrame');
-const browserBgColor = document.getElementById('browserBgColor');
-const calcInput = document.getElementById('calcInput');
-const calcResult = document.getElementById('calcResult');
-const siriInput = document.getElementById('siriInput');
-const siriResponse = document.getElementById('siriResponse');
-const bgSelectMenu = document.getElementById('bgSelectMenu');
-const bgColorInput = document.getElementById('bgColorInput');
-const bgUpload = document.getElementById('bgUpload');
-const bgImageSelect = document.getElementById('bgImageSelect');
+const screens=document.querySelectorAll('.ios-screen')
+const appsEl=document.getElementById('apps')
+let installed=JSON.parse(localStorage.getItem('apps'))||['Browser','Calculator','Siri','Settings','Store']
 
-const bgOptions = ['nature','space','ocean','abstract','city','mountain','forest','desert','beach','snow','flowers','sunset','night','waterfall','river','clouds','stars','galaxy','rain','lava','mountains2','beach2','forest2','city2','ocean2','sunrise','sunset2','night2','stars2','flowers2','desert2'];
-
-bgOptions.forEach(bg => {
-  const optionMenu = document.createElement('option');
-  optionMenu.value = `https://source.unsplash.com/1600x900/?${bg}`;
-  optionMenu.text = bg.charAt(0).toUpperCase() + bg.slice(1);
-  bgSelectMenu.appendChild(optionMenu);
-
-  const optionSettings = document.createElement('option');
-  optionSettings.value = `https://source.unsplash.com/1600x900/?${bg}`;
-  optionSettings.text = bg.charAt(0).toUpperCase() + bg.slice(1);
-  bgImageSelect.appendChild(optionSettings);
-});
-
-let apps = [
-  {name: 'Calculator', screen: calculatorScreen, icon: 'https://img.icons8.com/ios-filled/100/ffffff/calculator.png'},
-  {name: 'Map', func: mapApp, icon: 'https://img.icons8.com/ios-filled/100/ffffff/map.png'},
-  {name: 'Siri', screen: siriScreen, icon: 'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png'},
-  {name: 'Browser', screen: browserScreen, icon: 'https://img.icons8.com/ios-filled/100/ffffff/internet.png'},
-  {name: 'Settings', screen: settingsScreen, icon: 'https://img.icons8.com/ios-filled/100/ffffff/settings.png'}
-];
-
-function saveState(){
-  localStorage.setItem('bgImage', iosScreen.style.backgroundImage);
-  localStorage.setItem('bgColor', iosScreen.style.backgroundColor);
-  localStorage.setItem('browserBg', browserFrame.style.backgroundColor);
+const appData={
+ Browser:{icon:'https://img.icons8.com/ios-filled/100/ffffff/internet.png',open:()=>open('browser')},
+ Calculator:{icon:'https://img.icons8.com/ios-filled/100/ffffff/calculator.png',open:()=>open('calc')},
+ Siri:{icon:'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png',open:()=>open('siri')},
+ Settings:{icon:'https://img.icons8.com/ios-filled/100/ffffff/settings.png',open:()=>open('settings')},
+ Store:{icon:'https://img.icons8.com/ios-filled/100/ffffff/shop.png',open:()=>open('store')},
+ Notes:{icon:'https://img.icons8.com/ios-filled/100/ffffff/note.png',open:()=>alert('Notes app coming soon')},
+ Clock:{icon:'https://img.icons8.com/ios-filled/100/ffffff/clock.png',open:()=>alert(new Date().toLocaleTimeString())}
 }
 
-function loadState(){
-  const savedBgImage = localStorage.getItem('bgImage');
-  const savedBgColor = localStorage.getItem('bgColor');
-  const savedBrowserBg = localStorage.getItem('browserBg');
-  if(savedBgImage) iosScreen.style.backgroundImage = savedBgImage;
-  if(savedBgColor) iosScreen.style.backgroundColor = savedBgColor;
-  if(savedBrowserBg) browserFrame.style.backgroundColor = savedBrowserBg;
-}
+function startIOS(){menu.style.display='none';open('home');render()}
+function exitIOS(){location.reload()}
+function open(id){screens.forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function goHome(){open('home')}
 
-function startIOS(){
-  mainMenu.style.display = 'none';
-  iosScreen.classList.add('active');
-  if(!iosScreen.style.backgroundImage) iosScreen.style.backgroundImage = `url('${bgSelectMenu.value}')`;
-  renderApps();
-  loadState();
-}
+function render(){appsEl.innerHTML='';installed.forEach(a=>{
+ const d=document.createElement('div');d.className='app'
+ d.innerHTML=`<img src="${appData[a].icon}"><p>${a}</p>`
+ d.onclick=appData[a].open;appsEl.appendChild(d)
+})}
 
-function exitIOS(){
-  iosScreen.classList.remove('active');
-  mainMenu.style.display = 'block';
-  saveState();
-}
+function go(){let u=url.value;if(!u.includes('.'))u='https://www.google.com/search?q='+u;if(!u.startsWith('http'))u='https://'+u;frame.src=u}
 
-function renderApps(){
-  appContainer.innerHTML = '';
-  apps.forEach(app => {
-    const div = document.createElement('div');
-    div.className = 'app';
-    div.innerHTML = `<img src='${app.icon}'><p>${app.name}</p>`;
-    div.onclick = () => {
-      document.querySelectorAll('.ios-screen').forEach(s => s.classList.remove('active'));
-      if(app.screen){
-        app.screen.classList.add('active');
-      } else if(app.func){
-        app.func();
-        iosScreen.classList.add('active');
-      }
-    };
-    appContainer.appendChild(div);
-  });
-}
+const btns=['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C']
+btns.forEach(b=>{
+ const d=document.createElement('div');d.className='calc-btn';d.innerText=b
+ d.onclick=()=>{if(b==='C')calcDisplay.value='';else if(b==='=')calcDisplay.value=eval(calcDisplay.value);else calcDisplay.value+=b}
+ calcBtns.appendChild(d)
+})
 
-function backHome(){
-  document.querySelectorAll('.ios-screen').forEach(s => s.classList.remove('active'));
-  iosScreen.classList.add('active');
-}
+function siri(){const t=siriInput.value.toLowerCase();
+ if(t.includes('open')){const a=t.split('open ')[1];if(appData[a.charAt(0).toUpperCase()+a.slice(1)]){open(a.charAt(0).toUpperCase()+a.slice(1));siriOut.innerText='Opening '+a}}
+ else if(t.includes('time'))siriOut.innerText=new Date().toLocaleTimeString();
+ else siriOut.innerText='Searching '+t;frame.src='https://www.google.com/search?q='+t}
 
-function calculate(){
-  try { calcResult.innerText = 'Result: ' + eval(calcInput.value); }
-  catch(e){ calcResult.innerText = 'Invalid expression'; }
-}
+function install(a){if(!installed.includes(a)){installed.push(a);localStorage.setItem('apps',JSON.stringify(installed));render()}}
 
-function siriRespond(){
-  const text = siriInput.value.toLowerCase();
-  if(!text) { siriResponse.innerText = '...'; return; }
-  if(text.includes('time')) siriResponse.innerText = 'It is ' + new Date().toLocaleTimeString();
-  else if(text.includes('hello')) siriResponse.innerText = 'Hello there!';
-  else siriResponse.innerText = 'I heard: ' + siriInput.value;
-}
+function setText(c){document.body.style.color=c;localStorage.setItem('text',c)}
+function setBg(c){home.style.background=c;localStorage.setItem('bg',c)}
 
-function mapApp(){ alert('Map App launched (demo)'); }
-
-function loadURL(){
-  let url = urlInput.value.trim();
-  if(!url.startsWith('http')) url = 'https://' + url;
-  browserFrame.src = url;
-}
-
-function changeBgColor(){
-  iosScreen.style.background = bgColorInput.value;
-  iosScreen.style.backgroundImage = '';
-  saveState();
-}
-
-function uploadBgImage(event){
-  const reader = new FileReader();
-  reader.onload = function(){
-    iosScreen.style.backgroundImage = `url('${reader.result}')`;
-    iosScreen.style.backgroundColor = '';
-    saveState();
-  }
-  reader.readAsDataURL(event.target.files[0]);
-}
-
-function changeBgImage(){
-  iosScreen.style.backgroundImage = `url('${bgImageSelect.value}')`;
-  iosScreen.style.backgroundColor = '';
-  saveState();
-}
-
-function changeBrowserBg(){
-  browserFrame.style.backgroundColor = browserBgColor.value;
-  saveState();
-}
-
-window.onload = loadState;
+window.onload=()=>{document.body.style.color=localStorage.getItem('text')||'white';home.style.background=localStorage.getItem('bg')||'#000'}
 </script>
-
 </body>
 </html>
