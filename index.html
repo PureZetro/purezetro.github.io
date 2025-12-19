@@ -3,133 +3,97 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS Demo v3</title>
+<title>iOS Demo v5</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:white;transition:.3s}
-.ios{display:none;min-height:100vh;padding:15px;background-size:cover}
-.ios.active{display:block}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:white}
+.screen{display:none;min-height:100vh;padding:15px;background-size:cover;background-position:center}
+.screen.active{display:block}
+.button{padding:10px 16px;border:none;border-radius:14px;background:#1e90ff;color:white;cursor:pointer}
 .home{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding-bottom:90px}
-.app{background:rgba(0,0,0,.6);border-radius:20px;padding:14px;text-align:center;cursor:pointer}
+.app{background:rgba(0,0,0,.6);border-radius:20px;padding:14px;text-align:center;cursor:pointer;user-select:none}
 .app img{width:56px;height:56px;border-radius:14px}
 .dock{position:fixed;bottom:0;left:0;right:0;height:80px;background:rgba(0,0,0,.7);display:flex;justify-content:center;gap:25px;padding:12px}
-.button{padding:6px 12px;border:none;border-radius:10px;background:#1e90ff;color:white;cursor:pointer}
-.back{background:#ff5555;border:none;border-radius:8px;padding:6px 10px;color:white}
-iframe{width:100%;height:70vh;border:none}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.calc-btn{padding:18px;border-radius:14px;background:#333;color:white;font-size:18px}
-.folder{grid-column:span 2;background:rgba(0,0,0,.5);padding:10px;border-radius:20px}
+.folder{background:rgba(0,0,0,.4);border-radius:20px;padding:10px;grid-column:span 2}
+.lock{display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:28px}
 </style>
 </head>
 <body>
 
-<div id="menu">
-<h1>iOS Demo v3</h1>
-<button class="button" onclick="start()">Start</button>
+<div id="lock" class="screen active lock">
+  <h1 id="time"></h1>
+  <button class="button" onclick="unlock()">Swipe to Unlock</button>
 </div>
 
-<div id="home" class="ios">
-<div class="home" id="apps"></div>
-<div class="dock" id="dock"></div>
+<div id="wallpaperSetup" class="screen">
+  <h2>Choose a Wallpaper</h2>
+  <div id="wallGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:15px"></div>
+  <button class="button" onclick="finishSetup()">Continue</button>
 </div>
 
-<div id="browser" class="ios">
-<button class="back" onclick="goHome()">Back</button>
-<input id="url" placeholder="URL or search" />
-<button class="button" onclick="go()">Go</button>
-<button class="button" onclick="backPage()">◀</button>
-<button class="button" onclick="forwardPage()">▶</button>
-<iframe id="frame"></iframe>
-</div>
-
-<div id="calc" class="ios">
-<button class="back" onclick="goHome()">Back</button>
-<input id="calcDisplay" readonly />
-<div class="calc-grid" id="calcBtns"></div>
-</div>
-
-<div id="siri" class="ios">
-<button class="back" onclick="goHome()">Back</button>
-<input id="siriInput" placeholder="Speak or type" />
-<button class="button" onclick="runSiri()">Ask</button>
-<button class="button" onclick="voiceSiri()">🎤</button>
-<p id="siriOut"></p>
-</div>
-
-<div id="settings" class="ios">
-<button class="back" onclick="goHome()">Back</button>
-<h3>Settings</h3>
-<label>Text Color <input type="color" onchange="setText(this.value)"></label><br>
-<label>Background <input type="color" onchange="setBg(this.value)"></label><br>
-<button class="button" onclick="toggleMode()">Dark / Light</button>
-</div>
-
-<div id="store" class="ios">
-<button class="back" onclick="goHome()">Back</button>
-<h2>App Store</h2>
-<button class="button" onclick="install('Notes')">Install Notes</button>
-<button class="button" onclick="install('Clock')">Install Clock</button>
-<button class="button" onclick="install('Files')">Install Files</button>
+<div id="home" class="screen">
+  <div class="home" id="apps"></div>
+  <div class="dock" id="dock"></div>
 </div>
 
 <script>
-const screens=document.querySelectorAll('.ios')
+const screens=document.querySelectorAll('.screen')
 const appsEl=document.getElementById('apps')
 const dockEl=document.getElementById('dock')
-let installed=JSON.parse(localStorage.getItem('apps'))||['Browser','Calculator','Siri','Settings','Store']
-let dark=localStorage.getItem('mode')||'dark'
-let history=[],index=-1
+const wallGrid=document.getElementById('wallGrid')
 
-const defaultWallpaper="linear-gradient(135deg,#1e3c72,#2a5298)";
+const wallpapers=[
+ 'linear-gradient(135deg,#1e3c72,#2a5298)',
+ 'linear-gradient(135deg,#0f2027,#203a43,#2c5364)',
+ 'linear-gradient(135deg,#42275a,#734b6d)',
+ 'linear-gradient(135deg,#134e5e,#71b280)'
+]
 
-function setDefaultWallpaper(){if(!localStorage.getItem('bg')){home.style.background=defaultWallpaper}}
+let installed=JSON.parse(localStorage.getItem('apps'))||['Browser','Calculator','Siri','Folder']
 
 const appData={
-Browser:{icon:'https://img.icons8.com/ios-filled/100/ffffff/internet.png',open:()=>open('browser')},
-Calculator:{icon:'https://img.icons8.com/ios-filled/100/ffffff/calculator.png',open:()=>open('calc')},
-Siri:{icon:'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png',open:()=>open('siri')},
-Settings:{icon:'https://img.icons8.com/ios-filled/100/ffffff/settings.png',open:()=>open('settings')},
-Store:{icon:'https://img.icons8.com/ios-filled/100/ffffff/shop.png',open:()=>open('store')},
-Notes:{icon:'https://img.icons8.com/ios-filled/100/ffffff/note.png',open:()=>alert('Notes soon')},
-Clock:{icon:'https://img.icons8.com/ios-filled/100/ffffff/clock.png',open:()=>alert(new Date().toLocaleTimeString())},
-Files:{icon:'https://img.icons8.com/ios-filled/100/ffffff/folder-invoices.png',open:()=>alert('Files soon')}
+ Browser:{icon:'https://img.icons8.com/ios-filled/100/ffffff/internet.png'},
+ Calculator:{icon:'https://img.icons8.com/ios-filled/100/ffffff/calculator.png'},
+ Siri:{icon:'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png'},
+ Folder:{icon:'https://img.icons8.com/ios-filled/100/ffffff/folder-invoices.png'}
 }
 
-function start(){menu.style.display='none';setDefaultWallpaper();open('home');render()}}
-function open(id){screens.forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
-function goHome(){open('home')}
+function show(id){screens.forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
 
-function render(){appsEl.innerHTML='';dockEl.innerHTML='';installed.forEach((a,i)=>{
- const d=document.createElement('div');d.className='app'
+function unlock(){
+ if(!localStorage.getItem('bg')) show('wallpaperSetup')
+ else show('home')
+ renderApps()
+}
+
+function finishSetup(){show('home');renderApps()}
+
+function renderApps(){appsEl.innerHTML='';dockEl.innerHTML='';installed.forEach((a,i)=>{
+ const d=document.createElement('div');d.className='app';d.draggable=true
  d.innerHTML=`<img src="${appData[a].icon}"><p>${a}</p>`
- d.onclick=appData[a].open
- d.oncontextmenu=e=>{e.preventDefault();if(confirm('Uninstall '+a+'?')){installed.splice(i,1);save();render()}}
+ d.ondragstart=e=>e.dataTransfer.setData('app',a)
  appsEl.appendChild(d)
- if(i<4){const dk=d.cloneNode(true);dk.onclick=appData[a].open;dockEl.appendChild(dk)}
+ if(i<4) dockEl.appendChild(d.cloneNode(true))
 })}
 
-function install(a){if(!installed.includes(a)){installed.push(a);save();render()}}
+appsEl?.addEventListener('dragover',e=>e.preventDefault())
+appsEl?.addEventListener('drop',e=>{
+ e.preventDefault();const a=e.dataTransfer.getData('app');installed.push(a);save();renderApps()
+})
+
+wallpapers.forEach(w=>{
+ const d=document.createElement('div');d.style.height='160px';d.style.borderRadius='20px';d.style.background=w
+ d.onclick=()=>{home.style.background=w;localStorage.setItem('bg',w)}
+ wallGrid.appendChild(d)
+})
+
 function save(){localStorage.setItem('apps',JSON.stringify(installed))}
 
-function go(){let u=url.value;if(!u.includes('.'))u='https://www.google.com/search?q='+u;if(!u.startsWith('http'))u='https://'+u;frame.src=u;history.push(frame.src);index++}
-function backPage(){if(index>0){index--;frame.src=history[index]}}
-function forwardPage(){if(index<history.length-1){index++;frame.src=history[index]}}
+setInterval(()=>{time.innerText=new Date().toLocaleTimeString()},1000)
 
-const btns=['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C']
-btns.forEach(b=>{const d=document.createElement('div');d.className='calc-btn';d.innerText=b;d.onclick=()=>{if(b==='C')calcDisplay.value='';else if(b==='=')calcDisplay.value=eval(calcDisplay.value);else calcDisplay.value+=b};calcBtns.appendChild(d)})
-
-function runSiri(){const t=siriInput.value.toLowerCase();
- if(t.startsWith('open')){const a=t.replace('open ','');if(appData[a.charAt(0).toUpperCase()+a.slice(1)]){open(a.charAt(0).toUpperCase()+a.slice(1));siriOut.innerText='Opening '+a;return}}
- if(t.includes('dark')){setMode('dark');siriOut.innerText='Dark mode on';return}
- if(t.includes('light')){setMode('light');siriOut.innerText='Light mode on';return}
- if(t.includes('time')){siriOut.innerText=new Date().toLocaleTimeString();return}
- siriOut.innerText='Searching '+t;frame.src='https://www.google.com/search?q='+t;open('browser')}
-
-function voiceSiri(){const r=new webkitSpeechRecognition();r.onresult=e=>{siriInput.value=e.results[0][0].transcript;runSiri()};r.start()}
-
-function setText(c){document.body.style.color=c;localStorage.setItem('text',c)}
-function setBg(c){home.style.background=c;localStorage.setItem('bg',c)}
-function setMode(m){dark=m;localStorage.setItem('mode',m);document.body.style.background=m==='dark'?'#000':'#eee';document.body.style.color=m==='dark'?'white':'black'}
-function toggleMode(){setMode(dark==='dark'?'light':'dark')}
-
-window.onload=()=>{setMode(dark);document.body.style.color=localStorage.getItem('text')||'white';home.style.background=localStorage.getItem('bg')||defaultWallpaper}
+window.onload=()=>{
+ const bg=localStorage.getItem('bg');if(bg) home.style.background=bg
+}
+</script>
+</body>
+</html>
