@@ -3,115 +3,132 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS Demo v2</title>
+<title>iOS Demo v3</title>
 <style>
-  *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:white}
-  .button{padding:8px 14px;border:none;border-radius:10px;background:#1e90ff;color:white;cursor:pointer}
-  .ios-screen{display:none;min-height:100vh;padding:15px;background-size:cover}
-  .ios-screen.active{display:block}
-  .home{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-  .app{background:rgba(0,0,0,.6);border-radius:20px;padding:14px;text-align:center;cursor:pointer}
-  .app img{width:56px;height:56px;border-radius:14px}
-  .back{background:#ff5555;border:none;border-radius:8px;padding:6px 10px;color:white}
-  input,select{border-radius:8px;border:none;padding:6px}
-  iframe{width:100%;height:75vh;border:none}
-  .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  .calc-btn{padding:18px;border-radius:14px;background:#333;color:white;font-size:18px;cursor:pointer}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:white;transition:.3s}
+.ios{display:none;min-height:100vh;padding:15px;background-size:cover}
+.ios.active{display:block}
+.home{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding-bottom:90px}
+.app{background:rgba(0,0,0,.6);border-radius:20px;padding:14px;text-align:center;cursor:pointer}
+.app img{width:56px;height:56px;border-radius:14px}
+.dock{position:fixed;bottom:0;left:0;right:0;height:80px;background:rgba(0,0,0,.7);display:flex;justify-content:center;gap:25px;padding:12px}
+.button{padding:6px 12px;border:none;border-radius:10px;background:#1e90ff;color:white;cursor:pointer}
+.back{background:#ff5555;border:none;border-radius:8px;padding:6px 10px;color:white}
+iframe{width:100%;height:70vh;border:none}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.calc-btn{padding:18px;border-radius:14px;background:#333;color:white;font-size:18px}
+.folder{grid-column:span 2;background:rgba(0,0,0,.5);padding:10px;border-radius:20px}
 </style>
 </head>
 <body>
 
 <div id="menu">
-  <h1>Try iOS Demo</h1>
-  <button class="button" onclick="startIOS()">Start</button>
+<h1>iOS Demo v3</h1>
+<button class="button" onclick="start()">Start</button>
 </div>
 
-<div id="home" class="ios-screen">
-  <button class="back" onclick="exitIOS()">Exit</button>
-  <div class="home" id="apps"></div>
+<div id="home" class="ios">
+<div class="home" id="apps"></div>
+<div class="dock" id="dock"></div>
 </div>
 
-<div id="browser" class="ios-screen">
-  <button class="back" onclick="goHome()">Back</button>
-  <input id="url" placeholder="Enter URL or search" />
-  <button class="button" onclick="go()">Go</button>
-  <iframe id="frame"></iframe>
+<div id="browser" class="ios">
+<button class="back" onclick="goHome()">Back</button>
+<input id="url" placeholder="URL or search" />
+<button class="button" onclick="go()">Go</button>
+<button class="button" onclick="backPage()">◀</button>
+<button class="button" onclick="forwardPage()">▶</button>
+<iframe id="frame"></iframe>
 </div>
 
-<div id="calc" class="ios-screen">
-  <button class="back" onclick="goHome()">Back</button>
-  <input id="calcDisplay" readonly />
-  <div class="calc-grid" id="calcBtns"></div>
+<div id="calc" class="ios">
+<button class="back" onclick="goHome()">Back</button>
+<input id="calcDisplay" readonly />
+<div class="calc-grid" id="calcBtns"></div>
 </div>
 
-<div id="siri" class="ios-screen">
-  <button class="back" onclick="goHome()">Back</button>
-  <input id="siriInput" placeholder="Say a command" />
-  <button class="button" onclick="siri()">Ask</button>
-  <p id="siriOut"></p>
+<div id="siri" class="ios">
+<button class="back" onclick="goHome()">Back</button>
+<input id="siriInput" placeholder="Speak or type" />
+<button class="button" onclick="runSiri()">Ask</button>
+<button class="button" onclick="voiceSiri()">🎤</button>
+<p id="siriOut"></p>
 </div>
 
-<div id="settings" class="ios-screen">
-  <button class="back" onclick="goHome()">Back</button>
-  <h3>Customization</h3>
-  <input type="color" onchange="setText(this.value)">
-  <input type="color" onchange="setBg(this.value)">
+<div id="settings" class="ios">
+<button class="back" onclick="goHome()">Back</button>
+<h3>Settings</h3>
+<label>Text Color <input type="color" onchange="setText(this.value)"></label><br>
+<label>Background <input type="color" onchange="setBg(this.value)"></label><br>
+<button class="button" onclick="toggleMode()">Dark / Light</button>
 </div>
 
-<div id="store" class="ios-screen">
-  <button class="back" onclick="goHome()">Back</button>
-  <h2>App Store</h2>
-  <button class="button" onclick="install('Notes')">Install Notes</button>
-  <button class="button" onclick="install('Clock')">Install Clock</button>
+<div id="store" class="ios">
+<button class="back" onclick="goHome()">Back</button>
+<h2>App Store</h2>
+<button class="button" onclick="install('Notes')">Install Notes</button>
+<button class="button" onclick="install('Clock')">Install Clock</button>
+<button class="button" onclick="install('Files')">Install Files</button>
 </div>
 
 <script>
-const screens=document.querySelectorAll('.ios-screen')
+const screens=document.querySelectorAll('.ios')
 const appsEl=document.getElementById('apps')
+const dockEl=document.getElementById('dock')
 let installed=JSON.parse(localStorage.getItem('apps'))||['Browser','Calculator','Siri','Settings','Store']
+let dark=localStorage.getItem('mode')||'dark'
+let history=[],index=-1
 
 const appData={
- Browser:{icon:'https://img.icons8.com/ios-filled/100/ffffff/internet.png',open:()=>open('browser')},
- Calculator:{icon:'https://img.icons8.com/ios-filled/100/ffffff/calculator.png',open:()=>open('calc')},
- Siri:{icon:'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png',open:()=>open('siri')},
- Settings:{icon:'https://img.icons8.com/ios-filled/100/ffffff/settings.png',open:()=>open('settings')},
- Store:{icon:'https://img.icons8.com/ios-filled/100/ffffff/shop.png',open:()=>open('store')},
- Notes:{icon:'https://img.icons8.com/ios-filled/100/ffffff/note.png',open:()=>alert('Notes app coming soon')},
- Clock:{icon:'https://img.icons8.com/ios-filled/100/ffffff/clock.png',open:()=>alert(new Date().toLocaleTimeString())}
+Browser:{icon:'https://img.icons8.com/ios-filled/100/ffffff/internet.png',open:()=>open('browser')},
+Calculator:{icon:'https://img.icons8.com/ios-filled/100/ffffff/calculator.png',open:()=>open('calc')},
+Siri:{icon:'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png',open:()=>open('siri')},
+Settings:{icon:'https://img.icons8.com/ios-filled/100/ffffff/settings.png',open:()=>open('settings')},
+Store:{icon:'https://img.icons8.com/ios-filled/100/ffffff/shop.png',open:()=>open('store')},
+Notes:{icon:'https://img.icons8.com/ios-filled/100/ffffff/note.png',open:()=>alert('Notes soon')},
+Clock:{icon:'https://img.icons8.com/ios-filled/100/ffffff/clock.png',open:()=>alert(new Date().toLocaleTimeString())},
+Files:{icon:'https://img.icons8.com/ios-filled/100/ffffff/folder-invoices.png',open:()=>alert('Files soon')}
 }
 
-function startIOS(){menu.style.display='none';open('home');render()}
-function exitIOS(){location.reload()}
+function start(){menu.style.display='none';open('home');render()}
 function open(id){screens.forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
 function goHome(){open('home')}
 
-function render(){appsEl.innerHTML='';installed.forEach(a=>{
+function render(){appsEl.innerHTML='';dockEl.innerHTML='';installed.forEach((a,i)=>{
  const d=document.createElement('div');d.className='app'
  d.innerHTML=`<img src="${appData[a].icon}"><p>${a}</p>`
- d.onclick=appData[a].open;appsEl.appendChild(d)
+ d.onclick=appData[a].open
+ d.oncontextmenu=e=>{e.preventDefault();if(confirm('Uninstall '+a+'?')){installed.splice(i,1);save();render()}}
+ appsEl.appendChild(d)
+ if(i<4){const dk=d.cloneNode(true);dk.onclick=appData[a].open;dockEl.appendChild(dk)}
 })}
 
-function go(){let u=url.value;if(!u.includes('.'))u='https://www.google.com/search?q='+u;if(!u.startsWith('http'))u='https://'+u;frame.src=u}
+function install(a){if(!installed.includes(a)){installed.push(a);save();render()}}
+function save(){localStorage.setItem('apps',JSON.stringify(installed))}
+
+function go(){let u=url.value;if(!u.includes('.'))u='https://www.google.com/search?q='+u;if(!u.startsWith('http'))u='https://'+u;frame.src=u;history.push(frame.src);index++}
+function backPage(){if(index>0){index--;frame.src=history[index]}}
+function forwardPage(){if(index<history.length-1){index++;frame.src=history[index]}}
 
 const btns=['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C']
-btns.forEach(b=>{
- const d=document.createElement('div');d.className='calc-btn';d.innerText=b
- d.onclick=()=>{if(b==='C')calcDisplay.value='';else if(b==='=')calcDisplay.value=eval(calcDisplay.value);else calcDisplay.value+=b}
- calcBtns.appendChild(d)
-})
+btns.forEach(b=>{const d=document.createElement('div');d.className='calc-btn';d.innerText=b;d.onclick=()=>{if(b==='C')calcDisplay.value='';else if(b==='=')calcDisplay.value=eval(calcDisplay.value);else calcDisplay.value+=b};calcBtns.appendChild(d)})
 
-function siri(){const t=siriInput.value.toLowerCase();
- if(t.includes('open')){const a=t.split('open ')[1];if(appData[a.charAt(0).toUpperCase()+a.slice(1)]){open(a.charAt(0).toUpperCase()+a.slice(1));siriOut.innerText='Opening '+a}}
- else if(t.includes('time'))siriOut.innerText=new Date().toLocaleTimeString();
- else siriOut.innerText='Searching '+t;frame.src='https://www.google.com/search?q='+t}
+function runSiri(){const t=siriInput.value.toLowerCase();
+ if(t.startsWith('open')){const a=t.replace('open ','');if(appData[a.charAt(0).toUpperCase()+a.slice(1)]){open(a.charAt(0).toUpperCase()+a.slice(1));siriOut.innerText='Opening '+a;return}}
+ if(t.includes('dark')){setMode('dark');siriOut.innerText='Dark mode on';return}
+ if(t.includes('light')){setMode('light');siriOut.innerText='Light mode on';return}
+ if(t.includes('time')){siriOut.innerText=new Date().toLocaleTimeString();return}
+ siriOut.innerText='Searching '+t;frame.src='https://www.google.com/search?q='+t;open('browser')}
 
-function install(a){if(!installed.includes(a)){installed.push(a);localStorage.setItem('apps',JSON.stringify(installed));render()}}
+function voiceSiri(){const r=new webkitSpeechRecognition();r.onresult=e=>{siriInput.value=e.results[0][0].transcript;runSiri()};r.start()}
 
 function setText(c){document.body.style.color=c;localStorage.setItem('text',c)}
 function setBg(c){home.style.background=c;localStorage.setItem('bg',c)}
+function setMode(m){dark=m;localStorage.setItem('mode',m);document.body.style.background=m==='dark'?'#000':'#eee';document.body.style.color=m==='dark'?'white':'black'}
+function toggleMode(){setMode(dark==='dark'?'light':'dark')}
 
-window.onload=()=>{document.body.style.color=localStorage.getItem('text')||'white';home.style.background=localStorage.getItem('bg')||'#000'}
+window.onload=()=>{setMode(dark);document.body.style.color=localStorage.getItem('text')||'white';home.style.background=localStorage.getItem('bg')||'#000'}
 </script>
 </body>
 </html>
