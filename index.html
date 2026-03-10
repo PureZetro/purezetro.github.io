@@ -1,186 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>iOS Demo v8 – All‑in‑One</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;transition:.3s}
-.screen{display:none;min-height:100vh;padding:15px;background-size:cover;background-position:center}
-.screen.active{display:block}
-.button{padding:10px 16px;border:none;border-radius:14px;background:#1e90ff;color:white;cursor:pointer}
-.home{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding-bottom:90px}
-.app{background:rgba(0,0,0,.6);border-radius:20px;padding:14px;text-align:center;cursor:pointer;color:var(--text)}
-.app img{width:56px;height:56px;border-radius:14px}
-.dock{position:fixed;bottom:0;left:0;right:0;height:80px;background:rgba(0,0,0,.7);display:flex;justify-content:center;gap:25px;padding:12px}
-.lock{display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:28px;color:white}
-.appScreen{background:rgba(0,0,0,.85);color:white}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.calc-btn{padding:20px;font-size:20px;border-radius:14px;border:none}
-input,select{width:100%;padding:15px;font-size:16px;border-radius:12px;border:none;margin:10px 0}
-.store-item{background:rgba(255,255,255,.1);padding:10px;border-radius:14px;margin-bottom:10px}
-</style>
+    <meta charset="UTF-8">
+    <title>Vortex Merger | Drag & Drop Edition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root { --electric: #00f2ff; --void: #120024; --error: #ff4d4d; }
+        body { 
+            background: #050505; 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+        .merger-box { 
+            background: #0a0a0a; 
+            border: 2px solid var(--electric); 
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 550px; 
+            text-align: center; 
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.15); 
+        }
+        .drop-zone { 
+            border: 2px dashed #333; 
+            padding: 40px 20px; 
+            margin-bottom: 15px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            border-radius: 12px;
+            background: #111;
+        }
+        .drop-zone.dragover { 
+            border-color: var(--electric); 
+            background: rgba(0, 242, 255, 0.1); 
+            transform: scale(1.02);
+        }
+        .file-list { 
+            background: #000; 
+            border: 1px solid #222; 
+            height: 180px; 
+            margin-bottom: 15px; 
+            overflow-y: auto; 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: left; 
+            font-size: 13px; 
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #111;
+        }
+        .merge-btn { 
+            background: linear-gradient(45deg, var(--electric), #0077ff); 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 100%; 
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        .merge-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .clear-btn {
+            background: none;
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
-<!-- LOCK SCREEN -->
-<div id="lock" class="screen active lock">
-  <h1 id="time"></h1>
-  <button class="button" onclick="unlock()">Swipe to Unlock</button>
-</div>
+<div class="merger-box">
+    <h2 style="color:var(--electric); margin-top:0; letter-spacing: 3px;">VORTEX MERGER</h2>
+    
+    <div class="drop-zone" id="dropZone">
+        <div style="font-size: 24px; margin-bottom: 10px;">📥</div>
+        <p id="dropText">Drop ZIP files here or click to browse</p>
+        <input type="file" id="zipInput" hidden multiple accept=".zip">
+    </div>
 
-<!-- HOME -->
-<div id="home" class="screen">
-  <div class="home" id="apps"></div>
-  <div class="dock"></div>
-</div>
+    <div class="file-list" id="fileList">
+        <p style="color:#444; text-align:center;">No packs loaded...</p>
+    </div>
 
-<!-- CALCULATOR -->
-<div id="calculator" class="screen appScreen">
-  <button class="button" onclick="goHome()">Home</button>
-  <input id="calcDisplay" readonly>
-  <div class="calc-grid" id="calc"></div>
-</div>
-
-<!-- BROWSER -->
-<div id="browser" class="screen appScreen">
-  <button class="button" onclick="goHome()">Home</button>
-  <input id="url" placeholder="Enter URL or search">
-  <iframe id="web" style="width:100%;height:70vh;border-radius:14px"></iframe>
-</div>
-
-<!-- SIRI -->
-<div id="siri" class="screen appScreen">
-  <button class="button" onclick="goHome()">Home</button>
-  <h2>Siri</h2>
-  <input id="siriInput" placeholder="Ask Siri">
-  <p id="siriReply"></p>
-</div>
-
-<!-- SETTINGS -->
-<div id="settings" class="screen appScreen">
-  <button class="button" onclick="goHome()">Home</button>
-  <h2>Settings</h2>
-  <label>Text Color</label>
-  <input type="color" id="textColor">
-  <label>Wallpaper</label>
-  <select id="wallSelect"></select>
-</div>
-
-<!-- APP STORE -->
-<div id="store" class="screen appScreen">
-  <button class="button" onclick="goHome()">Home</button>
-  <h2>App Store</h2>
-  <div id="storeList"></div>
+    <button id="mergeBtn" class="merge-btn" onclick="mergePacks()" disabled>Combine into Master Pack</button>
+    <button class="clear-btn" onclick="clearList()">Clear All Files</button>
 </div>
 
 <script>
-const screens=document.querySelectorAll('.screen')
-const appsEl=document.getElementById('apps')
-const root=document.documentElement
+    let uploadedZips = [];
+    const dropZone = document.getElementById('dropZone');
+    const zipInput = document.getElementById('zipInput');
+    const fileList = document.getElementById('fileList');
+    const mergeBtn = document.getElementById('mergeBtn');
 
-const wallpapers=[
- 'linear-gradient(135deg,#1e3c72,#2a5298)',
- 'linear-gradient(135deg,#0f2027,#203a43,#2c5364)',
- 'linear-gradient(135deg,#42275a,#734b6d)',
- 'linear-gradient(135deg,#134e5e,#71b280)',
- 'linear-gradient(135deg,#232526,#414345)'
-]
+    // Drag and Drop Logic
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
 
-let state=JSON.parse(localStorage.getItem('state'))||{
- bg:wallpapers[0],
- text:'#ffffff',
- apps:['Browser','Calculator','Siri','Settings','Store']
-}
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
 
-const icons={
- Browser:'https://img.icons8.com/ios-filled/100/ffffff/internet.png',
- Calculator:'https://img.icons8.com/ios-filled/100/ffffff/calculator.png',
- Siri:'https://img.icons8.com/ios-filled/100/ffffff/voice-command.png',
- Settings:'https://img.icons8.com/ios-filled/100/ffffff/settings.png',
- Store:'https://img.icons8.com/ios-filled/100/ffffff/shop.png'
-}
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+    });
 
-const storeApps=['Browser','Calculator','Siri','Settings']
+    dropZone.addEventListener('click', () => zipInput.click());
 
-function save(){localStorage.setItem('state',JSON.stringify(state))}
-function show(id){screens.forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
-function unlock(){applyTheme();render();show('home')}
-function goHome(){show('home')}
+    zipInput.onchange = (e) => handleFiles(e.target.files);
 
-function render(){
- appsEl.innerHTML=''
- state.apps.forEach(a=>{
-  const d=document.createElement('div');d.className='app'
-  d.innerHTML=`<img src="${icons[a]}"><p>${a}</p>`
-  d.onclick=()=>openApp(a)
-  appsEl.appendChild(d)
- })
-}
+    function handleFiles(files) {
+        const newFiles = Array.from(files).filter(f => f.name.endsWith('.zip'));
+        uploadedZips = [...uploadedZips, ...newFiles];
+        updateList();
+    }
 
-function openApp(a){
- if(a==='Calculator') show('calculator')
- if(a==='Browser') show('browser')
- if(a==='Siri') show('siri')
- if(a==='Settings') show('settings')
- if(a==='Store') show('store')
-}
+    function updateList() {
+        if (uploadedZips.length === 0) {
+            fileList.innerHTML = '<p style="color:#444; text-align:center;">No packs loaded...</p>';
+            mergeBtn.disabled = true;
+            return;
+        }
+        
+        fileList.innerHTML = uploadedZips.map((f, index) => `
+            <div class="file-item">
+                <span>📦 ${f.name}</span>
+                <span style="color:#666;">(${(f.size / 1024).toFixed(1)} KB)</span>
+            </div>
+        `).join('');
+        mergeBtn.disabled = false;
+    }
 
-// Calculator
-const keys=['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+']
-keys.forEach(k=>{
- const b=document.createElement('button');b.className='calc-btn';b.innerText=k
- b.onclick=()=>{if(k==='=')calcDisplay.value=eval(calcDisplay.value);else calcDisplay.value+=k}
- calc.appendChild(b)
-})
+    function clearList() {
+        uploadedZips = [];
+        updateList();
+    }
 
-// Browser
-url.onchange=()=>{
- let v=url.value
- if(!v.startsWith('http')) v='https://www.google.com/search?q='+v
- web.src=v
-}
+    async function mergePacks() {
+        const masterZip = new JSZip();
+        mergeBtn.innerText = "Processing Data...";
+        mergeBtn.disabled = true;
 
-// Siri
-siriInput.onchange=()=>{
- const q=siriInput.value.toLowerCase()
- if(q.includes('time')) siriReply.innerText=new Date().toLocaleTimeString()
- else if(q.includes('open calculator')) openApp('Calculator')
- else siriReply.innerText='I am still learning.'
-}
+        // Create the base pack.mcmeta
+        masterZip.file("pack.mcmeta", JSON.stringify({
+            pack: { pack_format: 48, description: "Vortex Master Collection Combined" }
+        }));
 
-// Settings
-textColor.oninput=e=>{state.text=e.target.value;applyTheme();save()}
-wallpapers.forEach((w,i)=>{
- const o=document.createElement('option');o.value=i;o.innerText='Wallpaper '+(i+1)
- wallSelect.appendChild(o)
-})
-wallSelect.onchange=e=>{state.bg=wallpapers[e.target.value];applyTheme();save()}
+        for (const file of uploadedZips) {
+            try {
+                const zip = await JSZip.loadAsync(file);
+                for (const [path, zipEntry] of Object.entries(zip.files)) {
+                    // Skip mcmeta from individual packs
+                    if (!path.includes("pack.mcmeta") && !zipEntry.dir) {
+                        const content = await zipEntry.async("blob");
+                        masterZip.file(path, content);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to read " + file.name, err);
+            }
+        }
 
-function applyTheme(){
- home.style.background=state.bg
- root.style.setProperty('--text',state.text)
-}
-
-// App Store
-function renderStore(){
- storeList.innerHTML=''
- storeApps.forEach(a=>{
-  const d=document.createElement('div');d.className='store-item'
-  const installed=state.apps.includes(a)
-  d.innerHTML=`<b>${a}</b><br><button class="button">${installed?'Installed':'Install'}</button>`
-  d.querySelector('button').onclick=()=>{
-   if(!installed){state.apps.push(a);save();render()}
-  }
-  storeList.appendChild(d)
- })
-}
-
-store.onclick=renderStore
-
-setInterval(()=>time.innerText=new Date().toLocaleTimeString(),1000)
-window.onload=applyTheme
+        const finalBlob = await masterZip.generateAsync({ type: "blob" });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(finalBlob);
+        link.download = "Vortex_Master_Pack.zip";
+        link.click();
+        
+        mergeBtn.innerText = "Combine into Master Pack";
+        mergeBtn.disabled = false;
+    }
 </script>
+
 </body>
 </html>
