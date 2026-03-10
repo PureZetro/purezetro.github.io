@@ -2,249 +2,193 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Vortex Studio | Legendary Edition</title>
+    <title>Vortex Merger | Drag & Drop Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        :root { 
-            --gold: #ffcc00; 
-            --electric: #00f2ff; 
-            --netherite: #443a3a; 
-            --void: #120024;
-        }
+        :root { --electric: #00f2ff; --void: #120024; --error: #ff4d4d; }
         body { 
-            margin: 0; 
-            overflow: hidden; 
+            background: #050505; 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             min-height: 100vh; 
-            background: radial-gradient(circle, #1a0033 0%, #050505 100%); 
-            font-family: 'Segoe UI', sans-serif; 
-            color: white; 
+            margin: 0; 
         }
-        .container { 
-            background: rgba(10, 10, 10, 0.95); 
-            padding: 25px; 
+        .merger-box { 
+            background: #0a0a0a; 
             border: 2px solid var(--electric); 
-            width: 700px; 
-            border-radius: 16px; 
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.2); 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-        #viewer-container { 
-            width: 100%; 
-            height: 300px; 
-            background: #000; 
-            border: 1px solid #333; 
-            border-radius: 8px; 
-            position: relative; 
-        }
-        canvas { width: 100%; height: 100%; border-radius: 8px; }
-        .upload-row { display: flex; gap: 10px; }
-        .file-label { 
-            flex: 1; 
-            background: #1a1a1a; 
-            border: 1px dashed #444; 
-            padding: 12px; 
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 550px; 
             text-align: center; 
-            cursor: pointer; 
-            font-size: 12px; 
-            border-radius: 6px;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.15); 
         }
-        .file-label:hover { border-color: var(--gold); color: var(--gold); }
-        .controls { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-            background: #111; 
+        .drop-zone { 
+            border: 2px dashed #333; 
+            padding: 40px 20px; 
+            margin-bottom: 15px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            border-radius: 12px;
+            background: #111;
+        }
+        .drop-zone.dragover { 
+            border-color: var(--electric); 
+            background: rgba(0, 242, 255, 0.1); 
+            transform: scale(1.02);
+        }
+        .file-list { 
+            background: #000; 
+            border: 1px solid #222; 
+            height: 180px; 
+            margin-bottom: 15px; 
+            overflow-y: auto; 
             padding: 15px; 
             border-radius: 8px; 
+            text-align: left; 
+            font-size: 13px; 
         }
-        input, select { 
-            background: #000; 
-            border: 1px solid #333; 
-            color: white; 
-            padding: 10px; 
-            border-radius: 4px; 
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #111;
         }
-        .build-btn { 
+        .merge-btn { 
             background: linear-gradient(45deg, var(--electric), #0077ff); 
             color: white; 
             border: none; 
-            padding: 18px; 
+            padding: 15px; 
             border-radius: 8px; 
             font-weight: bold; 
             cursor: pointer; 
-            font-size: 16px; 
+            width: 100%; 
             text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 14px;
         }
-        .build-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .merge-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .clear-btn {
+            background: none;
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div style="display:flex; justify-content: space-between; align-items: center;">
-        <h2 style="margin:0; color:var(--electric);">VORTEX <span style="color:var(--gold)">LEGEND</span></h2>
-        <span style="font-size: 10px; color: #666;">v3.4 UNIVERSAL</span>
-    </div>
+<div class="merger-box">
+    <h2 style="color:var(--electric); margin-top:0; letter-spacing: 3px;">VORTEX MERGER</h2>
     
-    <div id="viewer-container"><canvas id="renderCanvas"></canvas></div>
-
-    <div class="upload-row">
-        <label class="file-label">📁 JSON MODEL<input type="file" id="jsonIn" hidden accept=".json"></label>
-        <label class="file-label">🖼️ PNG TEXTURE<input type="file" id="pngIn" hidden accept=".png"></label>
+    <div class="drop-zone" id="dropZone">
+        <div style="font-size: 24px; margin-bottom: 10px;">📥</div>
+        <p id="dropText">Drop ZIP files here or click to browse</p>
+        <input type="file" id="zipInput" hidden multiple accept=".zip">
     </div>
 
-    <div class="controls">
-        <div style="display:flex; flex-direction:column; gap:5px;">
-            <label style="font-size:11px; color:var(--gold);">TARGET ITEM ID</label>
-            <input type="text" id="targetId" placeholder="e.g. totem_of_undying" list="itemSuggestions">
-        </div>
-        <div style="display:flex; flex-direction:column; gap:5px;">
-            <label style="font-size:11px; color:var(--gold);">GAME VERSION</label>
-            <select id="verSelect">
-                <option value="48">1.21+ (Mace Support)</option>
-                <option value="15">1.20.1 (Legacy)</option>
-            </select>
-        </div>
+    <div class="file-list" id="fileList">
+        <p style="color:#444; text-align:center;">No packs loaded...</p>
     </div>
 
-    <datalist id="itemSuggestions">
-        <option value="mace">
-        <option value="totem_of_undying">
-        <option value="ender_pearl">
-        <option value="golden_apple">
-        <option value="enchanted_golden_apple">
-        <option value="apple">
-        <option value="netherite_sword">
-        <option value="netherite_pickaxe">
-        <option value="netherite_axe">
-        <option value="netherite_leggings">
-        <option value="netherite_boots">
-        <option value="netherite_chestplate">
-        <option value="netherite_helmet">
-    </datalist>
-
-    <button class="build-btn" onclick="generatePack()">Package & Download</button>
+    <button id="mergeBtn" class="merge-btn" onclick="mergePacks()" disabled>Combine into Master Pack</button>
+    <button class="clear-btn" onclick="clearList()">Clear All Files</button>
 </div>
 
 <script>
-    let scene, camera, renderer, modelGroup, activeTexture, lastData;
+    let uploadedZips = [];
+    const dropZone = document.getElementById('dropZone');
+    const zipInput = document.getElementById('zipInput');
+    const fileList = document.getElementById('fileList');
+    const mergeBtn = document.getElementById('mergeBtn');
 
-    function init3D() {
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(45, 650/300, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('renderCanvas'), alpha: true, antialias: true });
-        renderer.setSize(650, 300);
-        
-        const light = new THREE.DirectionalLight(0xffffff, 1.5);
-        light.position.set(5, 10, 7);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-        
-        camera.position.z = 22;
-        animate();
+    // Drag and Drop Logic
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+    });
+
+    dropZone.addEventListener('click', () => zipInput.click());
+
+    zipInput.onchange = (e) => handleFiles(e.target.files);
+
+    function handleFiles(files) {
+        const newFiles = Array.from(files).filter(f => f.name.endsWith('.zip'));
+        uploadedZips = [...uploadedZips, ...newFiles];
+        updateList();
     }
 
-    document.getElementById('pngIn').onchange = (e) => {
-        const reader = new FileReader();
-        reader.onload = (f) => {
-            new THREE.TextureLoader().load(f.target.result, (tex) => {
-                activeTexture = tex;
-                activeTexture.magFilter = THREE.NearestFilter;
-                activeTexture.minFilter = THREE.NearestFilter;
-                buildPreview();
-            });
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    };
-
-    document.getElementById('jsonIn').onchange = (e) => {
-        const reader = new FileReader();
-        reader.onload = (f) => {
-            lastData = JSON.parse(f.target.result);
-            buildPreview();
-        };
-        reader.readAsText(e.target.files[0]);
-    };
-
-    function buildPreview() {
-        if (!lastData || !activeTexture) return;
-        if (modelGroup) scene.remove(modelGroup);
-        modelGroup = new THREE.Group();
-
-        lastData.elements.forEach(el => {
-            const size = [el.to[0]-el.from[0], el.to[1]-el.from[1], el.to[2]-el.from[2]];
-            const geometry = new THREE.BoxGeometry(size[0], size[1], size[2]);
-            const materials = ['east', 'west', 'up', 'down', 'south', 'north'].map(face => {
-                const f = el.faces[face];
-                if (f) {
-                    const tex = activeTexture.clone();
-                    tex.needsUpdate = true;
-                    const u = f.uv[0]/16, v = f.uv[1]/16, u2 = f.uv[2]/16, v2 = f.uv[3]/16;
-                    tex.repeat.set(Math.abs(u2 - u), Math.abs(v2 - v));
-                    tex.offset.set(Math.min(u, u2), 1 - Math.max(v, v2));
-                    return new THREE.MeshLambertMaterial({ map: tex, transparent: true, alphaTest: 0.5 });
-                }
-                return new THREE.MeshBasicMaterial({ visible: false });
-            });
-            const cube = new THREE.Mesh(geometry, materials);
-            cube.position.set(el.from[0]+size[0]/2-8, el.from[1]+size[1]/2-8, el.from[2]+size[2]/2-8);
-            modelGroup.add(cube);
-        });
-        scene.add(modelGroup);
-    }
-
-    function animate() { 
-        requestAnimationFrame(animate); 
-        if(modelGroup) modelGroup.rotation.y += 0.01; 
-        renderer.render(scene, camera); 
-    }
-
-    async function generatePack() {
-        const itemName = document.getElementById('targetId').value.toLowerCase().trim() || "mace";
-        const zip = new JSZip();
-        const format = document.getElementById('verSelect').value;
+    function updateList() {
+        if (uploadedZips.length === 0) {
+            fileList.innerHTML = '<p style="color:#444; text-align:center;">No packs loaded...</p>';
+            mergeBtn.disabled = true;
+            return;
+        }
         
-        zip.file("pack.mcmeta", JSON.stringify({ 
-            pack: { pack_format: parseInt(format), description: "Vortex Legend Export" } 
+        fileList.innerHTML = uploadedZips.map((f, index) => `
+            <div class="file-item">
+                <span>📦 ${f.name}</span>
+                <span style="color:#666;">(${(f.size / 1024).toFixed(1)} KB)</span>
+            </div>
+        `).join('');
+        mergeBtn.disabled = false;
+    }
+
+    function clearList() {
+        uploadedZips = [];
+        updateList();
+    }
+
+    async function mergePacks() {
+        const masterZip = new JSZip();
+        mergeBtn.innerText = "Processing Data...";
+        mergeBtn.disabled = true;
+
+        // Create the base pack.mcmeta
+        masterZip.file("pack.mcmeta", JSON.stringify({
+            pack: { pack_format: 48, description: "Vortex Master Collection Combined" }
         }));
-        
-        // Fix JSON Model
-        let fixedJson = JSON.parse(JSON.stringify(lastData));
-        if (fixedJson.textures) {
-            for (let key in fixedJson.textures) { 
-                fixedJson.textures[key] = `minecraft:item/${itemName}`; 
-            }
-        }
-        zip.file(`assets/minecraft/models/item/${itemName}.json`, JSON.stringify(fixedJson, null, 2));
-        
-        // Fix Texture
-        const pFile = document.getElementById('pngIn').files[0];
-        if (pFile) {
-            zip.file(`assets/minecraft/textures/item/${itemName}.png`, pFile);
-            
-            // Handle Armor Layer Logic
-            if (itemName.includes("leggings")) {
-                zip.file(`assets/minecraft/textures/models/armor/netherite_layer_2.png`, pFile);
-            } else if (itemName.includes("helmet") || itemName.includes("chestplate") || itemName.includes("boots")) {
-                zip.file(`assets/minecraft/textures/models/armor/netherite_layer_1.png`, pFile);
+
+        for (const file of uploadedZips) {
+            try {
+                const zip = await JSZip.loadAsync(file);
+                for (const [path, zipEntry] of Object.entries(zip.files)) {
+                    // Skip mcmeta from individual packs
+                    if (!path.includes("pack.mcmeta") && !zipEntry.dir) {
+                        const content = await zipEntry.async("blob");
+                        masterZip.file(path, content);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to read " + file.name, err);
             }
         }
 
-        const content = await zip.generateAsync({ type: "blob" });
+        const finalBlob = await masterZip.generateAsync({ type: "blob" });
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(content);
-        link.download = `Vortex_${itemName}_Pack.zip`;
+        link.href = URL.createObjectURL(finalBlob);
+        link.download = "Vortex_Master_Pack.zip";
         link.click();
+        
+        mergeBtn.innerText = "Combine into Master Pack";
+        mergeBtn.disabled = false;
     }
-
-    init3D();
 </script>
+
 </body>
 </html>
