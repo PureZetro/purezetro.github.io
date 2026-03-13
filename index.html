@@ -1,8 +1,86 @@
-<div style="width:100%; height:500px; border:5px solid #000; overflow:hidden;">
-    <iframe src="https://classic.minecraft.net/" 
-            style="width:100%; height:600px; border:none; margin-top:-50px;">
-    </iframe>
-</div>
-<p style="font-family:sans-serif; text-align:center; color:#55ff55;">
-    ▲ Click the box above to start building! ▲
-</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; padding: 20px; text-align: center; }
+        .card { background: #252525; padding: 25px; border-radius: 12px; border: 2px solid #444; max-width: 400px; margin: auto; }
+        h2 { color: #55ff55; margin-top: 0; }
+        select, input, button { width: 100%; margin: 10px 0; padding: 12px; border-radius: 6px; border: 1px solid #333; background: #111; color: white; box-sizing: border-box; }
+        button { background: #55ff55; color: black; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; }
+        button:hover { background: #7cfc00; }
+        .preview { margin-top: 10px; height: 30px; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Sound Pack Fixer</h2>
+        
+        <label>1. Upload Any Audio:</label>
+        <input type="file" id="audioInput" accept="audio/*" onchange="updatePreview()">
+        <audio id="audioPreview" class="preview" controls style="display:none;"></audio>
+
+        <label>2. Replace This Action:</label>
+        <select id="mcEvent">
+            <option value="entity.player.attack.sweep">Sword Swing</option>
+            <option value="entity.player.hurt">Player Hurt</option>
+            <option value="entity.player.death">Player Death</option>
+            <option value="ui.button.click">UI Click</option>
+            <option value="entity.generic.explode">Explosion</option>
+        </select>
+
+        <button onclick="buildPack()">Download Fixed Pack</button>
+    </div>
+
+    <script>
+        function updatePreview() {
+            const file = document.getElementById('audioInput').files[0];
+            const audio = document.getElementById('audioPreview');
+            if (file) {
+                audio.src = URL.createObjectURL(file);
+                audio.style.display = "block";
+            }
+        }
+
+        async function buildPack() {
+            const fileInput = document.getElementById('audioInput');
+            const eventName = document.getElementById('mcEvent').value;
+            
+            if (!fileInput.files[0]) return alert("Upload a sound first!");
+
+            const zip = new JSZip();
+            const userFile = fileInput.files[0];
+            
+            // FIX: We force a specific lowercase name to avoid 'custom_sfx' errors
+            const finalFileName = "sound_effect.ogg";
+
+            // 1. Meta File
+            zip.file("pack.mcmeta", JSON.stringify({
+                "pack": { "pack_format": 15, "description": "Fixed Sound Pack" }
+            }));
+
+            // 2. The Sound File (Placed in a safe 'custom' subfolder)
+            const soundFolder = zip.folder("assets/minecraft/sounds/custom");
+            soundFolder.file(finalFileName, userFile);
+
+            // 3. The JSON (Matched exactly to 'custom/sound_effect')
+            const soundsJson = {};
+            soundsJson[eventName] = {
+                "replace": true,
+                "sounds": [{ "name": "custom/sound_effect", "stream": false }]
+            };
+            zip.folder("assets/minecraft").file("sounds.json", JSON.stringify(soundsJson, null, 4));
+
+            // 4. Download
+            zip.generateAsync({type:"blob"}).then(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = "Fixed_Sound_Pack.zip";
+                a.click();
+            });
+        }
+    </script>
+</body>
+</html>
