@@ -2,193 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Vortex Merger | Drag & Drop Edition</title>
+    <title>Minecraft Sound Pack Creator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        :root { --electric: #00f2ff; --void: #120024; --error: #ff4d4d; }
-        body { 
-            background: #050505; 
-            color: white; 
-            font-family: 'Segoe UI', sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-        }
-        .merger-box { 
-            background: #0a0a0a; 
-            border: 2px solid var(--electric); 
-            padding: 30px; 
-            border-radius: 20px; 
-            width: 550px; 
-            text-align: center; 
-            box-shadow: 0 0 50px rgba(0, 242, 255, 0.15); 
-        }
-        .drop-zone { 
-            border: 2px dashed #333; 
-            padding: 40px 20px; 
-            margin-bottom: 15px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            border-radius: 12px;
-            background: #111;
-        }
-        .drop-zone.dragover { 
-            border-color: var(--electric); 
-            background: rgba(0, 242, 255, 0.1); 
-            transform: scale(1.02);
-        }
-        .file-list { 
-            background: #000; 
-            border: 1px solid #222; 
-            height: 180px; 
-            margin-bottom: 15px; 
-            overflow-y: auto; 
-            padding: 15px; 
-            border-radius: 8px; 
-            text-align: left; 
-            font-size: 13px; 
-        }
-        .file-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid #111;
-        }
-        .merge-btn { 
-            background: linear-gradient(45deg, var(--electric), #0077ff); 
-            color: white; 
-            border: none; 
-            padding: 15px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            width: 100%; 
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-        .merge-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
-        .clear-btn {
-            background: none;
-            border: 1px solid var(--error);
-            color: var(--error);
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        body { font-family: sans-serif; background: #1e1e1e; color: white; padding: 40px; text-align: center; }
+        .box { background: #333; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; border: 2px solid #555; }
+        select, input, button { width: 100%; margin: 10px 0; padding: 10px; border-radius: 5px; border: none; }
+        button { background: #3e8e41; color: white; font-weight: bold; cursor: pointer; }
+        button:hover { background: #45a049; }
     </style>
 </head>
 <body>
 
-<div class="merger-box">
-    <h2 style="color:var(--electric); margin-top:0; letter-spacing: 3px;">VORTEX MERGER</h2>
-    
-    <div class="drop-zone" id="dropZone">
-        <div style="font-size: 24px; margin-bottom: 10px;">📥</div>
-        <p id="dropText">Drop ZIP files here or click to browse</p>
-        <input type="file" id="zipInput" hidden multiple accept=".zip">
+    <h2>MC Sound Pack Generator</h2>
+    <div class="box">
+        <label>1. Upload your sound (.ogg or .wav):</label>
+        <input type="file" id="audioFile" accept=".ogg,.wav">
+
+        <label>2. What are you replacing?</label>
+        <select id="soundType">
+            <option value="item.trident.throw">Trident Throw</option>
+            <option value="entity.player.attack.sweep">Sword Swing (Sweep)</option>
+            <option value="entity.arrow.shoot">Bow Shot</option>
+            <option value="ui.button.click">Menu Click</option>
+            <option value="entity.generic.explode">Explosion</option>
+        </select>
+
+        <label>3. Pack Name:</label>
+        <input type="text" id="packName" placeholder="My Cool Sounds">
+
+        <button onclick="generatePack()">Download Ready-to-Go Pack</button>
     </div>
 
-    <div class="file-list" id="fileList">
-        <p style="color:#444; text-align:center;">No packs loaded...</p>
-    </div>
-
-    <button id="mergeBtn" class="merge-btn" onclick="mergePacks()" disabled>Combine into Master Pack</button>
-    <button class="clear-btn" onclick="clearList()">Clear All Files</button>
-</div>
-
-<script>
-    let uploadedZips = [];
-    const dropZone = document.getElementById('dropZone');
-    const zipInput = document.getElementById('zipInput');
-    const fileList = document.getElementById('fileList');
-    const mergeBtn = document.getElementById('mergeBtn');
-
-    // Drag and Drop Logic
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-    });
-
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('dragover');
-    });
-
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        handleFiles(e.dataTransfer.files);
-    });
-
-    dropZone.addEventListener('click', () => zipInput.click());
-
-    zipInput.onchange = (e) => handleFiles(e.target.files);
-
-    function handleFiles(files) {
-        const newFiles = Array.from(files).filter(f => f.name.endsWith('.zip'));
-        uploadedZips = [...uploadedZips, ...newFiles];
-        updateList();
-    }
-
-    function updateList() {
-        if (uploadedZips.length === 0) {
-            fileList.innerHTML = '<p style="color:#444; text-align:center;">No packs loaded...</p>';
-            mergeBtn.disabled = true;
-            return;
-        }
-        
-        fileList.innerHTML = uploadedZips.map((f, index) => `
-            <div class="file-item">
-                <span>📦 ${f.name}</span>
-                <span style="color:#666;">(${(f.size / 1024).toFixed(1)} KB)</span>
-            </div>
-        `).join('');
-        mergeBtn.disabled = false;
-    }
-
-    function clearList() {
-        uploadedZips = [];
-        updateList();
-    }
-
-    async function mergePacks() {
-        const masterZip = new JSZip();
-        mergeBtn.innerText = "Processing Data...";
-        mergeBtn.disabled = true;
-
-        // Create the base pack.mcmeta
-        masterZip.file("pack.mcmeta", JSON.stringify({
-            pack: { pack_format: 48, description: "Vortex Master Collection Combined" }
-        }));
-
-        for (const file of uploadedZips) {
-            try {
-                const zip = await JSZip.loadAsync(file);
-                for (const [path, zipEntry] of Object.entries(zip.files)) {
-                    // Skip mcmeta from individual packs
-                    if (!path.includes("pack.mcmeta") && !zipEntry.dir) {
-                        const content = await zipEntry.async("blob");
-                        masterZip.file(path, content);
-                    }
-                }
-            } catch (err) {
-                console.error("Failed to read " + file.name, err);
+    <script>
+        async function generatePack() {
+            const fileInput = document.getElementById('audioFile');
+            const soundType = document.getElementById('soundType').value;
+            const packName = document.getElementById('packName').value || "CustomSounds";
+            
+            if (fileInput.files.length === 0) {
+                alert("Please upload a sound file first!");
+                return;
             }
+
+            const zip = new JSZip();
+            const file = fileInput.files[0];
+            const fileName = "custom_sound.ogg"; // Minecraft prefers .ogg
+
+            // 1. Create pack.mcmeta
+            const mcmeta = {
+                "pack": {
+                    "pack_format": 15,
+                    "description": "Created with Gemini's Tool"
+                }
+            };
+            zip.file("pack.mcmeta", JSON.stringify(mcmeta, null, 4));
+
+            // 2. Create the folder structure and add the sound
+            // Path: assets/minecraft/sounds/custom/
+            const soundFolder = zip.folder("assets/minecraft/sounds/custom");
+            soundFolder.file(fileName, file);
+
+            // 3. Create sounds.json to tell the game to use our new file
+            const soundsJson = {};
+            soundsJson[soundType] = {
+                "replace": true,
+                "sounds": [{ "name": "custom/custom_sound", "stream": false }]
+            };
+            zip.folder("assets/minecraft").file("sounds.json", JSON.stringify(soundsJson, null, 4));
+
+            // 4. Generate the ZIP and download
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                const element = document.createElement('a');
+                element.href = URL.createObjectURL(content);
+                element.download = packName + ".zip";
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            });
         }
-
-        const finalBlob = await masterZip.generateAsync({ type: "blob" });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(finalBlob);
-        link.download = "Vortex_Master_Pack.zip";
-        link.click();
-        
-        mergeBtn.innerText = "Combine into Master Pack";
-        mergeBtn.disabled = false;
-    }
-</script>
-
+    </script>
 </body>
 </html>
