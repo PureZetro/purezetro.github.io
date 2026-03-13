@@ -1,108 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Ultimate MC Sound Pack Creator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #e0e0e0; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-        .box { background: #1e1e1e; padding: 30px; border-radius: 15px; width: 100%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
-        h2 { color: #4caf50; margin-bottom: 20px; }
-        label { display: block; text-align: left; margin-top: 15px; font-size: 0.9rem; color: #bbb; }
-        select, input, button { width: 100%; margin: 8px 0; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #2b2b2b; color: white; box-sizing: border-box; }
-        button { background: #4caf50; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 20px; }
-        button:hover { background: #66bb6a; transform: translateY(-2px); }
-        audio { width: 100%; margin-top: 10px; height: 35px; }
-        .footer { margin-top: 20px; font-size: 0.8rem; color: #666; }
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        :root {
+            --mc-green: #5aa742;
+            --mc-dirt: #795548;
+            --mc-stone: #7a7a7a;
+            --mc-border: #000000;
+        }
+
+        body {
+            background-color: #333;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            font-family: 'VT323', monospace;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* The Header - Dirt Block Style */
+        .header {
+            background: var(--mc-dirt);
+            border: 6px solid var(--mc-border);
+            border-top: 15px solid var(--mc-green); /* Grass top */
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 10px 0 #222;
+            margin-bottom: 30px;
+        }
+
+        h1 { font-size: 3rem; margin: 0; text-shadow: 3px 3px 0 #000; letter-spacing: 2px; }
+
+        /* Navigation Buttons - Stone Style */
+        .nav-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .mc-button {
+            background: var(--mc-stone);
+            border: 4px solid var(--mc-border);
+            padding: 15px;
+            color: #ddd;
+            text-align: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: inset -4px -4px 0 #444, inset 4px 4px 0 #aaa;
+            transition: 0.1s;
+        }
+
+        .mc-button:hover {
+            background: #8b8b8b;
+            color: #fff;
+            box-shadow: inset -2px -2px 0 #444, inset 2px 2px 0 #aaa;
+        }
+
+        .mc-button:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* Content Box - Inventory/GUI Style */
+        .content-box {
+            background: #c6c6c6;
+            border: 6px solid var(--mc-border);
+            color: #444;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            margin-top: 30px;
+            box-shadow: inset -4px -4px 0 #555, inset 4px 4px 0 #fff;
+        }
+
+        .content-box h2 { border-bottom: 4px solid #8b8b8b; padding-bottom: 5px; margin-top: 0; }
+        
+        /* Interactive "Experience Bar" */
+        .exp-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #111;
+            border: 2px solid #000;
+            margin-top: 10px;
+        }
+
+        .exp-fill {
+            width: 75%;
+            height: 100%;
+            background: #7cfc00;
+            box-shadow: 0 0 10px #7cfc00;
+        }
+
+        .stat-text { color: #55ff55; font-weight: bold; text-align: center; margin-top: 5px; }
+
     </style>
 </head>
 <body>
 
-    <h2>MC Sound Pack Creator</h2>
-    <div class="box">
-        <label>1. Upload your sound (.ogg recommended):</label>
-        <input type="file" id="audioFile" accept=".ogg,.wav,.mp3" onchange="previewSound()">
-        <audio id="audioPreview" controls style="display:none;"></audio>
-
-        <label>2. What are you replacing?</label>
-        <select id="soundType">
-            <optgroup label="Combat">
-                <option value="entity.player.death">Player Death (Ugh!)</option>
-                <option value="entity.player.hurt">Hitting a Player (Hurt)</option>
-                <option value="entity.player.attack.sweep">Sword Swing (Sweep)</option>
-                <option value="entity.arrow.shoot">Bow Shot</option>
-            </optgroup>
-            <optgroup label="World & UI">
-                <option value="ui.button.click">Menu Click</option>
-                <option value="entity.generic.explode">Explosion</option>
-                <option value="block.chest.open">Chest Opening</option>
-            </optgroup>
-        </select>
-
-        <label>3. Name your Pack:</label>
-        <input type="text" id="packName" placeholder="Cool_Sound_Pack">
-
-        <button onclick="generatePack()">Download Ready-to-Go Pack</button>
+    <div class="header">
+        <h1>MY CRAFT SITE</h1>
+        <p>Resource Packs, Sounds & Adventures</p>
     </div>
-    <p class="footer">Note: Files are processed in your browser. No data is sent to a server.</p>
 
-    <script>
-        function previewSound() {
-            const file = document.getElementById('audioFile').files[0];
-            const preview = document.getElementById('audioPreview');
-            if (file) {
-                preview.src = URL.createObjectURL(file);
-                preview.style.display = "block";
-            }
-        }
+    <div class="nav-container">
+        <div class="mc-button" onclick="alert('Downloading Textures...')">Download Textures</div>
+        <div class="mc-button" onclick="alert('Opening Sound Lab...')">Sound Lab</div>
+        <div class="mc-button" onclick="alert('View Storyboard...')">The Storyboard</div>
+        <div class="mc-button" onclick="alert('Join the Discord!')">Join Server</div>
+    </div>
 
-        async function generatePack() {
-            const fileInput = document.getElementById('audioFile');
-            const soundType = document.getElementById('soundType').value;
-            const packName = document.getElementById('packName').value.replace(/\s+/g, '_') || "Custom_Pack";
-            
-            if (fileInput.files.length === 0) {
-                alert("Please upload a sound file first!");
-                return;
-            }
+    <div class="content-box">
+        <h2>Latest Update: Flaming Sword Pack</h2>
+        <p>I just added custom 3D models and burning sounds to the Nethetite sword. Check out the "Sound Lab" button to hear the new fire sizzle effect!</p>
+        
+        <div class="exp-bar-container"><div class="exp-fill"></div></div>
+        <div class="stat-text">Level 26 - Creative Mode Enabled</div>
+    </div>
 
-            const zip = new JSZip();
-            const file = fileInput.files[0];
-            const extension = file.name.split('.').pop();
-            const fileName = `custom_sfx.${extension}`;
-
-            // 1. Create pack.mcmeta
-            const mcmeta = {
-                "pack": {
-                    "pack_format": 15,
-                    "description": "Custom Sound Pack"
-                }
-            };
-            zip.file("pack.mcmeta", JSON.stringify(mcmeta, null, 4));
-
-            // 2. Create folder structure and add sound
-            const soundFolder = zip.folder("assets/minecraft/sounds/custom");
-            soundFolder.file(fileName, file);
-
-            // 3. Create sounds.json
-            const soundsJson = {};
-            soundsJson[soundType] = {
-                "replace": true,
-                "sounds": [{
-                    "name": `custom/custom_sfx`,
-                    "stream": false
-                }]
-            };
-            zip.folder("assets/minecraft").file("sounds.json", JSON.stringify(soundsJson, null, 4));
-
-            // 4. Export the ZIP
-            zip.generateAsync({type:"blob"}).then(function(content) {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(content);
-                link.download = packName + ".zip";
-                link.click();
-            });
-        }
-    </script>
 </body>
 </html>
