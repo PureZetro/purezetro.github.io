@@ -2,43 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Minecraft Sound Pack Creator</title>
+    <title>Ultimate MC Sound Pack Creator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #1e1e1e; color: white; padding: 40px; text-align: center; }
-        .box { background: #333; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; border: 2px solid #555; }
-        select, input, button { width: 100%; margin: 10px 0; padding: 10px; border-radius: 5px; border: none; }
-        button { background: #3e8e41; color: white; font-weight: bold; cursor: pointer; }
-        button:hover { background: #45a049; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #e0e0e0; padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        .box { background: #1e1e1e; padding: 30px; border-radius: 15px; width: 100%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
+        h2 { color: #4caf50; margin-bottom: 20px; }
+        label { display: block; text-align: left; margin-top: 15px; font-size: 0.9rem; color: #bbb; }
+        select, input, button { width: 100%; margin: 8px 0; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #2b2b2b; color: white; box-sizing: border-box; }
+        button { background: #4caf50; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        button:hover { background: #66bb6a; transform: translateY(-2px); }
+        audio { width: 100%; margin-top: 10px; height: 35px; }
+        .footer { margin-top: 20px; font-size: 0.8rem; color: #666; }
     </style>
 </head>
 <body>
 
-    <h2>MC Sound Pack Generator</h2>
+    <h2>MC Sound Pack Creator</h2>
     <div class="box">
-        <label>1. Upload your sound (.ogg or .wav):</label>
-        <input type="file" id="audioFile" accept=".ogg,.wav">
+        <label>1. Upload your sound (.ogg recommended):</label>
+        <input type="file" id="audioFile" accept=".ogg,.wav,.mp3" onchange="previewSound()">
+        <audio id="audioPreview" controls style="display:none;"></audio>
 
         <label>2. What are you replacing?</label>
         <select id="soundType">
-            <option value="item.trident.throw">Trident Throw</option>
-            <option value="entity.player.attack.sweep">Sword Swing (Sweep)</option>
-            <option value="entity.arrow.shoot">Bow Shot</option>
-            <option value="ui.button.click">Menu Click</option>
-            <option value="entity.generic.explode">Explosion</option>
+            <optgroup label="Combat">
+                <option value="entity.player.death">Player Death (Ugh!)</option>
+                <option value="entity.player.hurt">Hitting a Player (Hurt)</option>
+                <option value="entity.player.attack.sweep">Sword Swing (Sweep)</option>
+                <option value="entity.arrow.shoot">Bow Shot</option>
+            </optgroup>
+            <optgroup label="World & UI">
+                <option value="ui.button.click">Menu Click</option>
+                <option value="entity.generic.explode">Explosion</option>
+                <option value="block.chest.open">Chest Opening</option>
+            </optgroup>
         </select>
 
-        <label>3. Pack Name:</label>
-        <input type="text" id="packName" placeholder="My Cool Sounds">
+        <label>3. Name your Pack:</label>
+        <input type="text" id="packName" placeholder="Cool_Sound_Pack">
 
         <button onclick="generatePack()">Download Ready-to-Go Pack</button>
     </div>
+    <p class="footer">Note: Files are processed in your browser. No data is sent to a server.</p>
 
     <script>
+        function previewSound() {
+            const file = document.getElementById('audioFile').files[0];
+            const preview = document.getElementById('audioPreview');
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = "block";
+            }
+        }
+
         async function generatePack() {
             const fileInput = document.getElementById('audioFile');
             const soundType = document.getElementById('soundType').value;
-            const packName = document.getElementById('packName').value || "CustomSounds";
+            const packName = document.getElementById('packName').value.replace(/\s+/g, '_') || "Custom_Pack";
             
             if (fileInput.files.length === 0) {
                 alert("Please upload a sound file first!");
@@ -47,38 +68,39 @@
 
             const zip = new JSZip();
             const file = fileInput.files[0];
-            const fileName = "custom_sound.ogg"; // Minecraft prefers .ogg
+            const extension = file.name.split('.').pop();
+            const fileName = `custom_sfx.${extension}`;
 
             // 1. Create pack.mcmeta
             const mcmeta = {
                 "pack": {
                     "pack_format": 15,
-                    "description": "Created with Gemini's Tool"
+                    "description": "Custom Sound Pack"
                 }
             };
             zip.file("pack.mcmeta", JSON.stringify(mcmeta, null, 4));
 
-            // 2. Create the folder structure and add the sound
-            // Path: assets/minecraft/sounds/custom/
+            // 2. Create folder structure and add sound
             const soundFolder = zip.folder("assets/minecraft/sounds/custom");
             soundFolder.file(fileName, file);
 
-            // 3. Create sounds.json to tell the game to use our new file
+            // 3. Create sounds.json
             const soundsJson = {};
             soundsJson[soundType] = {
                 "replace": true,
-                "sounds": [{ "name": "custom/custom_sound", "stream": false }]
+                "sounds": [{
+                    "name": `custom/custom_sfx`,
+                    "stream": false
+                }]
             };
             zip.folder("assets/minecraft").file("sounds.json", JSON.stringify(soundsJson, null, 4));
 
-            // 4. Generate the ZIP and download
+            // 4. Export the ZIP
             zip.generateAsync({type:"blob"}).then(function(content) {
-                const element = document.createElement('a');
-                element.href = URL.createObjectURL(content);
-                element.download = packName + ".zip";
-                document.body.appendChild(element);
-                element.click();
-                document.body.removeChild(element);
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = packName + ".zip";
+                link.click();
             });
         }
     </script>
