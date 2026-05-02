@@ -1,37 +1,48 @@
-// Mock Database
 const players = [
-    { name: "PlayerOne", tier: "HT1", status: "Tested" },
-    { name: "PvPMaster", tier: "LT3", status: "Tested" },
-    { name: "Newbie_01", tier: "None", status: "Untested" },
-    { name: "SharpSword", tier: "None", status: "Untested" }
+    {
+        name: "360Mall",
+        rank: 1,
+        title: "Combat Ace",
+        points: 146,
+        region: "AS/AU",
+        tiers: [
+            { mode: "Crystal", level: "LT2", type: "lt" },
+            { mode: "Sword", level: "HT3", type: "ht" },
+            { mode: "Axe", level: "LT3", type: "lt" }
+        ]
+    },
+    {
+        name: "signetxh",
+        rank: 2,
+        title: "Combat Specialist",
+        points: 98,
+        region: "AS/AU",
+        tiers: [
+            { mode: "Crystal", level: "LT2", type: "lt" },
+            { mode: "Axe", level: "HT3", type: "ht" }
+        ]
+    }
 ];
 
-const tableBody = document.getElementById('tableBody');
-const searchInput = document.getElementById('searchInput');
-
-function displayPlayers(filter = "") {
-    tableBody.innerHTML = "";
-    
-    const filtered = players.filter(p => 
-        p.name.toLowerCase().includes(filter.toLowerCase())
-    );
-
-    filtered.forEach(p => {
-        const row = `
-            <tr>
-                <td>${p.name}</td>
-                <td class="tier-${p.tier.toLowerCase()}">${p.tier}</td>
-                <td class="status-${p.status.toLowerCase()}">${p.status}</td>
-            </tr>
-        `;
-        tableBody.innerHTML += row;
-    });
+function render() {
+    const list = document.getElementById('playerList');
+    list.innerHTML = players.map(p => `
+        <div class="player-card">
+            <div class="rank-number">${p.rank}</div>
+            <img class="avatar" src="https://mc-heads.net/avatar/${p.name}">
+            <div class="player-info">
+                <div class="player-name">${p.name}</div>
+                <div class="player-title">✦ ${p.title}</div>
+            </div>
+            <div class="tiers-container">
+                ${p.tiers.map(t => `
+                    <div class="tier-dot tier-${t.type}">
+                        <span>${t.level}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
 }
 
-// Search functionality
-searchInput.addEventListener('input', (e) => {
-    displayPlayers(e.target.value);
-});
-
-// Initial load
-displayPlayers();
+render();
