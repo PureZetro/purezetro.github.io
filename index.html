@@ -1,25 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Player Tier List</title>
+    <meta charset="UTF-8">
+    <title>MCTiers Clone</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Competitive Tier List</h1>
-        <input type="text" id="searchInput" placeholder="Search for a player...">
-        
-        <table id="tierTable">
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>Tier</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                </tbody>
-        </table>
+    <div class="dashboard">
+        <header>
+            <div class="logo">🏆</div>
+            <nav>
+                <a href="#" class="active">Rankings</a>
+                <a href="#">Testers</a>
+                <a href="#">Guide</a>
+            </nav>
+        </header>
+
+        <div class="filter-bar">
+            <div class="stat-count">13,547 RANKED PLAYERS</div>
+            <input type="text" id="searchInput" placeholder="Search players...">
+        </div>
+
+        <div id="playerList" class="player-list">
+            </div>
     </div>
     <script src="script.js"></script>
 </body>
