@@ -1,68 +1,74 @@
-:root {
-    --bg-color: #0a0a0a;
-    --card-bg: #161616;
-    --text-main: #ffffff;
-    --text-dim: #a0a0a0;
-    --accent-gold: #ffb800;
-}
-
 body {
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    font-family: 'Inter', sans-serif;
-    margin: 0;
+  margin: 0;
+  font-family: Arial;
+  background: #1e1e2f;
+  color: white;
 }
 
-.dashboard {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px;
+#login {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
-header nav a {
-    color: var(--text-dim);
-    text-decoration: none;
-    margin-right: 20px;
-    font-weight: 600;
+input {
+  padding: 12px;
+  width: 250px;
+  border: none;
+  border-radius: 10px;
 }
 
-header nav a.active { color: white; border-bottom: 2px solid var(--accent-gold); }
-
-/* The Player Card */
-.player-card {
-    background: var(--card-bg);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    padding: 15px 25px;
-    margin-bottom: 10px;
-    transition: transform 0.2s;
-    border: 1px solid #222;
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: purple;
+  color: white;
+  cursor: pointer;
 }
 
-.player-card:hover { background: #1c1c1c; transform: scale(1.01); }
-
-.rank-number { width: 40px; font-weight: bold; color: var(--text-dim); }
-
-.avatar { width: 50px; height: 50px; border-radius: 8px; margin: 0 20px; }
-
-.player-info { flex-grow: 1; }
-.player-name { font-size: 1.1rem; font-weight: 700; }
-.player-title { font-size: 0.8rem; color: #b967ff; } /* Purple title like 'Combat Specialist' */
-
-/* Tier Bubbles */
-.tiers-container { display: flex; gap: 8px; }
-.tier-dot {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.6rem;
-    background: #252525;
+#app {
+  height: 100vh;
 }
 
-.tier-ht { border: 2px solid #ff4b4b; box-shadow: 0 0 10px rgba(255, 75, 75, 0.3); }
-.tier-lt { border: 2px solid #4bafff; }
+#sidebar {
+  width: 250px;
+  background: #2b2b40;
+  padding: 20px;
+}
+
+.friend {
+  background: #3a3a55;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+#chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.message {
+  background: #3a3a55;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+#bottom {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  background: #2b2b40;
+}
