@@ -1,271 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Learning Path</title>
-
+<title>Image Viewer</title>
 <style>
 body{
     margin:0;
-    font-family:Arial,sans-serif;
-    background:#dfe4ef;
+    background:black;
+    overflow:hidden;
 }
 
-.topbar{
-    background:white;
-    padding:15px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+#image{
+    width:100vw;
+    height:100vh;
+    object-fit:contain;
 }
 
-.logo{
-    font-size:40px;
-    color:#f58220;
-    font-weight:bold;
-}
-
-.container{
-    display:flex;
-    max-width:1400px;
-    margin:auto;
-}
-
-.sidebar{
-    width:220px;
-    padding:15px;
-}
-
-.card{
-    background:white;
-    border-radius:8px;
-    margin-bottom:15px;
-    padding:15px;
-    box-shadow:0 2px 4px rgba(0,0,0,.1);
-}
-
-.progress{
-    width:130px;
-    height:130px;
-    border:8px solid green;
-    border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    margin:auto;
-    color:green;
-    font-size:28px;
-    font-weight:bold;
-}
-
-.main{
-    flex:1;
-    padding:15px;
-}
-
-.lesson-area{
-    background:white;
-    border-radius:10px;
-    padding:20px;
-}
-
-.lesson{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:25px 10px;
-    border-bottom:1px solid #ddd;
-}
-
-.lesson-left{
-    display:flex;
-    align-items:center;
-    gap:20px;
-}
-
-.check{
-    width:55px;
-    height:55px;
-    border:4px solid green;
-    border-radius:50%;
-    color:green;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:30px;
-    font-weight:bold;
-}
-
-.lesson-title{
-    font-size:32px;
-}
-
-.complete{
-    color:green;
-    font-size:22px;
-    font-weight:bold;
-}
-
-.rightbar{
-    width:250px;
-    padding:15px;
-}
-
-.rank{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin:10px 0;
-}
-
-.avatar{
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    background:#89c;
+#upload{
+    position:fixed;
+    top:10px;
+    left:10px;
+    z-index:100;
 }
 </style>
 </head>
-
 <body>
 
-<div class="topbar">
-    <div class="logo">miacademy</div>
-    <div>769,414 Gold | Elan</div>
-</div>
+<input type="file" id="upload" accept="image/*">
 
-<div class="container">
+<img id="image">
 
-<div class="sidebar">
+<script>
+const upload = document.getElementById("upload");
+const image = document.getElementById("image");
 
-    <div class="card">
-        <h3>Today's Progress</h3>
-        <div class="progress">
-            250/50
-        </div>
-    </div>
+upload.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-</div>
+    const reader = new FileReader();
 
-<div class="main">
+    reader.onload = function(event){
+        image.src = event.target.result;
+    };
 
-<div class="lesson-area">
-
-<h1>Learning Path</h1>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Language Arts: Level E</div>
-    </div>
-    <div class="complete">4 / 4 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Reading Comprehension: Level F</div>
-    </div>
-    <div class="complete">1 / 1 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Language Arts: Level F</div>
-    </div>
-    <div class="complete">7 / 7 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Math: Level C</div>
-    </div>
-    <div class="complete">5 / 5 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Earth Science</div>
-    </div>
-    <div class="complete">5 / 5 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Life Science</div>
-    </div>
-    <div class="complete">6 / 6 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Physical Science</div>
-    </div>
-    <div class="complete">6 / 6 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Social Studies: Geography</div>
-    </div>
-    <div class="complete">5 / 5 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Spanish: Level 1</div>
-    </div>
-    <div class="complete">5 / 5 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Art</div>
-    </div>
-    <div class="complete">4 / 4 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Music</div>
-    </div>
-    <div class="complete">4 / 4 tasks completed</div>
-</div>
-
-<div class="lesson">
-    <div class="lesson-left">
-        <div class="check">✓</div>
-        <div class="lesson-title">Technology</div>
-    </div>
-    <div class="complete">4 / 4 tasks completed</div>
-</div>
-
-</div>
-</div>
-
-<div class="rightbar">
-    <div class="card">
-        <h2>Streak Secured!</h2>
-        <p>11 Day Streak</p>
-    </div>
-
-    <div class="card">
-        <h2>My Rank</h2>
-        <div class="rank"><div class="avatar"></div>Elan "MINECRAFT"</div>
-    </div>
-</div>
-
-</div>
+    reader.readAsDataURL(file);
+});
+</script>
 
 </body>
 </html>
