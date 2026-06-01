@@ -1,53 +1,271 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>FriendLink</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Path</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#dfe4ef;
+}
+
+.topbar{
+    background:white;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:40px;
+    color:#f58220;
+    font-weight:bold;
+}
+
+.container{
+    display:flex;
+    max-width:1400px;
+    margin:auto;
+}
+
+.sidebar{
+    width:220px;
+    padding:15px;
+}
+
+.card{
+    background:white;
+    border-radius:8px;
+    margin-bottom:15px;
+    padding:15px;
+    box-shadow:0 2px 4px rgba(0,0,0,.1);
+}
+
+.progress{
+    width:130px;
+    height:130px;
+    border:8px solid green;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:auto;
+    color:green;
+    font-size:28px;
+    font-weight:bold;
+}
+
+.main{
+    flex:1;
+    padding:15px;
+}
+
+.lesson-area{
+    background:white;
+    border-radius:10px;
+    padding:20px;
+}
+
+.lesson{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:25px 10px;
+    border-bottom:1px solid #ddd;
+}
+
+.lesson-left{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.check{
+    width:55px;
+    height:55px;
+    border:4px solid green;
+    border-radius:50%;
+    color:green;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+    font-weight:bold;
+}
+
+.lesson-title{
+    font-size:32px;
+}
+
+.complete{
+    color:green;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.rightbar{
+    width:250px;
+    padding:15px;
+}
+
+.rank{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:10px 0;
+}
+
+.avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:#89c;
+}
+</style>
 </head>
 
 <body>
 
-<div id="login">
-
-  <h1>FriendLink</h1>
-
-  <input type="text" id="username" placeholder="Username">
-
-  <button onclick="login()">Create Account</button>
-
+<div class="topbar">
+    <div class="logo">miacademy</div>
+    <div>769,414 Gold | Elan</div>
 </div>
 
-<div id="app" style="display:none;">
+<div class="container">
 
-  <div id="sidebar">
+<div class="sidebar">
 
-    <h2 id="name"></h2>
-
-    <h3>Friends</h3>
-
-    <div class="friend">Alex</div>
-    <div class="friend">Jay</div>
-    <div class="friend">Luna</div>
-
-  </div>
-
-  <div id="chat">
-
-    <div id="messages"></div>
-
-    <div id="bottom">
-
-      <input type="text" id="messageInput" placeholder="Message">
-
-      <button onclick="sendMessage()">Send</button>
-
+    <div class="card">
+        <h3>Today's Progress</h3>
+        <div class="progress">
+            250/50
+        </div>
     </div>
 
-  </div>
-
 </div>
 
-<script src="script.js"></script>
+<div class="main">
+
+<div class="lesson-area">
+
+<h1>Learning Path</h1>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Language Arts: Level E</div>
+    </div>
+    <div class="complete">4 / 4 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Reading Comprehension: Level F</div>
+    </div>
+    <div class="complete">1 / 1 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Language Arts: Level F</div>
+    </div>
+    <div class="complete">7 / 7 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Math: Level C</div>
+    </div>
+    <div class="complete">5 / 5 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Earth Science</div>
+    </div>
+    <div class="complete">5 / 5 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Life Science</div>
+    </div>
+    <div class="complete">6 / 6 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Physical Science</div>
+    </div>
+    <div class="complete">6 / 6 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Social Studies: Geography</div>
+    </div>
+    <div class="complete">5 / 5 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Spanish: Level 1</div>
+    </div>
+    <div class="complete">5 / 5 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Art</div>
+    </div>
+    <div class="complete">4 / 4 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Music</div>
+    </div>
+    <div class="complete">4 / 4 tasks completed</div>
+</div>
+
+<div class="lesson">
+    <div class="lesson-left">
+        <div class="check">✓</div>
+        <div class="lesson-title">Technology</div>
+    </div>
+    <div class="complete">4 / 4 tasks completed</div>
+</div>
+
+</div>
+</div>
+
+<div class="rightbar">
+    <div class="card">
+        <h2>Streak Secured!</h2>
+        <p>11 Day Streak</p>
+    </div>
+
+    <div class="card">
+        <h2>My Rank</h2>
+        <div class="rank"><div class="avatar"></div>Elan "MINECRAFT"</div>
+    </div>
+</div>
+
+</div>
 
 </body>
 </html>
