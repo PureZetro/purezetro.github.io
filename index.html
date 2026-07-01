@@ -11,53 +11,47 @@
 <body>
 
 <div class="bg"></div>
+<div class="particles"></div>
 
-<div class="container">
-
-    <div class="hero">
-        <h1>☄️ Comet Client</h1>
-        <p>The next generation Minecraft PvP client. Smooth. Fast. Clean.</p>
-
-        <div class="buttons">
-            <a href="#download" class="btn primary">Download</a>
-            <a href="#features" class="btn">Features</a>
-            <a href="#about" class="btn">About</a>
-        </div>
+<nav class="nav">
+    <div class="logo">☄️ Comet</div>
+    <div class="links">
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
     </div>
+</nav>
 
-    <section id="features">
-        <h2>🔥 Features</h2>
+<header id="home" class="hero reveal">
+    <h1>Comet Client</h1>
+    <p>Fast. Clean. Competitive Minecraft PvP Client.</p>
+    <a class="bigbtn" href="#download">Get Started</a>
+</header>
 
-        <div class="grid">
-            <div class="card">⚡ FPS Boost</div>
-            <div class="card">🎯 Better PvP HUD</div>
-            <div class="card">🎮 Custom Mods</div>
-            <div class="card">🧠 Smart UI Design</div>
-            <div class="card">🖥️ Clean Interface</div>
-            <div class="card">🚀 Fast Launch</div>
-        </div>
-    </section>
+<section id="features" class="section reveal">
+    <h2>🔥 Features</h2>
 
-    <section id="about">
-        <h2>📦 About</h2>
-        <p>
-            Comet Client is built for competitive Minecraft players who want performance,
-            style, and control. No laggy junk. Just clean gameplay.
-        </p>
-    </section>
+    <div class="cards">
+        <div class="card">⚡ FPS Boost</div>
+        <div class="card">🎯 PvP HUD</div>
+        <div class="card">🧠 Smart UI</div>
+        <div class="card">🚀 Fast Launch</div>
+        <div class="card">🎮 Mods Support</div>
+        <div class="card">🖥️ Clean Design</div>
+    </div>
+</section>
 
-    <section id="download">
-        <h2>⬇️ Download</h2>
-        <p>Click below to get the latest version.</p>
+<section id="download" class="section reveal">
+    <h2>⬇️ Download</h2>
+    <p>Get the latest version of Comet Client.</p>
 
-        <button onclick="downloadClient()" class="download-btn">
-            Download Comet Client
-        </button>
+    <button class="download" onclick="downloadClient()">Download</button>
+    <p id="status"></p>
+</section>
 
-        <p id="status"></p>
-    </section>
-
-</div>
+<footer>
+    <p>© 2026 Comet Client. All rights reserved.</p>
+</footer>
 
 <script src="script.js"></script>
 </body>
