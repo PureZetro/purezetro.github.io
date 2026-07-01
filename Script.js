@@ -1,16 +1,28 @@
+// download button fake action
 function downloadClient() {
     const status = document.getElementById("status");
-
     status.innerHTML = "Preparing download...";
 
     setTimeout(() => {
-        status.innerHTML = "Download started!";
+        status.innerHTML = "Starting download...";
 
-        // fake file download (replace with real link later)
-        const link = document.createElement("a");
-        link.href = "https://example.com";
-        link.download = "CometClient.zip";
-        link.click();
+        const a = document.createElement("a");
+        a.href = "https://example.com";
+        a.download = "CometClient.zip";
+        a.click();
 
-    }, 1500);
+    }, 1200);
 }
+
+// ✨ scroll reveal animation (THIS fixes "nothing cool")
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+        }
+    });
+});
+
+document.querySelectorAll(".reveal").forEach(el => {
+    observer.observe(el);
+});
