@@ -3,109 +3,163 @@
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
+    scroll-behavior: smooth;
 }
 
 body {
     color: white;
-    overflow-x: hidden;
     background: black;
+    overflow-x: hidden;
 }
 
-/* animated background */
+/* 🌌 animated background */
 .bg {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at top, #1a1a2e, #000);
-    animation: move 10s infinite alternate;
+    background: radial-gradient(circle at top, #0f172a, #000);
+    animation: glow 8s infinite alternate;
+    z-index: -2;
+}
+
+@keyframes glow {
+    0% { filter: hue-rotate(0deg) brightness(1); }
+    100% { filter: hue-rotate(90deg) brightness(1.2); }
+}
+
+/* ✨ floating particles */
+.particles {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(white 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.05;
+    animation: movebg 20s linear infinite;
     z-index: -1;
 }
 
-@keyframes move {
-    0% { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(60deg); }
+@keyframes movebg {
+    from { transform: translateY(0px); }
+    to { transform: translateY(-200px); }
 }
 
-/* center layout */
-.container {
+/* NAV */
+.nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 40px;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+}
+
+.nav a {
+    color: white;
+    margin-left: 15px;
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+.nav a:hover {
+    opacity: 1;
+}
+
+/* HERO */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    padding: 60px 20px;
 }
 
-/* hero */
 .hero h1 {
-    font-size: 60px;
-    margin-bottom: 10px;
+    font-size: 70px;
+    animation: pop 1s ease;
 }
 
 .hero p {
-    opacity: 0.8;
-    margin-bottom: 20px;
+    opacity: 0.7;
+    margin: 10px 0;
 }
 
-/* buttons */
-.buttons {
+.bigbtn {
     margin-top: 20px;
-}
-
-.btn {
-    display: inline-block;
-    padding: 12px 20px;
-    margin: 5px;
-    border: 1px solid white;
+    padding: 12px 25px;
+    background: #6c5ce7;
+    border-radius: 10px;
     color: white;
     text-decoration: none;
-    border-radius: 8px;
     transition: 0.3s;
 }
 
-.btn:hover {
-    background: white;
-    color: black;
+.bigbtn:hover {
+    transform: scale(1.1);
 }
 
-.primary {
-    background: #6c5ce7;
-    border: none;
+/* SECTIONS */
+.section {
+    padding: 100px 20px;
+    text-align: center;
 }
 
-/* sections */
-section {
-    margin-top: 80px;
-}
-
-h2 {
-    margin-bottom: 20px;
-}
-
-/* feature grid */
-.grid {
+/* CARDS */
+.cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 15px;
-    max-width: 800px;
+    max-width: 900px;
     margin: auto;
+    margin-top: 30px;
 }
 
 .card {
     background: rgba(255,255,255,0.05);
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.3s;
 }
 
-/* download button */
-.download-btn {
+.card:hover {
+    transform: translateY(-8px);
+    background: rgba(255,255,255,0.1);
+}
+
+/* DOWNLOAD BUTTON */
+.download {
+    margin-top: 20px;
     padding: 15px 25px;
-    font-size: 16px;
     border: none;
     border-radius: 10px;
-    background: #00d2ff;
-    color: black;
+    background: cyan;
     cursor: pointer;
-    margin-top: 15px;
+    font-size: 16px;
 }
 
-.download-btn:hover {
-    background: #00aaff;
+.download:hover {
+    transform: scale(1.05);
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 40px;
+    opacity: 0.6;
+}
+
+/* 🔥 SCROLL ANIMATIONS */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 0.8s ease;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
 }
