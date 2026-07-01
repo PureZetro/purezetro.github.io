@@ -1,1 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  background: radial-gradient(circle at top, #0a0a0f, #000);
+  color: white;
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  padding: 20px;
+}
+
+.sidebar h2 {
+  color: #7c3aed;
+}
+
+.sidebar a {
+  display: block;
+  color: #aaa;
+  text-decoration: none;
+  margin: 15px 0;
+  transition: 0.2s;
+}
+
+.sidebar a:hover {
+  color: white;
+  transform: translateX(5px);
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 30px;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  gap: 10px;
+}
+
+.topbar input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255,255,255,0.05);
+  color: white;
+}
+
+.topbar button {
+  padding: 12px 18px;
+  background: #7c3aed;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+/* Hero */
+.hero {
+  margin-top: 40px;
+}
+
+.hero h1 {
+  font-size: 42px;
+  background: linear-gradient(90deg, #7c3aed, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Grid */
+.grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 20px;
+  border-radius: 15px;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: #7c3aed;
+  box-shadow: 0 0 25px rgba(124,58,237,0.3);
+}
+
+.card button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #06b6d4;
+  color: black;
+  cursor: pointer;
+}
