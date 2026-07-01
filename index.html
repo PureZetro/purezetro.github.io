@@ -1,1 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comet Client</title>
 
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<div class="container">
+
+    <div class="hero">
+        <h1>☄️ Comet Client</h1>
+        <p>The next generation Minecraft PvP client. Smooth. Fast. Clean.</p>
+
+        <div class="buttons">
+            <a href="#download" class="btn primary">Download</a>
+            <a href="#features" class="btn">Features</a>
+            <a href="#about" class="btn">About</a>
+        </div>
+    </div>
+
+    <section id="features">
+        <h2>🔥 Features</h2>
+
+        <div class="grid">
+            <div class="card">⚡ FPS Boost</div>
+            <div class="card">🎯 Better PvP HUD</div>
+            <div class="card">🎮 Custom Mods</div>
+            <div class="card">🧠 Smart UI Design</div>
+            <div class="card">🖥️ Clean Interface</div>
+            <div class="card">🚀 Fast Launch</div>
+        </div>
+    </section>
+
+    <section id="about">
+        <h2>📦 About</h2>
+        <p>
+            Comet Client is built for competitive Minecraft players who want performance,
+            style, and control. No laggy junk. Just clean gameplay.
+        </p>
+    </section>
+
+    <section id="download">
+        <h2>⬇️ Download</h2>
+        <p>Click below to get the latest version.</p>
+
+        <button onclick="downloadClient()" class="download-btn">
+            Download Comet Client
+        </button>
+
+        <p id="status"></p>
+    </section>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
