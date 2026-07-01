@@ -1,0 +1,142 @@
+{
+  "name": "SiteContent",
+  "type": "object",
+  "properties": {
+    "hero_title": {
+      "type": "string"
+    },
+    "hero_subtitle": {
+      "type": "string"
+    },
+    "hero_description": {
+      "type": "string"
+    },
+    "hero_stat1_value": {
+      "type": "string"
+    },
+    "hero_stat1_label": {
+      "type": "string"
+    },
+    "hero_stat2_value": {
+      "type": "string"
+    },
+    "hero_stat2_label": {
+      "type": "string"
+    },
+    "hero_stat3_value": {
+      "type": "string"
+    },
+    "hero_stat3_label": {
+      "type": "string"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "stat": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cosmetics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "rarity": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "socials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "members": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "changelog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "footer_text": {
+      "type": "string"
+    }
+  }
+}
